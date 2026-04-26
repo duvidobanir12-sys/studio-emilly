@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#c9184a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Studio ES">
+    <meta name="application-name" content="Studio ES">
+    <meta name="description" content="Relatórios e estatísticas - Studio Emilly Santos">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="apple-touch-icon" href="favicon.svg">
+    <meta property="og:title" content="Relatórios · Studio Emilly Santos">
+    <meta property="og:description" content="Dashboard de atendimentos - Studio Emilly Santos">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="favicon.svg">
+    <title>Relatórios · Studio Emilly Santos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+:root {
+  --rose:#d45c7a; --rose-light:#f7c5d2; --rose-dark:#a83055;
+  --blush:#fce8ef; --cream:#fff5f8; --text:#3a1a24; --muted:#9a6475;
+  --white:#ffffff; --green:#1a7a3c; --green-bg:#e0f7e9; --red:#c0392b; --red-bg:#fce4e1; --orange:#b45309; --orange-bg:#fff3e0; --purple:#7c3aed; --purple-bg:#ede9fe;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
+
+/* ── Tela de login ── */
+.login-screen{position:fixed;inset:0;background:var(--cream);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+.login-screen.hidden{display:none;}
+.login-box{background:var(--white);border-radius:20px;padding:40px 32px;text-align:center;box-shadow:0 8px 40px rgba(168,48,85,.18);border:1.5px solid var(--rose-light);max-width:320px;width:90%;}
+.login-logo{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--rose-dark),var(--rose));display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:#fff;margin:0 auto 16px;box-shadow:0 6px 20px rgba(168,48,85,.3);}
+.login-box h2{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--rose-dark);margin-bottom:6px;}
+.login-box p{font-size:12px;color:var(--muted);margin-bottom:16px;}
+.login-box input{text-align:center;letter-spacing:6px;font-size:24px;font-weight:700;padding:12px;border:1.5px solid var(--rose-light);border-radius:12px;width:100%;outline:none;font-family:'DM Sans',sans-serif;color:var(--rose-dark);}
+.login-box input:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(212,92,122,.12);}
+.login-err{font-size:12px;color:var(--red);margin-top:8px;display:none;}
+.login-btn{margin-top:12px;padding:12px;width:100%;background:linear-gradient(135deg,var(--rose-dark),var(--rose));color:#fff;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
+.login-set-pw{margin-top:16px;font-size:11px;color:var(--muted);}
+.login-set-pw a{color:var(--rose);cursor:pointer;text-decoration:underline;}
+
+h1{text-align:center;font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--rose-dark);margin-top:24px;margin-bottom:4px;position:relative;}
+.subtitle{text-align:center;font-size:12px;color:var(--muted);margin-bottom:20px;}
+.btn-logout{position:fixed;top:16px;right:16px;background:var(--white);border:1.5px solid var(--rose-light);border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer;display:none;align-items:center;justify-content:center;color:var(--muted);}
+.btn-logout:hover{background:var(--blush);color:var(--rose-dark);}
+
+/* ── Main content ── */
+.dashboard{padding:0 20px 60px;max-width:780px;margin:0 auto;}
+
+/* ── Period Filter Bar ── */
+.filter-bar{background:var(--white);border-radius:14px;padding:16px 18px;box-shadow:0 4px 20px rgba(212,92,122,.13);border:1.5px solid var(--rose-light);margin-bottom:18px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px;}
+.filter-bar label{display:block;font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.filter-bar select,.filter-bar input[type="date"]{padding:8px 10px;border:1.5px solid var(--rose-light);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:12px;background:var(--cream);color:var(--text);outline:none;}
+.filter-bar select:focus,.filter-bar input[type="date"]:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(212,92,122,.12);}
+
+/* ── Summary Cards ── */
+.summary-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:18px;}
+.scard{background:var(--white);border-radius:12px;padding:14px 14px;box-shadow:0 4px 20px rgba(212,92,122,.13);border:1.5px solid var(--rose-light);text-align:center;}
+.scard strong{display:block;font-size:20px;color:var(--rose-dark);font-weight:700;}
+.scard small{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.scard-delta{display:flex;justify-content:center;margin-top:4px;font-size:11px;font-weight:600;}
+.delta-up{color:var(--green);}
+.delta-down{color:var(--red);}
+.delta-neutral{color:var(--muted);}
+
+/* ── Card ── */
+.card{background:var(--white);border-radius:14px;padding:20px;box-shadow:0 4px 24px rgba(212,92,122,.13);border:1.5px solid var(--rose-light);margin-bottom:22px;}
+.card h2{font-size:14px;color:var(--rose-dark);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.card h2::before{content:'✦';color:var(--rose);font-size:10px;}
+
+.chart-container{position:relative;width:100%;max-width:600px;margin:0 auto;}
+canvas{max-width:100%;}
+
+/* ── Top Services ── */
+.top-services{display:flex;flex-direction:column;gap:8px;}
+.top-svc{display:flex;align-items:center;gap:10px;}
+.top-svc-name{font-size:13px;width:150px;}
+.top-svc-bar{flex:1;background:var(--cream);border-radius:50px;height:10px;overflow:hidden;}
+.top-svc-fill{height:100%;background:linear-gradient(90deg,var(--rose-dark),var(--rose));border-radius:50px;transition:width .6s;}
+.top-svc-count{font-size:12px;color:var(--muted);width:60px;text-align:right;}
+
+/* ── Top Clients ── */
+.top-client{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--blush);}
+.top-client:last-child{border-bottom:none;}
+.top-client-pos{width:24px;height:24px;border-radius:50%;background:var(--rose);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.top-client-name{flex:1;font-size:13px;font-weight:600;}
+.top-client-val{font-size:13px;font-weight:700;color:var(--rose-dark);}
+
+/* ── Clientes Sumidos ── */
+.ghost-list{display:flex;flex-direction:column;gap:8px;}
+.ghost-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--orange-bg);border-radius:10px;border-left:3px solid var(--orange);}
+.ghost-item-name{font-weight:600;font-size:13px;flex:1;}
+.ghost-item-days{font-size:12px;color:var(--orange);font-weight:600;}
+
+/* ── Table ── */
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{background:rgba(168,48,85,.06);padding:8px 10px;text-align:left;font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);}
+td{padding:8px 10px;border-bottom:1px solid var(--blush);}
+tr:hover{background:var(--cream);}
+
+/* ── Buttons ── */
+.btn{padding:11px 22px;border-radius:11px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+.btn-rose{background:linear-gradient(135deg,var(--rose-dark),var(--rose));color:#fff;box-shadow:0 4px 16px rgba(212,92,122,.3);}
+.btn-rose:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(212,92,122,.38);}
+.btn-outline{background:var(--white);border:1.5px solid var(--rose-light);color:var(--rose-dark);}
+.btn-outline:hover{background:var(--blush);}
+
+.loading{text-align:center;padding:60px 20px;color:var(--muted);}
+.loading .spinner{width:24px;height:24px;border:3px solid var(--rose-light);border-top-color:var(--rose);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.empty{text-align:center;padding:30px;color:var(--muted);font-size:13px;}
+
+/* ── Responsive ── */
+@media(max-width:600px){
+    .filter-bar{flex-direction:column;align-items:stretch;}
+    .summary-row{grid-template-columns:1fr 1fr;}
+    .top-svc-name{width:100px;}
+    h1{font-size:26px;}
+}
+    </style>
+</head>
+<body>
+
+<!-- ── Tela de senha ── -->
+<div class="login-screen" id="login-screen">
+    <div class="login-box">
+        <div class="login-logo">ES</div>
+        <h2>Relatórios</h2>
+        <p>Digite o PIN para acessar</p>
+        <input type="password" id="pin-input" inputmode="numeric" maxlength="8" placeholder="****" autocomplete="off" onkeydown="if(event.key==='Enter')verificarPIN()">
+        <button class="login-btn" onclick="verificarPIN()">Acessar</button>
+        <p class="login-err" id="pin-err">PIN incorreto</p>
+        <div class="login-set-pw"><a onclick="configurarPIN()">Configurar PIN</a></div>
+    </div>
+</div>
+
+<button class="btn-logout" id="btn-logout" onclick="fazerLogout()" title="Sair">✕</button>
+
+<!-- ── Dashboard ── -->
+<div class="dashboard" id="dashboard">
+    <h1>Relatórios</h1>
+    <p class="subtitle">Dashboard de atendimentos — Studio Emilly Santos</p>
+
+    <div class="filter-bar">
+        <div>
+            <label>Período</label>
+            <select id="periodo-tipo" onchange="togglePeriodo()">
+                <option value="mes">Este mês</option>
+                <option value="personalizado">Personalizado</option>
+            </select>
+        </div>
+        <div id="mes-select-wrap">
+            <label>Mês</label>
+            <select id="mes-filtro" onchange="renderTudo()"><option value="todos">Todos</option></select>
+        </div>
+        <div id="range-wrap" style="display:none;">
+            <label>De</label>
+            <input type="date" id="data-de" onchange="renderTudo()">
+        </div>
+        <div id="range-wrap2" style="display:none;">
+            <label>Até</label>
+            <input type="date" id="data-ate" onchange="renderTudo()">
+        </div>
+    </div>
+
+    <div class="summary-row" id="summary">
+        <div class="scard"><strong id="total-receita">-</strong><small>Receita</small><div class="scard-delta" id="delta-receita"></div></div>
+        <div class="scard"><strong id="total-atend">-</strong><small>Atendimentos</small><div class="scard-delta" id="delta-atend"></div></div>
+        <div class="scard"><strong id="ticket-medio">-</strong><small>Ticket médio</small></div>
+        <div class="scard"><strong id="client-uniq">-</strong><small>Clientes</small></div>
+    </div>
+
+    <div class="card">
+        <h2>Atendimentos por Mês</h2>
+        <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
+    </div>
+
+    <div class="card">
+        <h2>Receita Mensal</h2>
+        <div class="chart-container"><canvas id="revenueChart"></canvas></div>
+    </div>
+
+    <div class="card">
+        <h2>Dia da Semana mais movimentado</h2>
+        <div class="chart-container"><canvas id="dowChart"></canvas></div>
+    </div>
+
+    <div class="card">
+        <h2>Serviços Mais Pedidos</h2>
+        <div class="top-services" id="top-servicos"></div>
+    </div>
+
+    <div class="card">
+        <h2>Serviço mais lucrativo (por faturamento)</h2>
+        <div class="top-services" id="top-servicos-receita"></div>
+    </div>
+
+    <div class="card">
+        <h2>Top Clientes por Receita</h2>
+        <div id="top-clientes"></div>
+    </div>
+
+    <div class="card">
+        <h2>Clientes que não voltam há 30+ dias</h2>
+        <div class="ghost-list" id="clientes-sumidos"></div>
+    </div>
+
+    <div class="card">
+        <h2>Detalhamento</h2>
+        <div style="overflow-x:auto;" id="tabela-container"><div class="loading"><div class="spinner"></div>Carregando dados...</div></div>
+    </div>
+
+    <div style="display:flex;gap:12px;justify-content:center;">
+        <button class="btn btn-outline" onclick="exportarCSV()">Exportar CSV</button>
+        <button class="btn btn-rose" onclick="printPDF()">📄 Salvar PDF</button>
+    </div>
+</div>
+
+<script>
+// ═══ CONFIGURAÇÕES FIREBASE ═══
+const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyDBr3kQaZj_g_gxJ_h2f2zWv5C_-K9yEts",
+    authDomain: "studio-emilly.firebaseapp.com",
+    databaseURL: "https://studio-emilly-default-rtdb.firebaseio.com",
+    projectId: "studio-emilly",
+    storageBucket: "studio-emilly.appspot.com",
+    messagingSenderId: "360676621995",
+    appId: "1:360676621995:web:c0d9e78fea71c99ffc3e30"
+};
+
+const PIN_STORAGE = 'emilly_rel_pin';
+let registros = [];
+let charts = {};
+const MESES_FULL = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DIAS_SEM = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+const DIAS_SHORT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+// ═══ PIN / AUTH ═══
+function configurarPIN(){
+    const pin = prompt('Defina um PIN de 4 dígitos:');
+    if(pin && /^\d{4}$/.test(pin)){
+        localStorage.setItem(PIN_STORAGE, pin);
+        alert('PIN configurado!');
+        document.getElementById('pin-input').value = '';
+        document.getElementById('pin-err').style.display = 'none';
+    } else if(pin) {
+        alert('Digite exatamente 4 dígitos.');
+    }
+}
+
+function verificarPIN(){
+    const pin = localStorage.getItem(PIN_STORAGE);
+    const val = document.getElementById('pin-input').value;
+    if(!pin){
+        // Se não tem PIN, libera mesmo assim
+        liberarAcesso(); return;
+    }
+    if(val === pin){ liberarAcesso(); }
+    else {
+        document.getElementById('pin-err').style.display = 'block';
+        document.getElementById('pin-input').value = '';
+    }
+}
+
+function liberarAcesso(){
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('btn-logout').style.display = localStorage.getItem(PIN_STORAGE) ? 'flex' : 'none';
+}
+
+function fazerLogout(){
+    document.getElementById('login-screen').classList.remove('hidden');
+    document.getElementById('pin-input').value = '';
+}
+
+// Verifica se já tem sessão
+(function(){
+    const sessao = localStorage.getItem('emilly_rel_sessao');
+    if(sessao === 'ok'){ liberarAcesso(); }
+    else if(!localStorage.getItem(PIN_STORAGE)){ liberarAcesso(); }
+})();
+
+// Marca sessão quando logar
+const _origLiberar = liberarAcesso;
+window.liberarAcesso = function(){ _origLiberar(); localStorage.setItem('emilly_rel_sessao','ok'); };
+window.fazerLogout = function(){ document.getElementById('login-screen').classList.remove('hidden'); document.getElementById('pin-input').value=''; localStorage.removeItem('emilly_rel_sessao'); };
+
+
+// ═══ UTILS ═══
+function fmt(v){ return 'R$ '+v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
+function nomeMesLabel(m){ const [y,mm]=m.split('-'); return MESES_FULL[parseInt(mm)-1]+' '+y; }
+function fmtData(d){ if(!d) return '–'; const [y,m,dd]=d.split('-'); return `${dd}/${m}/${y}`; }
+
+function getFiltrados(){
+    const tipo = document.getElementById('periodo-tipo').value;
+    if(tipo === 'personalizado'){
+        const de = document.getElementById('data-de').value;
+        const ate = document.getElementById('data-ate').value;
+        if(de && ate) return registros.filter(r=>r.data>=de && r.data<=ate);
+        if(de) return registros.filter(r=>r.data>=de);
+        if(ate) return registros.filter(r=>r.data<=ate);
+    }
+    const v = document.getElementById('mes-filtro').value;
+    return v==='todos' ? registros : registros.filter(r=>r.data.startsWith(v));
+}
+
+function getPeriodoAnterior(fil){
+    if(!fil.length) return [];
+    const tipo = document.getElementById('periodo-tipo').value;
+    const datas = fil.map(r=>r.data).sort();
+    const min = datas[0], max = datas[datas.length-1];
+    const dur = (new Date(max)-new Date(min)) || 30*86400000;
+    const de = new Date(new Date(min).getTime()-dur);
+    const ate = new Date(new Date(min).getTime()-86400000);
+    return registros.filter(r=>{
+        const d = r.data;
+        return d >= de.toISOString().slice(0,10) && d <= ate.toISOString().slice(0,10);
+    });
+}
+
+function togglePeriodo(){
+    const sel = document.getElementById('periodo-tipo').value;
+    const showRange = sel==='personalizado';
+    document.getElementById('mes-select-wrap').style.display = showRange?'none':'';
+    document.getElementById('range-wrap').style.display = showRange?'':'none';
+    document.getElementById('range-wrap2').style.display = showRange?'':'none';
+    renderTudo();
+}
+
+// ═══ CONEXÃO FIREBASE ═══
+import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({initializeApp})=>{
+    import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js').then(({getDatabase, ref, onValue})=>{
+        const app = initializeApp(FIREBASE_CONFIG);
+        const db = getDatabase(app);
+        onValue(ref(db,'registros'), snap=>{
+            registros = [];
+            snap.forEach(child=>{ registros.push(child.val()); });
+            registros.sort((a,b)=>a.data.localeCompare(b.data)||(a.hinicio||'').localeCompare(b.hinicio||''));
+            onReady();
+        });
+    });
+}).catch(()=>{ setTimeout(()=>{ if(!registros.length) alert('Não foi possível conectar ao Firebase.'); },5000); });
+
+function onReady(){
+    // Set default date range
+    const hoje = new Date().toISOString().slice(0,10);
+    const mes = new Date(); mes.setMonth(mes.getMonth()-1);
+    const mesPassado = mes.toISOString().slice(0,10);
+    document.getElementById('data-de').value = mesPassado;
+    document.getElementById('data-ate').value = hoje;
+    buildMesFiltro();
+    renderTudo();
+}
+
+function buildMesFiltro(){
+    const sel=document.getElementById('mes-filtro');
+    const meses=[...new Set(registros.map(r=>r.data.slice(0,7)))].sort().reverse();
+    sel.innerHTML = '<option value="todos">Todos</option>' + meses.map(m=>{
+        const [y,mm]=m.split('-'); return `<option value="${m}">${MESES_FULL[parseInt(mm)-1]} ${y}</option>`;
+    }).join('');
+}
+
+// ═══ RENDER ═══
+function renderTudo(){
+    if(!registros.length) return;
+    buildMesFiltro();
+    const fil = getFiltrados();
+    const anterior = getPeriodoAnterior(fil);
+    renderSummary(fil, anterior);
+    renderMonthlyChart();
+    renderRevenueChart();
+    renderDowChart(fil);
+    renderServicos(fil);
+    renderServicosReceita(fil);
+    renderTopClientes(fil);
+    renderClientesSumidos(fil);
+    renderTabela(fil);
+}
+
+function deltaHTML(atual, anterior){
+    if(!anterior) return '';
+    const diff = anterior!==0 ? ((atual-anterior)/Math.abs(anterior)*100).toFixed(0) : 0;
+    if(diff > 0) return `<span class="delta-up">▲ +${diff}%</span>`;
+    if(diff < 0) return `<span class="delta-down">▼ ${diff}%</span>`;
+    return `<span class="delta-neutral">— 0%</span>`;
+}
+
+function renderSummary(fil, anterior){
+    const receita = fil.reduce((s,r)=>s+parseFloat(r.valor||0),0);
+    const antReceita = anterior.reduce((s,r)=>s+parseFloat(r.valor||0),0);
+    const clientes = new Set(fil.map(r=>r.nome.toLowerCase()));
+    const media = fil.length ? receita/fil.length : 0;
+    document.getElementById('total-atend').textContent = fil.length;
+    document.getElementById('delta-atend').innerHTML = deltaHTML(fil.length, anterior.length);
+    document.getElementById('total-receita').textContent = fmt(receita);
+    document.getElementById('delta-receita').innerHTML = deltaHTML(receita, antReceita);
+    document.getElementById('ticket-medio').textContent = fmt(media);
+    document.getElementById('client-uniq').textContent = clientes.size;
+}
+
+function aggregatePorMes(){
+    const mapa={};
+    registros.forEach(r=>{
+        const m=r.data.slice(0,7);
+        if(!mapa[m]) mapa[m]={count:0,receita:0};
+        mapa[m].count++; mapa[m].receita+=parseFloat(r.valor||0);
+    });
+    const keys=Object.keys(mapa).sort();
+    return {keys,dados:keys.map(k=>mapa[k])};
+}
+
+function renderMonthlyChart(){
+    const {keys,dados}=aggregatePorMes();
+    const labels=keys.map(k=>nomeMesLabel(k));
+    if(charts.monthly) charts.monthly.destroy();
+    charts.monthly=new Chart(document.getElementById('monthlyChart').getContext('2d'),{
+        type:'bar',
+        data:{labels,datasets:[{label:'Atendimentos',data:dados.map(d=>d.count),backgroundColor:'rgba(212,92,122,.5)',borderColor:'rgba(212,92,122,1)',borderWidth:1,borderRadius:8}]},
+        options:{responsive:true,maintainAspectRatio:true,scales:{y:{beginAtZero:true,ticks:{stepSize:1}},x:{grid:{display:false}}},plugins:{legend:{display:false}}}
+    });
+}
+
+function renderRevenueChart(){
+    const {keys,dados}=aggregatePorMes();
+    const labels=keys.map(k=>nomeMesLabel(k));
+    if(charts.revenue) charts.revenue.destroy();
+    charts.revenue=new Chart(document.getElementById('revenueChart').getContext('2d'),{
+        type:'line',
+        data:{labels,datasets:[{label:'Receita (R$)',data:dados.map(d=>d.receita),borderColor:'#a83055',backgroundColor:'rgba(212,92,122,.08)',fill:true,tension:.35,pointBackgroundColor:'#a83055',pointRadius:5}]},
+        options:{responsive:true,maintainAspectRatio:true,scales:{y:{beginAtZero:true,ticks:{callback:v=>'R$ '+v.toFixed(2).replace('.',',')}},x:{grid:{display:false}}},plugins:{legend:{position:'bottom'}}}
+    });
+}
+
+function renderDowChart(fil){
+    const mapa={};
+    fil.forEach(r=>{ const d=new Date(r.data+'T12:00:00'); const dow=d.getDay(); mapa[dow]=(mapa[dow]||0)+1; });
+    const keys=[0,1,2,3,4,5,6].filter(k=>mapa[k]!==undefined);
+    const labels=keys.map(k=>DIAS_SHORT[k]);
+    const dados=keys.map(k=>mapa[k]);
+    if(charts.dow) charts.dow.destroy();
+    if(!dados.length){ document.getElementById('dowChart').parentElement.querySelector('h2').nextElementSibling.innerHTML='<div class="empty">Sem dados neste período.</div>'; return; }
+    charts.dow=new Chart(document.getElementById('dowChart').getContext('2d'),{
+        type:'polarArea',
+        data:{labels,datasets:[{data:dados,backgroundColor:['rgba(212,92,122,.5)','rgba(124,58,237,.5)','rgba(247,197,210,.5)','rgba(249,215,228,.5)','rgba(168,48,85,.5)','rgba(253,242,246,.5)','rgba(134,239,172,.5)']}]},
+        options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'bottom',labels:{padding:12}}}}
+    });
+}
+
+function renderServicos(fil){
+    const svcs={};
+    fil.forEach(r=>{ svcs[r.proc]=(svcs[r.proc]||0)+1; });
+    const sorted=Object.entries(svcs).sort((a,b)=>b[1]-a[1]);
+    const max=sorted.length?sorted[0][1]:1;
+    document.getElementById('top-servicos').innerHTML = sorted.length ? sorted.map(([nome,n])=>`
+        <div class="top-svc">
+            <div class="top-svc-name">${nome}</div>
+            <div class="top-svc-bar"><div class="top-svc-fill" style="width:${Math.round(n/max*100)}%"></div></div>
+            <div class="top-svc-count">${n}x</div>
+        </div>`).join('') : '<div class="empty">Nenhum atendimento.</div>';
+}
+
+function renderServicosReceita(fil){
+    const svcs={};
+    fil.forEach(r=>{ svcs[r.proc]=(svcs[r.proc]||0)+parseFloat(r.valor||0); });
+    const sorted=Object.entries(svcs).sort((a,b)=>b[1]-a[1]);
+    const max=sorted.length?sorted[0][1]:1;
+    document.getElementById('top-servicos-receita').innerHTML = sorted.length ? sorted.map(([nome,val])=>`
+        <div class="top-svc">
+            <div class="top-svc-name">${nome}</div>
+            <div class="top-svc-bar"><div class="top-svc-fill" style="width:${Math.round(val/max*100)}%"></div></div>
+            <div class="top-svc-count">${fmt(val)}</div>
+        </div>`).join('') : '<div class="empty">Nenhum atendimento.</div>';
+}
+
+function renderTopClientes(fil){
+    const mapa={};
+    fil.forEach(r=>{
+        const k=r.nome.toLowerCase();
+        if(!mapa[k]) mapa[k]={nome:r.nome,valor:0,qtd:0};
+        mapa[k].valor+=parseFloat(r.valor||0); mapa[k].qtd++;
+    });
+    const sorted=Object.values(mapa).sort((a,b)=>b.valor-a.valor).slice(0,10);
+    document.getElementById('top-clientes').innerHTML = sorted.length ? sorted.map((c,i)=>`
+        <div class="top-client">
+            <div class="top-client-pos">${i+1}</div>
+            <div class="top-client-name">${c.nome} <small style="color:var(--muted);font-weight:400">(${c.qtd}x)</small></div>
+            <div class="top-client-val">${fmt(c.valor)}</div>
+        </div>`).join('') : '<div class="empty">Nenhum dado.</div>';
+}
+
+function renderClientesSumidos(){
+    const ultimoVisita = {};
+    registros.forEach(r=>{
+        const k = r.nome.toLowerCase();
+        if(!ultimoVisita[k] || r.data > ultimoVisita[k].data){
+            ultimoVisita[k] = {nome:r.nome, data:r.data, tel:r.tel};
+        }
+    });
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const sumidos = Object.values(ultimoVisita)
+        .map(c=>{
+            const dias = Math.round((hoje - new Date(c.data+'T00:00:00'))/86400000);
+            return {...c, dias};
+        })
+        .filter(c=>c.dias>=30)
+        .sort((a,b)=>b.dias-a.dias)
+        .slice(0,20);
+
+    document.getElementById('clientes-sumidos').innerHTML = sumidos.length ? sumidos.map(c=>`
+        <div class="ghost-item">
+            <div class="ghost-item-name">${c.nome}${c.tel?` · 📱 ${c.tel}`:''}</div>
+            <div class="ghost-item-days">${c.dias} dias</div>
+        </div>`).join('') : '<div class="empty">Todos os clientes compareceram recentemente! ✨</div>';
+}
+
+function renderTabela(fil){
+    if(!fil.length){document.getElementById('tabela-container').innerHTML='<div class="empty">Nenhum atendimento.</div>';return;}
+    const rows=fil.map(r=>`<tr><td style="font-weight:600">${r.nome}</td><td>${fmtData(r.data)}</td><td>${r.hinicio||'–'}</td><td>${r.proc}</td><td style="font-weight:700;color:var(--rose-dark)">${fmt(r.valor)}</td><td>${r.pgto||'–'}</td><td>${r.obs||'–'}</td></tr>`).join('');
+    const total = fil.reduce((s,r)=>s+parseFloat(r.valor||0),0);
+    document.getElementById('tabela-container').innerHTML=`<p style="font-size:11px;color:var(--muted);padding:6px 0;">${fil.length} registros · Total: <strong style="color:var(--rose-dark)">${fmt(total)}</strong></p><table><thead><tr><th>Cliente</th><th>Data</th><th>Hora</th><th>Serviço</th><th>Valor</th><th>Pagamento</th><th>Obs</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+// ═══ EXPORT ═══
+function exportarCSV(){
+    const fil=getFiltrados();
+    const head='Nome,Data,Hora Início,Hora Fim,Procedimento,Valor,Pagamento,WhatsApp,Obs\n';
+    const rows=fil.map(r=>`"${r.nome||''}","${r.data||''}","${r.hinicio||''}","${r.hfim||''}","${r.proc||''}","${r.valor||0}","${r.pgto||''}","${r.tel||''}","${r.obs||''}"`).join('\n');
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob(['\uFEFF'+head+rows],{type:'text/csv;charset=utf-8'}));
+    const periodo = document.getElementById('periodo-tipo').value==='personalizado'
+        ? (document.getElementById('data-de').value||'inicio')+'-a-'+(document.getElementById('data-ate').value||'fim')
+        : document.getElementById('mes-filtro').value||'completo';
+    a.download=`relatorio-${periodo}.csv`;
+    a.click();
+}
+
+function printPDF(){
+    window.print();
+}
+</script>
+</body>
+</html>

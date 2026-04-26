@@ -1,0 +1,24 @@
+{
+  "rules": {
+    "agendamentos": {
+      ".read": true,
+      ".write": true
+    },
+    "registros": {
+      ".read": true,
+      ".write": true
+    },
+    "clientes": {
+      ".read": true,
+      ".write": true
+    },
+    "folgas": {
+      ".read": true,
+      ".write": true
+    },
+    "espera": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}
