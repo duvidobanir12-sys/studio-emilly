@@ -1843,6 +1843,11 @@ const FIREBASE_CONFIG = {
 let agendamentos = [], registros = [], filaEspera = [], folgas = [];
 let _fbPush, _fbSet, _fbRemove, _fbUpdate;
 
+let editingAgendId = null, editingAgendKey = null;
+let editingFilaId = null, editingFilaKey = null;
+let editingRegId = null, editingRegKey = null;
+let editingFolgaId = null, editingFolgaKey = null;
+
 import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({initializeApp})=>{
   import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js').then(({getDatabase, ref, onValue, push, set, remove, update})=>{
     const app = initializeApp(FIREBASE_CONFIG);
@@ -2020,14 +2025,33 @@ document.getElementById('form-agendamento')?.addEventListener('submit', (e) => {
     return;
   }
 
-  agendamentos.push({ id: Date.now(), nome, tel, data, hora, proc });
-  // Salvar no Firebase
-  if(_fbPush) _fbPush('agendamentos', { nome, tel, data, hora, proc });
+  // Se estiver editando
+  if (editingAgendId !== null) {
+    const idx = agendamentos.findIndex(a => a.id === editingAgendId);
+    if (idx !== -1) {
+      agendamentos[idx] = { ...agendamentos[idx], nome, tel, data, hora, proc };
+      // Atualizar no Firebase
+      if(_fbUpdate && editingAgendKey) {
+        _fbUpdate('agendamentos/'+editingAgendKey, { nome, tel, data, hora, proc });
+      }
+    }
+    editingAgendId = null;
+    editingAgendKey = null;
+    const btn = document.querySelector('#form-agendamento button[type="submit"]');
+    btn.textContent = 'Agendar';
+    btn.style.background = 'linear-gradient(135deg, var(--primary-dark), var(--primary))';
+    toast('✅ Agendamento atualizado!');
+  } else {
+    agendamentos.push({ id: Date.now(), nome, tel, data, hora, proc });
+    // Salvar no Firebase
+    if(_fbPush) _fbPush('agendamentos', { nome, tel, data, hora, proc });
+    toast('✅ Agendamento realizado!');
+  }
+
   e.target.reset();
   renderAgendamentos();
   renderHome();
   updateBadges();
-  toast('✅ Agendamento realizado!');
 });
 
 function renderAgendamentos() {
@@ -2039,7 +2063,10 @@ function renderAgendamentos() {
         <div class="list-item-title">${a.nome}</div>
         <div class="list-item-desc">📅 ${fmtData(a.data)} às ${a.hora} • ${a.proc}</div>
       </div>
-      <button class="btn btn-sm btn-danger" onclick="deletarAgend(${a.id})">✕</button>
+      <div class="list-item-actions">
+        <button class="btn btn-sm btn-primary" onclick="editarAgend(${a.id})">✏️</button>
+        <button class="btn btn-sm btn-danger" onclick="deletarAgend(${a.id})">✕</button>
+      </div>
     </div>
   `).join('') : '<div class="empty"><div class="empty-icon">📭</div><p>Nenhum agendamento</p></div>';
 
@@ -2060,6 +2087,26 @@ function deletarAgend(id) {
   renderAgendamentos();
   updateBadges();
   toast('✅ Agendamento removido');
+}
+
+function editarAgend(id) {
+  const item = agendamentos.find(a => a.id === id);
+  if (!item) return;
+
+  editingAgendId = id;
+  editingAgendKey = item._key;
+
+  document.getElementById('ag-nome').value = item.nome;
+  document.getElementById('ag-tel').value = item.tel || '';
+  document.getElementById('ag-data').value = item.data;
+  document.getElementById('ag-hora').value = item.hora;
+  document.getElementById('ag-proc').value = item.proc;
+
+  const btn = document.querySelector('#form-agendamento button[type="submit"]');
+  btn.textContent = 'Atualizar';
+  btn.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
+
+  toast('✏️ Editando agendamento...');
 }
 
 // FILA DE ESPERA
