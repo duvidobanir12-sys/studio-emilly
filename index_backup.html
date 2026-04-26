@@ -1,0 +1,2477 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#c9184a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Studio ES">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="Studio ES">
+<meta name="description" content="Sistema de gestão - Studio Emilly Santos">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon.svg">
+<meta property="og:title" content="Studio Emilly Santos - Gestão">
+<meta property="og:description" content="Sistema de gestão de atendimentos - Studio Emilly Santos">
+<meta property="og:type" content="website">
+<meta property="og:image" content="favicon.svg">
+<title>Studio Emilly Santos</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #c9184a;
+  --primary-dark: #a01435;
+  --primary-light: #e8476a;
+  --accent: #f97316;
+  --accent-light: #fed7aa;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --bg-dark: #0f172a;
+  --bg-light: #f5f3f0;
+  --surface: #ffffff;
+  --surface-alt: #faf8f6;
+  --text-primary: #1a1f36;
+  --text-secondary: #6b7280;
+  --border: #e5e7eb;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 20px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 30px -5px rgba(0, 0, 0, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg-light);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  letter-spacing: -0.3px;
+  line-height: 1.5;
+}
+
+/* ━━━━━━━━ HEADER ━━━━━━━━ */
+header {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
+  padding: 0 20px;
+  padding-top: max(16px, env(safe-area-inset-top));
+  padding-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: var(--shadow-lg);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.h-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+.h-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1),
+              inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.h-logo:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.h-title {
+  color: #fff;
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.h-title h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(20px, 3.5vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.8px;
+  line-height: 1.1;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  margin-bottom: 4px;
+  background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.9) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.h-subtitle {
+  font-size: 12px;
+  opacity: 0.9;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-top: 0;
+}
+
+.h-subtitle {
+  font-size: 11px;
+  opacity: 0.9;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+.h-title p {
+  font-size: 10px;
+  opacity: 0.85;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+.h-actions {
+  display: flex;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.h-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  flex-shrink: 0;
+}
+
+.h-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.menu-btn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .menu-btn {
+    display: flex;
+  }
+}
+
+/* ━━━━━━━━ MAIN LAYOUT ━━━━━━━━ */
+.app {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  overflow: hidden;
+  gap: 0;
+  min-height: 0;
+}
+
+/* ━━━━━━━━ SIDEBAR ━━━━━━━━ */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 240px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 16px 0;
+  gap: 8px;
+  flex-shrink: 0;
+  max-height: 100%;
+}
+
+/* Menu mobile */
+.menu-mobile {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.menu-mobile.open {
+  display: flex;
+}
+
+.menu-mobile-content {
+  background: var(--surface);
+  width: 240px;
+  height: 100%;
+  padding: 16px 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: calc(16px + env(safe-area-inset-top));
+}
+
+.menu-mobile-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  margin: 0 8px;
+  border-radius: 8px;
+}
+
+.nav-item:hover {
+  background: var(--surface-alt);
+  color: var(--text-primary);
+}
+
+.nav-item.active {
+  background: rgba(201, 24, 74, 0.1);
+  color: var(--primary);
+  border-left-color: var(--primary);
+  font-weight: 600;
+}
+
+.nav-item-icon {
+  font-size: 18px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* ━━━━━━━━ FORM STYLES ━━━━━━━━ */
+.ptitle {
+  font-family: 'Fraunces', serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pgroup {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.plabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pinput {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--surface);
+  transition: all 0.2s ease;
+}
+
+.pinput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(201, 24, 74, 0.1);
+}
+
+.pbtn {
+  padding: 10px 16px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pbtn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ━━━━━━━━ CONTENT ━━━━━━━━ */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 36px;
+  background: var(--bg-light);
+}
+
+.content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.content::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+/* ━━━━━━━━ CARDS & LISTS ━━━━━━━━ */
+undefined
+
+.list-item {
+  display: flex;
+  gap: 14px;
+  padding: 14px;
+  border-left: 4px solid var(--primary);
+  background: var(--surface-alt);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  align-items: flex-start;
+}
+
+.list-item-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(201, 24, 74, 0.1);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.list-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.list-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list-item-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list-item-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Outfit', sans-serif;
+}
+
+.btn-sm {
+  padding: 6px 10px;
+  font-size: 11px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+}
+
+.btn-danger {
+  background: var(--error);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge-dinheiro {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+}
+
+.badge-pix {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.badge-cartao {
+  background: rgba(168, 85, 247, 0.1);
+  color: #a855f7;
+}
+
+.empty {
+  text-align: center;
+  padding: 30px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-icon {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.empty p {
+  font-size: 13px;
+}
+
+/* ━━━━━━━━ TOAST ━━━━━━━━ */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  z-index: 9999;
+  animation: slideUp 0.3s ease;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* ━━━━━━━━ MODAL & MENU ━━━━━━━━ */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 5000;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-xl);
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--surface-alt);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: var(--border);
+}
+
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: none;
+  z-index: 4000;
+}
+
+.menu-overlay.active {
+  display: block;
+}
+
+.menu-drawer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 280px;
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  z-index: 4001;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+  padding-top: max(16px, env(safe-area-inset-top));
+}
+
+.menu-drawer.active {
+  transform: translateX(0);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: none;
+  background: none;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.menu-item:hover {
+  background: var(--surface-alt);
+  border-left-color: var(--primary);
+  color: var(--primary);
+}
+
+.menu-item-icon {
+  font-size: 18px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ━━━━━━━━ RESPONSIVE ━━━━━━━━ */
+@media (max-width: 768px) {
+  .app {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    max-height: 180px;
+  }
+
+  .sidebar-body {
+    display: none;
+  }
+
+  .sidebar-tabs {
+    flex-wrap: wrap;
+  }
+
+  .stab {
+    flex: 1 1 auto;
+    min-width: 100px;
+    padding: 10px 8px;
+    font-size: 10px;
+  }
+
+  .content {
+    padding: 16px;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  header {
+    padding: 0 16px;
+    padding-top: max(12px, env(safe-area-inset-top));
+    padding-bottom: 12px;
+  }
+
+  .h-brand {
+    gap: 8px;
+  }
+
+  .h-logo {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .h-title h1 {
+    font-size: 14px;
+  }
+
+  .h-title p {
+    font-size: 9px;
+  }
+
+  .h-actions {
+    gap: 6px;
+  }
+
+  .h-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+  }
+
+  .card {
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .list-item {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .list-item-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .list-item-title {
+    font-size: 12px;
+  }
+
+  .list-item-desc {
+    font-size: 11px;
+  }
+
+  .ptitle {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+
+  .pinput, .pbtn {
+    font-size: 13px;
+    padding: 9px 11px;
+  }
+
+  .pgroup {
+    margin-bottom: 12px;
+    gap: 5px;
+  }
+
+  .plabel {
+    font-size: 11px;
+  }
+
+  .modal-content {
+    width: 90%;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    max-height: 160px;
+  }
+
+  .stab {
+    font-size: 9px;
+    padding: 8px 6px;
+  }
+
+  .content {
+    padding: 12px;
+  }
+
+  header {
+    padding: 0 12px;
+    gap: 8px;
+  }
+
+  .h-logo {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .h-title h1 {
+    font-size: 12px;
+  }
+
+  .h-title p {
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+
+  .h-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  .list-item {
+    gap: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  .list-item-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+
+  .list-item-title {
+    font-size: 11px;
+  }
+
+  .list-item-desc {
+    font-size: 10px;
+  }
+
+  .btn-sm {
+    padding: 5px 8px;
+    font-size: 10px;
+  }
+
+  .ptitle {
+    font-size: 13px;
+  }
+
+  .pinput, .pbtn {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 16px;
+  }
+
+  .menu-drawer {
+    width: 260px;
+  }
+}
+/* ── MELHORIAS VISUAIS ── */
+/* Header com gradiente mais suave e animação */
+header {
+  transition: box-shadow 0.3s ease;
+}
+header:hover {
+  box-shadow: 0 15px 40px -8px rgba(0,0,0,0.15);
+}
+
+/* Logo com animação de brilho */
+.h-logo {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.h-logo::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s ease;
+}
+.h-logo:hover::after {
+  left: 100%;
+}
+
+/* Nav items com indicador animado */
+.nav-item {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+.nav-item::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  width: 0; height: 3px;
+  background: var(--primary);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+.nav-item:hover::before {
+  width: 50%;
+}
+.nav-item.active::before {
+  width: 80%;
+}
+
+/* Cards com hover effect */
+.card, .scard {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover, .scard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-xl);
+}
+
+/* Botões com animação */
+.btn, .btsub, .btn-submit {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.btn::after, .btsub::after, .btn-submit::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s ease;
+}
+.btn:hover::after, .btsub:hover::after, .btn-submit:hover::after {
+  left: 100%;
+}
+.btn:hover, .btsub:hover, .btn-submit:hover {
+  transform: translateY(-2px);
+}
+
+/* Animação de fadeIn */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.fade-in {
+  animation: fadeIn 0.3s ease;
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--primary-light);
+  border-radius: 3px;
+}
+
+/* ━━━━━━━━ MELHORIAS VISUAIS ━━━━━━━━ */
+/* Header com gradiente animado */
+header {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
+  padding: 0 20px;
+  padding-top: max(24px, env(safe-area-inset-top));
+  padding-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: var(--shadow-lg);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  min-height: 90px;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Logo com brilho */
+.h-logo {
+  position: relative;
+  overflow: hidden;
+}
+
+.h-logo::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+  transform: rotate(45deg);
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) rotate(45deg); }
+}
+
+/* Nav items com indicador animado */
+.nav-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--primary);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.nav-item:hover::after {
+  width: 80%;
+}
+
+.nav-item.active::after {
+  width: 90%;
+}
+
+/* Cards com hover effect e sombra melhorada */
+.card {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -12px rgba(201, 24, 74, 0.15),
+              0 8px 16px -6px rgba(0, 0, 0, 0.08);
+  border-color: var(--primary-light);
+}
+
+/* Botões com animação */
+.btn, .pbtn {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before, .pbtn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn:hover::before, .pbtn:hover::before {
+  left: 100%;
+}
+
+.btn:hover, .pbtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -8px rgba(201, 24, 74, 0.4);
+}
+
+/* Animação de fadeIn para conteúdo */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-content {
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* List items com hover suave */
+.list-item {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.list-item:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.1);
+}
+
+/* Toast com animação melhorada */
+.toast {
+  animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+/* Melhorar inputs com focus effect */
+.pinput {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pinput:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 3px rgba(201, 24, 74, 0.1),
+              0 4px 12px -4px rgba(201, 24, 74, 0.15);
+}
+
+/* Badge com pulse animation */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* ═══ MELHORIAS VISUAIS VERSÃO FINAL ═══ */
+
+/* Cards mais modernos */
+.card {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 24px -8px rgba(0,0,0,0.06);
+  border: 1px solid var(--border);
+  margin-bottom: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -12px rgba(201, 24, 74, 0.12);
+  border-color: var(--primary-light);
+}
+
+/* List items mais elegantes */
+.list-item {
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  border-left: 4px solid var(--primary);
+  background: var(--surface-alt);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  align-items: flex-start;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.list-item:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.08);
+  border-left-width: 6px;
+}
+
+.list-item-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(201, 24, 74, 0.1);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.list-item:hover .list-item-icon {
+  transform: scale(1.1);
+  background: rgba(201, 24, 74, 0.15);
+}
+
+.list-item-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list-item-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.5;
+}
+
+/* Botões mais profissionais */
+.btn, .pbtn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Outfit', sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-sm {
+  padding: 8px 12px;
+  font-size: 11px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  color: white;
+  box-shadow: 0 4px 12px -4px rgba(201, 24, 74, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -6px rgba(201, 24, 74, 0.4);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #dc2626, var(--error));
+  color: white;
+  box-shadow: 0 4px 12px -4px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -6px rgba(239, 68, 68, 0.4);
+}
+
+/* Inputs mais modernos */
+.pinput {
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--surface);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+}
+
+.pinput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(201, 24, 74, 0.1),
+              0 4px 12px -4px rgba(201, 24, 74, 0.15);
+  transform: translateY(-1px);
+  background: var(--surface);
+}
+
+/* Content area */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 36px 40px;
+  background: var(--bg-light);
+}
+
+/* Badges mais bonitos */
+.badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.badge-dinheiro {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+}
+
+.badge-pix {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.badge-cartao {
+  background: rgba(168, 85, 247, 0.1);
+  color: #a855f7;
+}
+
+/* Títulos de seção mais elegantes */
+.ptitle {
+  font-family: 'Fraunces', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--border);
+}
+
+/* Empty state mais amigável */
+.empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+  opacity: 0.6;
+}
+
+.empty p {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Animação de entrada para cards */
+.card {
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Toast mais elegante */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  color: white;
+  padding: 14px 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px -8px rgba(201, 24, 74, 0.4);
+  z-index: 9999;
+  animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 13px;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="h-brand">
+    <div class="h-logo">ES</div>
+    <div class="h-title">
+      <h1>Studio Emilly Santos</h1>
+      <p class="h-subtitle">Gestão Profissional · Nail Designer</p>
+    </div>
+  </div>
+  <div class="h-actions">
+    <button class="h-btn" title="Configurações" onclick="openSettings()">⚙️</button>
+    <button class="h-btn menu-btn" title="Menu" onclick="toggleMenu()">☰</button>
+  </div>
+</header>
+
+<!-- MAIN APP -->
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="nav-item active" onclick="showTab('home')">
+      <span class="nav-item-icon">📊</span>
+      <span>Home</span>
+    </div>
+    <div class="nav-item" onclick="showTab('agendamentos')">
+      <span class="nav-item-icon">📅</span>
+      <span>Agendamentos</span>
+    </div>
+    <div class="nav-item" onclick="showTab('historico')">
+      <span class="nav-item-icon">📋</span>
+      <span>Histórico</span>
+    </div>
+    <div class="nav-item" onclick="showTab('fila')">
+      <span class="nav-item-icon">⏳</span>
+      <span>Fila <span id="badge-fila" style="background: var(--error); color: white; padding: 2px 6px; border-radius: 50%; font-size: 10px; display: none; margin-left: 4px;"></span></span>
+    </div>
+    <div class="nav-item" onclick="showTab('relatorio')">
+      <span class="nav-item-icon">📈</span>
+      <span>Relatório</span>
+    </div>
+    <div class="nav-item" onclick="showTab('folgas')">
+      <span class="nav-item-icon">🌴</span>
+      <span>Folgas</span>
+    </div>
+    <div class="nav-item" onclick="showTab('configuracoes')">
+      <span class="nav-item-icon">⚙️</span>
+      <span>Configurações</span>
+    </div>
+  </div>
+
+  <!-- MENU MOBILE -->
+  <div class="menu-mobile" id="menu-mobile">
+    <button class="menu-mobile-close" onclick="toggleMenu()">✕</button>
+    <div class="menu-mobile-content">
+      <div class="nav-item active" onclick="showTab('home'); toggleMenu()">
+        <span class="nav-item-icon">📊</span>
+        <span>Home</span>
+      </div>
+      <div class="nav-item" onclick="showTab('agendamentos'); toggleMenu()">
+        <span class="nav-item-icon">📅</span>
+        <span>Agendamentos</span>
+      </div>
+      <div class="nav-item" onclick="showTab('historico'); toggleMenu()">
+        <span class="nav-item-icon">📋</span>
+        <span>Histórico</span>
+      </div>
+      <div class="nav-item" onclick="showTab('fila'); toggleMenu()">
+        <span class="nav-item-icon">⏳</span>
+        <span>Fila <span id="badge-fila-mobile" style="background: var(--error); color: white; padding: 2px 6px; border-radius: 50%; font-size: 10px; display: none; margin-left: 4px;"></span></span>
+      </div>
+      <div class="nav-item" onclick="showTab('relatorio'); toggleMenu()">
+        <span class="nav-item-icon">📈</span>
+        <span>Relatório</span>
+      </div>
+      <div class="nav-item" onclick="showTab('folgas'); toggleMenu()">
+        <span class="nav-item-icon">🌴</span>
+        <span>Folgas</span>
+      </div>
+      <div class="nav-item" onclick="showTab('configuracoes'); toggleMenu()">
+        <span class="nav-item-icon">⚙️</span>
+        <span>Configurações</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <!-- HOME -->
+    <div id="home" class="tab-content" style="display:block;">
+      <div class="card">
+        <h2 class="ptitle">💰 Resumo Hoje</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+          <div style="background: rgba(16,185,129,0.05); padding: 12px; border-radius: 8px; border-left: 3px solid var(--success);">
+            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; margin-bottom: 4px;">ATENDIMENTOS</div>
+            <div id="today-atend" style="font-size: 18px; font-weight: 700; color: var(--success);">0</div>
+          </div>
+          <div style="background: rgba(201,24,74,0.05); padding: 12px; border-radius: 8px; border-left: 3px solid var(--primary);">
+            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; margin-bottom: 4px;">RECEITA</div>
+            <div id="today-receita" style="font-size: 18px; font-weight: 700; color: var(--primary);">R$ 0</div>
+          </div>
+        </div>
+        <div style="background: rgba(245,158,11,0.05); padding: 12px; border-radius: 8px; border-left: 3px solid var(--warning);">
+          <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; margin-bottom: 4px;">TICKET MÉDIO</div>
+          <div id="today-media" style="font-size: 18px; font-weight: 700; color: var(--warning);">R$ 0</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="ptitle">📅 Próximos Agendamentos</h2>
+        <div id="proximos-container">
+          <div class="empty"><div class="empty-icon">✓</div><p>Nenhum agendamento</p></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="ptitle">🔥 Atendimentos Recentes</h2>
+        <div id="recentes-container">
+          <div class="empty"><div class="empty-icon">📭</div><p>Nenhum atendimento</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AGENDAMENTOS -->
+    <div id="agendamentos" class="tab-content" style="display:none;">
+      <div class="card">
+        <h2 class="ptitle">➕ Novo Agendamento</h2>
+        <form id="form-agendamento">
+          <div class="pgroup">
+            <label class="plabel">Nome</label>
+            <input type="text" id="ag-nome" class="pinput" placeholder="Nome do cliente" required>
+          </div>
+          <div class="pgroup">
+            <label class="plabel">Telefone</label>
+            <input type="tel" id="ag-tel" class="pinput" placeholder="(11) 99999-9999">
+          </div>
+          <div class="pgroup">
+            <label class="plabel">Data</label>
+            <input type="date" id="ag-data" class="pinput" required>
+          </div>
+          <div class="pgroup">
+            <label class="plabel">Hora</label>
+            <input type="time" id="ag-hora" class="pinput" required>
+          </div>
+          <div class="pgroup">
+            <label class="plabel">Procedimento</label>
+            <select id="ag-proc" class="pinput" required>
+              <option value="">Selecione</option>
+              <option value="Manicure">Manicure</option>
+              <option value="Pedicure">Pedicure</option>
+              <option value="Unhas Postiças">Unhas Postiças</option>
+              <option value="Design de Sobrancelha">Design de Sobrancelha</option>
+            </select>
+          </div>
+          <button type="submit" class="pbtn" style="width: 100%; background: linear-gradient(135deg, var(--primary-dark), var(--primary)); border: none; color: white;">Agendar</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2 class="ptitle">📅 Agendamentos</h2>
+        <div id="agendamentos-container">
+          <div class="empty"><div class="empty-icon">📭</div><p>Nenhum agendamento</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTÓRICO -->
+    <div id="historico" class="tab-content" style="display:none;">
+      <div class="card">
+        <h2 class="ptitle">➕ Registrar Atendimento</h2>
+        <form id="form-atendimento">
+          <div class="pgroup">
+            <label class="plabel">Nome</label>
+            <input type="text" id="at-nome" class="pinput" placeholder="Nome do cliente" required>
+          </div>
+          <div class="pgroup">
+            <label class="plabel">Data</label>
+            <input type="date" id="at-data" class="pinput" required>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="pgroup">
+              <label class="plabel">Início</label>
+              <input type="time" id="at-hinicio" class="pinput">
+            </div>
+            <div class="pgroup">
+              <label class="plabel">Fim</label>
+              <input type="time" id="at-hfim" class="pinput">
+            </div>
+          </div>
+          <div class="pgroup">
+            <label class="plabel">Procedimento</label>
+            <select id="at-proc" class="pinput" required>
+              <option value="">Selecione</option>
+              <option value="Manicure">Manicure</option>
+              <option value="Pedicure">Pedicure</option>
+              <option value="Unhas Postiças">Unhas Postiças</option>
+              <option value="Design de Sobrancelha">Design de Sobrancelha</option>
+            </select>
+          </div>
+          <div class="pgroup">
+            <label class="plabel">Valor (R$)</label>
+            <input type="number" id="at-valor" class="pinput" placeholder="0.00" step="0.01" required>
+          </div>
+          <div class="pgroup">
+            <label class="plabel">Pagamento</label>
+            <select id="at-pgto" class="pinput" required>
+              <option value="">Selecione</option>
+              <option value="Dinheiro">Dinheiro</option>
+              <option value="PIX">PIX</option>
+              <option value="Cartão">Cartão</option>
+            </select>
+          </div>
+          <button type="submit" class="pbtn" style="width: 100%; background: linear-gradient(135deg, var(--success), #06b6d4); border: none; color: white;">Registrar</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2 class="ptitle">📋 Histórico</h2>
+        <div style="margin-bottom: 16px;">
+          <label class="plabel" style="margin-bottom: 6px;">Filtrar por Mês</label>
+          <select id="hist-mes" class="pinput" onchange="renderHistorico()"></select>
+        </div>
+        <div id="historico-container">
+          <div class="empty"><div class="empty-icon">📭</div><p>Nenhum registro</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILA DE ESPERA -->
+    <div id="fila" class="tab-content" style="display:none;">
+      <div class="card">
+        <h2 class="ptitle">➕ Adicionar à Fila</h2>
+        <form id="form-fila">
+          <div class="pgroup">
+            <label class="plabel">Nome</label>
+            <input type="text" id="fila-nome" class="pinput" placeholder="Nome do cliente" required>
+          </div>
+          <div class="pgroup">
+            <label class="plabel">Procedimento</label>
+            <select id="fila-proc" class="pinput" required>
+              <option value="">Selecione</option>
+              <option value="Manicure">Manicure</option>
+              <option value="Pedicure">Pedicure</option>
+              <option value="Unhas Postiças">Unhas Postiças</option>
+              <option value="Design de Sobrancelha">Design de Sobrancelha</option>
+            </select>
+          </div>
+          <div class="pgroup">
+            <label class="plabel">Telefone</label>
+            <input type="tel" id="fila-tel" class="pinput" placeholder="(11) 99999-9999">
+          </div>
+          <button type="submit" class="pbtn" style="width: 100%; background: linear-gradient(135deg, var(--warning), var(--accent)); border: none; color: white;">Adicionar</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2 class="ptitle">⏳ Fila de Espera</h2>
+        <div id="fila-container">
+          <div class="empty"><div class="empty-icon">⏳</div><p>Nenhum cliente na fila</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RELATÓRIO -->
+    <div id="relatorio" class="tab-content" style="display:none;">
+      <div class="card">
+        <h2 class="ptitle">📊 Relatório Mensal</h2>
+        <div class="pgroup">
+          <label class="plabel">Mês</label>
+          <select id="rel-mes" class="pinput" onchange="renderRelatorio()"></select>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px;">
+          <div style="background: rgba(16,185,129,0.05); padding: 12px; border-radius: 8px; border-left: 3px solid var(--success);">
+            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; margin-bottom: 4px;">ATENDIMENTOS</div>
+            <div id="rel-atend" style="font-size: 18px; font-weight: 700; color: var(--success);">0</div>
+          </div>
+          <div style="background: rgba(201,24,74,0.05); padding: 12px; border-radius: 8px; border-left: 3px solid var(--primary);">
+            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; margin-bottom: 4px;">RECEITA</div>
+            <div id="rel-receita" style="font-size: 18px; font-weight: 700; color: var(--primary);">R$ 0</div>
+          </div>
+          <div style="background: rgba(245,158,11,0.05); padding: 12px; border-radius: 8px; border-left: 3px solid var(--warning);">
+            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; margin-bottom: 4px;">TICKET MÉDIO</div>
+            <div id="rel-media" style="font-size: 18px; font-weight: 700; color: var(--warning);">R$ 0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="ptitle">🎯 Meta do Mês</h2>
+        <div class="pgroup">
+          <label class="plabel">Meta (R$)</label>
+          <input type="number" id="meta-valor" class="pinput" placeholder="0.00" step="0.01" onchange="salvarMeta()">
+        </div>
+        <div style="margin-top: 12px;">
+          <div style="background: var(--surface-alt); border-radius: 50px; height: 12px; overflow: hidden; margin-bottom: 8px;">
+            <div id="meta-barra" style="height: 100%; background: linear-gradient(90deg, var(--primary-dark), var(--primary)); width: 0%; border-radius: 50px; transition: width 0.3s ease;"></div>
+          </div>
+          <div style="text-align: right; font-size: 12px; color: var(--text-secondary); font-weight: 600;">
+            <span id="meta-pct">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="ptitle">🛍️ Serviços Mais Pedidos</h2>
+        <div id="rel-servicos">
+          <div class="empty"><div class="empty-icon">📭</div><p>Nenhum dado</p></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <button class="pbtn" onclick="exportarCSV()" style="width: 100%; background: linear-gradient(135deg, #059669, var(--success)); border: none; color: white;">📥 Exportar Relatório (CSV)</button>
+      </div>
+    </div>
+
+    <!-- FOLGAS -->
+    <div id="folgas" class="tab-content" style="display:none;">
+      <div class="card">
+        <h2 class="ptitle">🌴 Adicionar Folga</h2>
+        <form id="form-folga">
+          <div class="pgroup">
+            <label class="plabel">Data da Folga</label>
+            <input type="date" id="folga-data" class="pinput" required>
+          </div>
+          <div class="pgroup">
+            <label class="plabel">Motivo (opcional)</label>
+            <input type="text" id="folga-motivo" class="pinput" placeholder="Ex: Férias, Descanso, Evento...">
+          </div>
+          <button type="submit" class="pbtn" style="width: 100%; background: linear-gradient(135deg, #059669, var(--success)); border: none; color: white;">➕ Registrar Folga</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2 class="ptitle">📅 Folgas Registradas</h2>
+        <div id="folgas-container">
+          <div class="empty"><div class="empty-icon">🌴</div><p>Nenhuma folga registrada</p></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="ptitle">📊 Resumo de Folgas</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div style="background: rgba(59,130,246,0.05); padding: 12px; border-radius: 8px; border-left: 3px solid #3b82f6;">
+            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; margin-bottom: 4px;">TOTAL DE FOLGAS</div>
+            <div id="folgas-total" style="font-size: 18px; font-weight: 700; color: #3b82f6;">0</div>
+          </div>
+          <div style="background: rgba(245,158,11,0.05); padding: 12px; border-radius: 8px; border-left: 3px solid var(--warning);">
+            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; margin-bottom: 4px;">PRÓXIMA FOLGA</div>
+            <div id="folgas-proxima" style="font-size: 13px; font-weight: 600; color: var(--warning);">-</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- CONFIGURAÇÕES -->
+  <div id="configuracoes" class="tab-content" style="display:none;">
+    <div class="card">
+      <h2 class="ptitle">⚙️ Configurações</h2>
+      
+      <div style="border: 1px solid var(--border); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+        <h3 style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">📊 Dados</h3>
+        <button class="pbtn" onclick="exportarTodos()" style="width: 100%; background: #3b82f6; margin-bottom: 8px;">💾 Fazer Backup</button>
+        <button class="pbtn" onclick="limparDados()" style="width: 100%; background: var(--error);">🗑️ Limpar Dados</button>
+      </div>
+
+      <div style="border: 1px solid var(--border); padding: 16px; border-radius: 8px;">
+        <h3 style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">ℹ️ Sobre</h3>
+        <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
+          <strong>Studio Emilly Santos</strong><br>
+          Sistema de Gestão Profissional<br>
+          <br>
+          v1.0.0<br>
+          Todos os dados são salvos localmente no seu dispositivo.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP END -->
+</div>
+
+
+<!-- SETTINGS MODAL REMOVIDO - AGORA É UMA ABA -->
+
+<script>
+// ═══ FIREBASE CONFIG ═══
+const firebaseConfig = {
+  apiKey: "AIzaSyDBr3kQaZj_g_gxJ_h2f2zWv5C_-K9yEts",
+  authDomain: "studio-emilly-santos.firebaseapp.com",
+  projectId: "studio-emilly-santos",
+  storageBucket: "studio-emilly-santos.appspot.com",
+  messagingSenderId: "360676621995",
+  appId: "1:360676621995:web:c0d9e78fea71c99ffc3e30",
+  databaseURL: "https://studio-emilly-santos-default-rtdb.firebaseio.com"
+};
+
+// Carregar Firebase
+if(!window.firebase){
+  const script = document.createElement('script');
+  script.src = 'https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js';
+  script.async = true;
+  document.head.appendChild(script);
+
+  script.onload = () => {
+    const script2 = document.createElement('script');
+    script2.src = 'https://www.gstatic.com/firebasejs/10.5.0/firebase-database.js';
+    script2.async = true;
+    document.head.appendChild(script2);
+    
+    script2.onload = () => {
+      console.log('Firebase carregado');
+      if(!window.firebase.apps.length) {
+        window.firebase.initializeApp(firebaseConfig);
+      }
+      setupFirebaseListener();
+    };
+  };
+}
+
+let db, agendamentos = [], registros = [], filaEspera = [], folgas = [];
+
+// Listener em tempo real do Firebase
+function setupFirebaseListener() {
+  try {
+    if(!window.firebase || !window.firebase.database) return;
+    
+    const db = window.firebase.database();
+    console.log('🔔 Configurando listener Firebase em tempo real...');
+    
+    db.ref('agendamentos').on('value', (snapshot) => {
+      if(snapshot.exists()) {
+        const data = snapshot.val();
+        console.log('🔄 Atualização Firebase recebida');
+        
+        const novoAgendamentos = Object.entries(data)
+          .filter(([key, value]) => value && value.nome && value.data && value.hora)
+          .map(([key, value]) => ({
+            ...value,
+            id: value.id || key
+          }))
+          .sort((a,b) => new Date(a.data + ' ' + a.hora) - new Date(b.data + ' ' + b.hora));
+        
+        // Verificar se houve mudanças
+        const mudou = JSON.stringify(novoAgendamentos) !== JSON.stringify(agendamentos);
+        if(mudou) {
+          console.log('✅ Mudanças detectadas, atualizando...');
+          agendamentos = novoAgendamentos;
+          localStorage.setItem('emilly_agendamentos', JSON.stringify(agendamentos));
+          
+          // Renderizar se a página estiver ativa
+          const container = document.getElementById('agendamentos-container');
+          if(container) {
+            renderAgendamentos();
+            renderHome();
+            updateBadges();
+          }
+        }
+      } else {
+        console.log('ℹ️ Nenhum agendamento no Firebase');
+        if(agendamentos.length > 0) {
+          agendamentos = [];
+          localStorage.setItem('emilly_agendamentos', JSON.stringify([]));
+          renderAgendamentos();
+          renderHome();
+          updateBadges();
+        }
+      }
+    }, (err) => {
+      console.warn('❌ Erro no listener Firebase:', err.message);
+    });
+  } catch(err) {
+    console.warn('❌ Erro ao configurar listener:', err.message);
+  }
+}
+
+// Função para limpar agendamentos inválidos ou testes
+async function limparAgendamentosInvalidos() {
+  try {
+    if(!window.firebase || !window.firebase.database) return;
+    
+    const db = window.firebase.database();
+    console.log('🧹 Verificando agendamentos inválidos...');
+    
+    const snapshot = await db.ref('agendamentos').once('value');
+    if(snapshot.exists()) {
+      const data = snapshot.val();
+      
+      for(const [key, agend] of Object.entries(data)) {
+        const ehValido = agend && agend.nome && agend.data && agend.hora && agend.proc;
+        const ehTeste = agend.nome && agend.nome.toLowerCase().includes('teste');
+        
+        if(!ehValido || ehTeste) {
+          console.log('🗑️ Deletando agendamento inválido:', agend.nome);
+          await db.ref(`agendamentos/${key}`).remove();
+        }
+      }
+      
+      console.log('✅ Limpeza concluída');
+      // Sincronizar novamente
+      await syncAgendamentosFromFirebase();
+    }
+  } catch(err) {
+    console.warn('Erro ao limpar agendamentos:', err);
+  }
+}
+// Carregar dados ao iniciar
+function loadAllData() {
+  registros = JSON.parse(localStorage.getItem('emilly_registros')) || [];
+  filaEspera = JSON.parse(localStorage.getItem('emilly_fila')) || [];
+  folgas = JSON.parse(localStorage.getItem('emilly_folgas')) || [];
+
+  // Tenta sincronizar do Firebase
+  if(window.firebase && window.firebase.database) {
+    setupFirebaseListener();
+  }
+}
+
+// ═══ MENU ═══
+function toggleMenu() {
+  const menu = document.getElementById('menu-mobile');
+  if (menu) {
+    menu.classList.toggle('open');
+  }
+}
+
+// ═══ SETTINGS ═══
+function openSettings() {
+  showTab('configuracoes');
+}
+
+function closeSettings() {
+  document.getElementById('settings-modal')?.classList.remove('active');
+}
+
+function limparDados() {
+  if (confirm('⚠️ Tem certeza? Todos os dados serão apagados!')) {
+    localStorage.clear();
+    agendamentos = [];
+    registros = [];
+    filaEspera = [];
+    renderHome();
+    toast('✅ Dados apagados');
+    closeSettings();
+  }
+}
+
+function exportarTodos() {
+  const todos = {
+    agendamentos,
+    registros,
+    filaEspera,
+    meta: localStorage.getItem('emilly_meta')
+  };
+  const json = JSON.stringify(todos, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  toast('✅ Backup criado!');
+}
+
+function showTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+  document.getElementById(tab).style.display = 'block';
+  
+  // Atualiza nav-items na sidebar
+  document.querySelectorAll('.sidebar .nav-item').forEach(el => el.classList.remove('active'));
+  const icons = {
+    'home': '📊',
+    'agendamentos': '📅',
+    'historico': '📋',
+    'fila': '⏳',
+    'relatorio': '📈',
+    'configuracoes': '⚙️'
+  };
+  
+  const sidebarItems = document.querySelectorAll('.sidebar .nav-item');
+  sidebarItems.forEach(item => {
+    const icon = item.querySelector('.nav-item-icon');
+    if (icon && icon.textContent.includes(icons[tab])) {
+      item.classList.add('active');
+    }
+  });
+  
+  // Atualiza nav-items no menu mobile
+  document.querySelectorAll('.menu-mobile-content .nav-item').forEach(el => el.classList.remove('active'));
+  const mobileItems = document.querySelectorAll('.menu-mobile-content .nav-item');
+  mobileItems.forEach(item => {
+    const icon = item.querySelector('.nav-item-icon');
+    if (icon && icon.textContent.includes(icons[tab])) {
+      item.classList.add('active');
+    }
+  });
+
+  if (tab === 'home') renderHome();
+  if (tab === 'agendamentos') renderAgendamentos();
+  if (tab === 'historico') renderHistorico();
+  if (tab === 'fila') renderFila();
+  if (tab === 'relatorio') renderRelatorio();
+  if (tab === 'folgas') renderFolgas();
+  if (tab === 'configuracoes') {} // Apenas mostra a aba
+}
+
+function toast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+function fmt(v) {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
+}
+
+function fmtData(d) {
+  return new Date(d + 'T00:00:00').toLocaleDateString('pt-BR');
+}
+
+// AGENDAMENTOS
+document.getElementById('form-agendamento')?.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const nome = document.getElementById('ag-nome').value.trim();
+  const tel = document.getElementById('ag-tel').value.trim();
+  const data = document.getElementById('ag-data').value;
+  const hora = document.getElementById('ag-hora').value;
+  const proc = document.getElementById('ag-proc').value;
+
+  if (!nome || !data || !hora || !proc) {
+    toast('⚠️ Preencha os campos obrigatórios');
+    return;
+  }
+
+  agendamentos.push({ id: Date.now(), nome, tel, data, hora, proc });
+  localStorage.setItem('emilly_agendamentos', JSON.stringify(agendamentos));
+  e.target.reset();
+  renderAgendamentos();
+  renderHome();
+  updateBadges();
+  toast('✅ Agendamento realizado!');
+});
+
+function renderAgendamentos() {
+  const sorted = agendamentos.sort((a, b) => new Date(a.data + ' ' + a.hora) - new Date(b.data + ' ' + b.hora));
+  const html = sorted.length ? sorted.map((a, i) => `
+    <div class="list-item">
+      <div class="list-item-icon" style="background: rgba(59,130,246,0.1); color: #3b82f6;">${i + 1}</div>
+      <div class="list-item-content">
+        <div class="list-item-title">${a.nome}</div>
+        <div class="list-item-desc">📅 ${fmtData(a.data)} às ${a.hora} • ${a.proc}</div>
+      </div>
+      <button class="btn btn-sm btn-danger" onclick="deletarAgend(${a.id})">✕</button>
+    </div>
+  `).join('') : '<div class="empty"><div class="empty-icon">📭</div><p>Nenhum agendamento</p></div>';
+
+  const container = document.getElementById('agendamentos-container');
+  if (container) container.innerHTML = html;
+}
+
+function deletarAgend(id) {
+  if (!confirm('Remover agendamento?')) return;
+  agendamentos = agendamentos.filter(a => a.id !== id);
+  localStorage.setItem('emilly_agendamentos', JSON.stringify(agendamentos));
+  
+  // Deletar também do Firebase
+  try {
+    if(window.firebase && window.firebase.database) {
+      const db = window.firebase.database();
+      db.ref('agendamentos').once('value', (snapshot) => {
+        if(snapshot.exists()) {
+          const data = snapshot.val();
+          for(const [key, agend] of Object.entries(data)) {
+            if(agend.id === id || key === id.toString()) {
+              db.ref(`agendamentos/${key}`).remove().then(() => {
+                console.log('✅ Agendamento deletado do Firebase');
+              }).catch(err => console.warn('Erro ao deletar do Firebase:', err));
+              break;
+            }
+          }
+        }
+      });
+    }
+  } catch(err) {
+    console.warn('Erro ao deletar do Firebase:', err);
+  }
+  
+  renderAgendamentos();
+  updateBadges();
+  toast('✅ Agendamento removido');
+}
+
+// FILA DE ESPERA
+document.getElementById('form-fila')?.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const nome = document.getElementById('fila-nome').value.trim();
+  const proc = document.getElementById('fila-proc').value;
+  const tel = document.getElementById('fila-tel').value.trim();
+
+  if (!nome || !proc) {
+    toast('⚠️ Preencha os campos obrigatórios');
+    return;
+  }
+
+  filaEspera.push({ id: Date.now(), nome, proc, tel });
+  localStorage.setItem('emilly_fila', JSON.stringify(filaEspera));
+  e.target.reset();
+  renderFila();
+  toast('✅ Cliente adicionado à fila');
+  updateBadges();
+});
+
+function renderFila() {
+  const html = filaEspera.length ? filaEspera.map((e, i) => `
+    <div class="list-item" style="border-left-color: var(--warning);">
+      <div class="list-item-icon" style="background: rgba(245,158,11,0.1); color: var(--warning);">${i + 1}</div>
+      <div class="list-item-content">
+        <div class="list-item-title">${e.nome}</div>
+        <div class="list-item-desc">💅 ${e.proc}${e.tel ? ' • 📱 ' + e.tel : ''}</div>
+      </div>
+      <div class="list-item-actions">
+        ${e.tel ? `<button class="btn btn-sm btn-primary" onclick="chamarWhats('${e.tel}')">💬</button>` : ''}
+        <button class="btn btn-sm btn-danger" onclick="deletarFila(${e.id})">✕</button>
+      </div>
+    </div>
+  `).join('') : '<div class="empty"><div class="empty-icon">⏳</div><p>Nenhum cliente na fila</p></div>';
+
+  const container = document.getElementById('fila-container');
+  if (container) container.innerHTML = html;
+}
+
+function deletarFila(id) {
+  if (!confirm('Remover da fila?')) return;
+  filaEspera = filaEspera.filter(f => f.id !== id);
+  localStorage.setItem('emilly_fila', JSON.stringify(filaEspera));
+  renderFila();
+  updateBadges();
+}
+
+function chamarWhats(tel) {
+  const url = `https://wa.me/55${tel.replace(/\D/g, '')}?text=Olá! Sua vez chegou! 💅`;
+  window.open(url, '_blank');
+}
+
+// HISTÓRICO
+document.getElementById('form-atendimento')?.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const nome = document.getElementById('at-nome').value.trim();
+  const data = document.getElementById('at-data').value;
+  const proc = document.getElementById('at-proc').value;
+  const valor = parseFloat(document.getElementById('at-valor').value || 0);
+  const pgto = document.getElementById('at-pgto').value;
+
+  if (!nome || !data || !proc || !valor || !pgto) {
+    toast('⚠️ Preencha todos os campos obrigatórios');
+    return;
+  }
+
+  registros.push({ id: Date.now(), nome, data, hinicio: '', hfim: '', proc, valor, pgto, obs: '' });
+  localStorage.setItem('emilly_registros', JSON.stringify(registros));
+  e.target.reset();
+  renderHistorico();
+  renderHome();
+  toast('✅ Atendimento registrado!');
+});
+
+function renderHistorico() {
+  const mes = document.getElementById('hist-mes')?.value || '';
+  const fil = mes ? registros.filter(r => r.data.startsWith(mes)) : registros;
+  const sorted = fil.sort((a, b) => new Date(b.data) - new Date(a.data));
+
+  const html = sorted.length ? sorted.map((r, i) => `
+    <div class="list-item">
+      <div class="list-item-icon" style="background: rgba(16,185,129,0.1); color: var(--success);">${i + 1}</div>
+      <div class="list-item-content">
+        <div class="list-item-title">${r.nome}</div>
+        <div class="list-item-desc">📅 ${fmtData(r.data)} • ${r.proc}</div>
+        <div class="list-item-desc" style="margin-top: 6px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <span style="background: rgba(201,24,74,0.1); color: var(--primary); padding: 2px 8px; border-radius: 50px; font-size: 11px; font-weight: 600;">${fmt(r.valor)}</span>
+          <span class="badge badge-${r.pgto.toLowerCase()}">${r.pgto}</span>
+        </div>
+      </div>
+      <button class="btn btn-sm btn-danger" onclick="deletarRegistro(${r.id})">✕</button>
+    </div>
+  `).join('') : '<div class="empty"><div class="empty-icon">📋</div><p>Nenhum registro</p></div>';
+
+  const container = document.getElementById('historico-container');
+  if (container) container.innerHTML = html;
+
+  const meses = [...new Set(registros.map(r => r.data.slice(0, 7)))].sort().reverse();
+  const sel = document.getElementById('hist-mes');
+  if (sel && !sel.value) sel.innerHTML = '<option value="">Todos</option>' + meses.map(m => `<option value="${m}">${['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(m.split('-')[1])-1]} ${m.split('-')[0]}</option>`).join('');
+}
+
+function deletarRegistro(id) {
+  if (!confirm('Remover registro?')) return;
+  registros = registros.filter(r => r.id !== id);
+  localStorage.setItem('emilly_registros', JSON.stringify(registros));
+  renderHistorico();
+  renderHome();
+}
+
+// RELATÓRIO
+function renderRelatorio() {
+  const sel = document.getElementById('rel-mes');
+  const meses = [...new Set(registros.map(r => r.data.slice(0, 7)))].sort().reverse();
+
+  // sempre popula o select
+  sel.innerHTML = '<option value="">Selecione um mês</option>'
+    + meses.map(m => `<option value="${m}" ${m === sel.value ? 'selected' : ''}>${['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(m.split('-')[1])-1]} de ${m.split('-')[0]}</option>`).join('');
+
+  if (!sel.value) {
+    document.getElementById('rel-receita').textContent = fmt(0);
+    document.getElementById('rel-atend').textContent = '0';
+    document.getElementById('rel-media').textContent = fmt(0);
+    document.getElementById('rel-servicos').innerHTML = '<p style="font-size: 13px; color: var(--text-secondary);">Selecione um mês.</p>';
+    return;
+  }
+
+  const mes = sel.value;
+  const fil = registros.filter(r => r.data.startsWith(mes));
+  const receita = fil.reduce((s, r) => s + (parseFloat(r.valor) || 0), 0);
+  const diasUnicos = [...new Set(fil.map(r => r.data))].length || 1;
+  const media = receita / diasUnicos;
+
+  document.getElementById('rel-receita').textContent = fmt(receita);
+  document.getElementById('rel-atend').textContent = fil.length;
+  document.getElementById('rel-media').textContent = fmt(media);
+
+  const servicos = {};
+  fil.forEach(r => {
+    servicos[r.proc] = (servicos[r.proc] || 0) + 1;
+  });
+
+  const svcHTML = Object.entries(servicos)
+    .sort((a, b) => b[1] - a[1])
+    .map(([s, n]) => `
+      <div style="margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px;">
+          <span style="color: var(--text-primary); font-weight: 500;">${s}</span>
+          <span style="color: var(--text-secondary);">${n}x</span>
+        </div>
+        <div style="background: var(--surface-alt); border-radius: 50px; height: 6px; overflow: hidden;">
+          <div style="height: 100%; background: linear-gradient(90deg, var(--primary-dark), var(--primary)); width: ${Math.round(n/fil.length*100)}%; border-radius: 50px;"></div>
+        </div>
+      </div>
+    `).join('');
+
+  document.getElementById('rel-servicos').innerHTML = svcHTML || '<p style="font-size: 13px; color: var(--text-secondary);">Nenhum atendimento neste mês.</p>';
+
+  atualizarMeta();
+}
+
+function salvarMeta() {
+  const val = parseFloat(document.getElementById('meta-valor').value || 0);
+  localStorage.setItem('emilly_meta', val);
+  atualizarMeta();
+}
+
+function atualizarMeta() {
+  const meta = parseFloat(localStorage.getItem('emilly_meta') || 0);
+  const mes = document.getElementById('rel-mes')?.value;
+  if (!mes) return;
+
+  const fil = registros.filter(r => r.data.startsWith(mes));
+  const receita = fil.reduce((s, r) => s + (parseFloat(r.valor) || 0), 0);
+  const pct = meta > 0 ? Math.min(Math.round(receita / meta * 100), 100) : 0;
+
+  document.getElementById('meta-barra').style.width = pct + '%';
+  document.getElementById('meta-pct').textContent = pct + '%';
+}
+
+function exportarCSV() {
+  const sel = document.getElementById('rel-mes');
+  const mes = sel?.value;
+  const fil = mes ? registros.filter(r => r.data.startsWith(mes)) : registros;
+
+  const header = 'Nome,Data,Procedimento,Valor,Pagamento\n';
+  const rows = fil.map(r => `"${r.nome}","${fmtData(r.data)}","${r.proc}","${fmt(r.valor)}","${r.pgto}"`).join('\n');
+
+  const blob = new Blob(['\uFEFF' + header + rows], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `relatorio-${mes || 'completo'}.csv`;
+  a.click();
+
+  toast('✅ Relatório exportado!');
+}
+
+// HOME
+function renderHome() {
+  const hoje = new Date().toISOString().split('T')[0];
+  const hojeFil = registros.filter(r => r.data === hoje);
+  const receita = hojeFil.reduce((s, r) => s + (parseFloat(r.valor) || 0), 0);
+  const media = hojeFil.length ? receita / hojeFil.length : 0;
+
+  document.getElementById('today-receita').textContent = fmt(receita);
+  document.getElementById('today-atend').textContent = hojeFil.length;
+  document.getElementById('today-media').textContent = fmt(media);
+
+  const proximos = agendamentos
+    .filter(a => new Date(a.data + ' ' + a.hora) >= new Date())
+    .sort((a, b) => new Date(a.data + ' ' + a.hora) - new Date(b.data + ' ' + b.hora))
+    .slice(0, 3)
+    .map((a, i) => `
+      <div class="list-item">
+        <div class="list-item-icon" style="background: rgba(59,130,246,0.1); color: #3b82f6;">${i + 1}</div>
+        <div class="list-item-content">
+          <div class="list-item-title">${a.nome}</div>
+          <div class="list-item-desc">📅 ${fmtData(a.data)} às ${a.hora}</div>
+        </div>
+      </div>
+    `).join('') || '<div class="empty" style="padding: 20px;"><div class="empty-icon">✓</div><p>Nenhum agendamento</p></div>';
+
+  const recentes = registros
+    .sort((a, b) => new Date(b.data) - new Date(a.data))
+    .slice(0, 3)
+    .map((r, i) => `
+      <div class="list-item">
+        <div class="list-item-icon" style="background: rgba(16,185,129,0.1); color: var(--success);">${i + 1}</div>
+        <div class="list-item-content">
+          <div class="list-item-title">${r.nome}</div>
+          <div class="list-item-desc">${r.proc} • ${fmt(r.valor)}</div>
+        </div>
+      </div>
+    `).join('') || '<div class="empty" style="padding: 20px;"><div class="empty-icon">📭</div><p>Nenhum atendimento</p></div>';
+
+  const proximosEl = document.getElementById('proximos-container');
+  const recentesEl = document.getElementById('recentes-container');
+  if (proximosEl) proximosEl.innerHTML = proximos;
+  if (recentesEl) recentesEl.innerHTML = recentes;
+}
+
+function updateBadges() {
+  const dataAtual = new Date().toISOString().split('T')[0];
+  const agendHoje = agendamentos.filter(a => new Date(a.data) >= new Date(dataAtual)).length;
+  const filaLen = filaEspera.length;
+
+  const badgeFila = document.getElementById('badge-fila');
+  if (badgeFila) {
+    badgeFila.textContent = filaLen;
+    badgeFila.style.display = filaLen > 0 ? 'inline' : 'none';
+  }
+}
+
+// ═══ FOLGAS ═══
+document.getElementById('form-folga')?.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const data = document.getElementById('folga-data').value;
+  const motivo = document.getElementById('folga-motivo').value.trim();
+
+  if (!data) {
+    toast('⚠️ Selecione uma data');
+    return;
+  }
+
+  folgas.push({ id: Date.now(), data, motivo });
+  localStorage.setItem('emilly_folgas', JSON.stringify(folgas));
+  e.target.reset();
+  renderFolgas();
+  toast('✅ Folga registrada!');
+});
+
+function renderFolgas() {
+  const sorted = folgas.sort((a, b) => new Date(a.data) - new Date(b.data));
+  const hoje = new Date().toISOString().split('T')[0];
+
+  const html = sorted.length ? sorted.map((f, i) => {
+    const isPast = f.data < hoje;
+    return `
+      <div class="list-item" style="opacity: ${isPast ? 0.6 : 1};">
+        <div class="list-item-icon" style="background: rgba(59,130,246,0.1); color: #3b82f6;">${i + 1}</div>
+        <div class="list-item-content">
+          <div class="list-item-title">${fmtData(f.data)}</div>
+          <div class="list-item-desc">${f.motivo || 'Sem motivo informado'}</div>
+        </div>
+        <button class="btn btn-sm btn-danger" onclick="deletarFolga(${f.id})">✕</button>
+      </div>
+    `;
+  }).join('') : '<div class="empty"><div class="empty-icon">🌴</div><p>Nenhuma folga registrada</p></div>';
+
+  const container = document.getElementById('folgas-container');
+  if (container) container.innerHTML = html;
+
+  // Resumo
+  const proxima = sorted.find(f => f.data >= hoje);
+  document.getElementById('folgas-total').textContent = sorted.length;
+  document.getElementById('folgas-proxima').textContent = proxima ? fmtData(proxima.data) : '-';
+}
+
+function deletarFolga(id) {
+  if (!confirm('Remover folga?')) return;
+  folgas = folgas.filter(f => f.id !== id);
+  localStorage.setItem('emilly_folgas', JSON.stringify(folgas));
+  renderFolgas();
+}
+
+// INIT
+console.log('🚀 Iniciando aplicação...');
+
+loadAllData();
+
+// Mostrar home após dados carregarem
+setTimeout(() => {
+  console.log('✅ Mostrando Home...');
+  showTab('home');
+  renderAgendamentos();
+  updateBadges();
+
+  const homeEl = document.getElementById('home');
+  if(homeEl) homeEl.style.display = 'block';
+  console.log('✅ Home exibida');
+}, 100);
+
+// ═══ SYNC AUTOMÁTICO ═══
+// Sincronizar agendamentos a cada 3 segundos
+setInterval(async () => {
+  const novoAgendamentos = JSON.parse(localStorage.getItem('emilly_agendamentos')) || [];
+  if(JSON.stringify(novoAgendamentos) !== JSON.stringify(agendamentos)) {
+    console.log('🔄 Sincronizando agendamentos locais...');
+    agendamentos = novoAgendamentos;
+    renderAgendamentos();
+    renderHome();
+    updateBadges();
+  }
+}, 3000);
+
+// Limpar agendamentos inválidos na primeira carga
+console.log('🚀 Iniciando limpeza de agendamentos...');
+setTimeout(() => {
+  limparAgendamentosInvalidos();
+}, 2000);
+</script>
+
+</body>
+</html>

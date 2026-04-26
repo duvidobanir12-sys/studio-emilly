@@ -1,0 +1,68 @@
+name: Lembrete de Agendamentos
+
+on:
+  schedule:
+    - cron: '0 23 * * *'  # 23h UTC = 20h Brasília
+  workflow_dispatch:       # permite rodar manualmente pra testar
+
+jobs:
+  lembrete:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verificar agendamentos de amanhã
+        run: |
+          node -e "
+          const https = require('https');
+
+          const TG_TOKEN   = '${{ secrets.TG_TOKEN }}';
+          const CHAT_IDS   = ['8791111721', '5106987392'];
+          const DB_URL     = '${{ secrets.FIREBASE_DB_URL }}';
+
+          // Data de amanhã
+          const amanha = new Date();
+          amanha.setDate(amanha.getDate() + 1);
+          const dataAmanha = amanha.toISOString().slice(0, 10);
+          const [y, m, d] = dataAmanha.split('-');
+          const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+          const dataFmt = d + ' de ' + meses[parseInt(m)-1];
+
+          function sendTelegram(chatId, msg) {
+            return new Promise(resolve => {
+              const body = JSON.stringify({ chat_id: chatId, text: msg, parse_mode: 'Markdown' });
+              const req = https.request({
+                hostname: 'api.telegram.org',
+                path: '/bot' + TG_TOKEN + '/sendMessage',
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) }
+              }, resolve);
+              req.write(body);
+              req.end();
+            });
+          }
+
+          // Busca agendamentos do Firebase
+          https.get(DB_URL + '/agendamentos.json', res => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', async () => {
+              const todos = JSON.parse(data) || {};
+              const amanha_agend = Object.values(todos).filter(a =>
+                a.data === dataAmanha && a.status !== 'Cancelado'
+              ).sort((a, b) => a.hora.localeCompare(b.hora));
+
+              if (amanha_agend.length === 0) {
+                const msg = '📅 *Lembretes de amanhã (' + dataFmt + ')*\n\n✨ Nenhum agendamento para amanhã!';
+                for (const id of CHAT_IDS) await sendTelegram(id, msg);
+                return;
+              }
+
+              const lista = amanha_agend.map((a, i) =>
+                (i+1) + '. 🕐 *' + a.hora + '* — ' + a.nome + ' · ' + a.proc +
+                (a.tel ? '\n   📱 ' + a.tel : '')
+              ).join('\n');
+
+              const msg = '🌸 *Lembretes de amanhã (' + dataFmt + ')*\n\n' + lista + '\n\n_Total: ' + amanha_agend.length + ' agendamento(s)_';
+              for (const id of CHAT_IDS) await sendTelegram(id, msg);
+            });
+          });
+          "

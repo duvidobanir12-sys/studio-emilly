@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/relatorios.html" },
+    { "source": "/painel", "destination": "/index.html" },
+    { "source": "/agendar", "destination": "/agendar.html" },
+    { "source": "/api/vercel/notify", "destination": "/api/vercel/notify.js" }
+  ],
+  "buildCommand": null
+}

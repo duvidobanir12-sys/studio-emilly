@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd:*)",
+      "Bash(node -c agendar.html)",
+      "Bash(node -c index.html)",
+      "Bash(grep -v \"style\\\\|querySelector\\\\|getElementById\\\\|classList\\\\|function\\\\|//\")",
+      "Bash(node -e \":*)",
+      "Bash(xxd)",
+      "Bash(powershell -Command \"\\(Get-Content index.html\\) -replace ''startsWith\\\\\\(mes\\\\\\)'', ''startsWith\\(mes\\)'' | Set-Content index.html\")",
+      "Bash(powershell -Command \"\\(Get-Content index.html -Raw\\) -replace ''r\\\\.data\\\\.startsWith\\\\\\(mes\\\\\\)'', ''r.data.startsWith\\(mes\\)'' | Set-Content index.html -NoNewline; Write-Host ''done''\")",
+      "Bash(powershell -Command \"$content = Get-Content index.html -Raw; $content = $content -replace ''fil = registros\\\\.filter\\\\\\(r => r\\\\.data\\\\.startsWith\\\\\\(mes\\\\\\)\\\\\\)'', ''fil = registros.filter\\(r => r.data.startsWith\\(mes\\)\\)''; Set-Content index.html -Value $content -NoNewline; Write-Host ''done''\")",
+      "Bash(powershell -Command \"Get-Content index.html -TotalCount 2265 | Select-Object -Last 1\")",
+      "Bash(powershell -Command \":*)",
+      "Bash(grep -n \"^function\\\\|^//\" index.html)",
+      "Bash(powershell -Command \"\\(Get-Content agendar.html -Raw\\) -replace ''apiKey: \"\"AIzaSyALLJn7hEnTxvTN2SNVzkAEs1HAwUG24hE\"\"'', ''apiKey: \"\"AIzaSyDBr3kQaZj_g_gxJ_h2f2zWv5C_-K9yEts\"\"'' -replace ''projectId: \"\"studio-emilly\"\"'', ''projectId: \"\"studio-emilly-santos\"\"'' -replace ''storageBucket: \"\"studio-emilly.firebasestorage.app\"\"'', ''storageBucket: \"\"studio-emilly-santos.appspot.com\"\"'' -replace ''messagingSenderId: \"\"130072077830\"\"'', ''messagingSenderId: \"\"360676621995\"\"'' -replace ''appId: \"\"1:130072077830:web:694aa5bb37307dae260587\"\"'', ''appId: \"\"1:360676621995:web:c0d9e78fea71c99ffc3e30\"\"'' -replace ''databaseURL: \"\"https://studio-emilly-default-rtdb.firebaseio.com\"\"'', ''databaseURL: \"\"https://studio-emilly-santos-default-rtdb.firebaseio.com\"\"'' | Set-Content agendar.html -NoNewline; Write-Host ''Done''\")",
+      "Bash(curl -s \"https://studio-emilly-santos-default-rtdb.firebaseio.com/.json\")",
+      "Bash(curl:*)",
+      "WebFetch(domain:studio-emilly-default-rtdb.firebaseio.com)",
+      "WebFetch(domain:duvidobanir12-sys.github.io)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:studio-emilly.vercel.app)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(powershell -Command \"\\(Get-Content 'C:\\\\Users\\\\Juan\\\\Downloads\\\\OpenClaude\\\\studio-emilly\\\\index.html'\\) -replace 'firebasejs','firebasejs' | Set-Content 'C:\\\\Users\\\\Juan\\\\Downloads\\\\OpenClaude\\\\studio-emilly\\\\index.html'\")",
+      "Bash(powershell -Command \"\\(\\(Get-Content 'C:\\\\Users\\\\Juan\\\\Downloads\\\\OpenClaude\\\\studio-emilly\\\\index.html' -Raw\\) -replace 'firebasejs/10.12.0/firebase','firebasejs/10.12.0/firebase'\\) | Set-Content 'C:\\\\Users\\\\Juan\\\\Downloads\\\\OpenClaude\\\\studio-emilly\\\\index.html' -NoNewline\")",
+      "Bash(powershell -Command \"$content = Get-Content 'C:\\\\Users\\\\Juan\\\\Downloads\\\\OpenClaude\\\\studio-emilly\\\\index.html' -Raw; $content = $content -replace 'firebasejs/10.12.0/firebase','firebasejs/10.12.0/firebase'; Set-Content 'C:\\\\Users\\\\Juan\\\\Downloads\\\\OpenClaude\\\\studio-emilly\\\\index.html' -Value $content -NoNewline\")",
+      "Bash(powershell -Command \"\\(Get-Content index.html -Raw\\) -replace ''firebasejs/10.12.0/firebase'',''firebasejs/10.12.0/firebase'' | Set-Content index.html; grep -n ''gstatic'' index.html | head -2\")",
+      "Bash(python3 -c \":*)",
+      "Bash(python3:*)",
+      "Bash(gh repo:*)"
+    ]
+  }
+}

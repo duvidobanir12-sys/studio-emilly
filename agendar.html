@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#c9184a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Studio ES">
+<meta name="application-name" content="Studio ES">
+<meta name="description" content="Agende seu horário - Studio Emilly Santos">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon.svg">
+<meta property="og:title" content="Agendar · Studio Emilly Santos">
+<meta property="og:description" content="Agende seu horário de unhas com a Emilly Santos">
+<meta property="og:type" content="website">
+<meta property="og:image" content="favicon.svg">
+<title>Agendar · Studio Emilly Santos</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rose:#d45c7a; --rose-light:#f7c5d2; --rose-dark:#a83055;
+  --blush:#fce8ef; --cream:#fff5f8; --text:#3a1a24;
+  --muted:#9a6475; --white:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--cream);
+  color:var(--text);
+  min-height:100vh;min-height:100dvh;
+  -webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent;
+}
+
+/* ── BG ── */
+.bg-deco{
+  position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;
+}
+.bg-circle{
+  position:absolute;border-radius:50%;opacity:.06;
+  background:var(--rose-dark);
+}
+.bg-circle:nth-child(1){width:500px;height:500px;top:-150px;right:-150px;}
+.bg-circle:nth-child(2){width:300px;height:300px;bottom:-80px;left:-80px;}
+.bg-circle:nth-child(3){width:150px;height:150px;top:40%;left:60%;}
+
+/* ── WRAP ── */
+.wrap{
+  position:relative;z-index:1;
+  max-width:480px;margin:0 auto;
+  padding:32px 20px 60px;
+}
+
+/* ── HERO ── */
+.hero{text-align:center;margin-bottom:30px;}
+.hero-logo{
+  width:76px;height:76px;border-radius:50%;
+  background:linear-gradient(135deg,var(--rose-dark),var(--rose));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;
+  color:#fff;margin:0 auto 14px;
+  box-shadow:0 8px 32px rgba(168,48,85,.3);
+}
+.hero h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:32px;font-weight:700;
+  color:var(--rose-dark);line-height:1.1;
+  margin-bottom:4px;
+}
+.hero p{font-size:14px;color:var(--muted);letter-spacing:.5px;}
+.hero-divider{
+  display:flex;align-items:center;gap:10px;
+  margin:16px auto 0;max-width:200px;
+}
+.hero-divider::before,.hero-divider::after{
+  content:'';flex:1;height:1px;background:var(--rose-light);
+}
+.hero-divider span{font-size:11px;color:var(--rose);opacity:.7;letter-spacing:2px;text-transform:uppercase;}
+
+/* ── CARD ── */
+.card{
+  background:var(--white);border-radius:20px;
+  padding:28px 24px;
+  box-shadow:0 8px 40px rgba(168,48,85,.12);
+  border:1.5px solid var(--rose-light);
+}
+
+/* ── FORM ── */
+.fgroup{margin-bottom:14px;}
+.fg-label{
+  display:block;font-size:10px;font-weight:600;
+  letter-spacing:1.2px;text-transform:uppercase;
+  color:var(--muted);margin-bottom:5px;
+}
+.fg-input{
+  width:100%;padding:12px 14px;
+  border:1.5px solid var(--rose-light);border-radius:12px;
+  font-family:'DM Sans',sans-serif;font-size:14px;
+  color:var(--text);background:var(--cream);
+  outline:none;transition:border-color .2s,box-shadow .2s;
+  appearance:none;-webkit-appearance:none;
+  display:inline-block;
+}
+.fg-input:focus{
+  border-color:var(--rose);
+  box-shadow:0 0 0 3px rgba(212,92,122,.12);
+  background:var(--white);
+}
+.fg-select{
+  width:100%;padding:12px 14px;
+  border:1.5px solid var(--rose-light);border-radius:12px;
+  font-family:'DM Sans',sans-serif;font-size:14px;
+  color:var(--text);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23d45c7a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  background-color:var(--cream);
+  padding-right:32px;cursor:pointer;
+  outline:none;appearance:none;-webkit-appearance:none;
+}
+.fg-textarea{
+  width:100%;padding:12px 14px;
+  border:1.5px solid var(--rose-light);border-radius:12px;
+  font-family:'DM Sans',sans-serif;font-size:14px;
+  color:var(--text);background:var(--cream);
+  outline:none;resize:vertical;min-height:80px;
+}
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23d45c7a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  padding-right:32px;cursor:pointer;
+}
+
+/* ── SECTION TITLE ── */
+.stitle{
+  font-size:12px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;color:var(--rose);
+  margin-bottom:16px;margin-top:6px;
+  display:flex;align-items:center;gap:8px;
+}
+.stitle::after{content:'';flex:1;height:1px;background:var(--rose-light);}
+
+/* ── ANAMNESE BUTTONS (no label/input, just div+js) ── */
+.an-q{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;display:block;line-height:1.4;}
+.an-btns{display:flex;gap:8px;margin-top:2px;}
+.an-btn{
+  padding:10px 20px;border-radius:50px;
+  border:1.5px solid var(--rose-light);
+  background:var(--cream);color:var(--muted);
+  font-size:14px;font-weight:500;cursor:pointer;
+  transition:all .15s;user-select:none;
+  text-transform:none;letter-spacing:0;
+  text-align:center;min-width:70px;
+  flex:1;
+  -webkit-tap-highlight-color:transparent;
+}
+.an-btn.sel{
+  background:linear-gradient(135deg,var(--rose-dark),var(--rose));
+  color:#fff;border-color:transparent;
+  box-shadow:0 3px 10px rgba(212,92,122,.35);
+  font-weight:700;
+}
+
+/* ── SUBMIT ── */
+.btn-submit{
+  width:100%;padding:16px;
+  background:linear-gradient(135deg,var(--rose-dark),var(--rose));
+  color:#fff;border:none;border-radius:14px;
+  font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;
+  cursor:pointer;margin-top:8px;
+  box-shadow:0 6px 24px rgba(212,92,122,.35);
+  transition:transform .15s,box-shadow .15s;
+  letter-spacing:.3px;
+  -webkit-appearance:none;
+}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(212,92,122,.4);}
+.btn-submit:active{transform:scale(.98);}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+/* ── STATUS MESSAGES ── */
+.msg-loading,.msg-success,.msg-error{
+  border-radius:12px;padding:14px 16px;
+  font-size:13px;font-weight:500;
+  margin-top:12px;
+  align-items:center;gap:10px;
+}
+.msg-loading,.msg-success,.msg-error{display:none;}
+.msg-loading{background:#f0f0f0;color:#555;}
+.msg-success{background:#e0f7e9;color:#1a7a3c;}
+.msg-error{background:#fce8ef;color:var(--rose-dark);}
+.msg-loading.show,.msg-success.show,.msg-error.show{display:flex;}
+
+/* ── SUCCESS SCREEN ── */
+.success-screen{display:none;text-align:center;padding:20px 0;}
+.success-screen.show{display:block;}
+.success-icon{
+  width:80px;height:80px;border-radius:50%;
+  background:linear-gradient(135deg,#4caf50,#66bb6a);
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;margin:0 auto 20px;
+  box-shadow:0 8px 24px rgba(76,175,80,.3);
+  animation:pop .4s cubic-bezier(.175,.885,.32,1.275);
+}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.success-screen h2{
+  font-family:'Cormorant Garamond',serif;
+  font-size:28px;font-weight:700;color:var(--rose-dark);
+  margin-bottom:8px;
+}
+.success-screen p{font-size:14px;color:var(--muted);line-height:1.6;}
+.success-detail{
+  background:var(--cream);border-radius:12px;padding:16px;
+  margin:20px 0;text-align:left;
+  border:1px solid var(--rose-light);
+}
+.sd-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--rose-light);}
+.sd-row:last-child{border-bottom:none;}
+.sd-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;width:90px;flex-shrink:0;}
+.sd-val{font-size:13px;font-weight:600;color:var(--text);}
+.btn-novo{
+  padding:12px 28px;
+  border:1.5px solid var(--rose);
+  border-radius:12px;background:none;
+  color:var(--rose-dark);font-family:'DM Sans',sans-serif;
+  font-size:14px;font-weight:600;cursor:pointer;
+  transition:all .2s;
+}
+.btn-novo:hover{background:var(--blush);}
+
+/* ── FOOTER ── */
+.footer{text-align:center;margin-top:24px;font-size:11px;color:var(--rose-light);}
+.footer span{color:var(--rose);opacity:.6;}
+
+/* ── SPINNER ── */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{
+  width:16px;height:16px;border:2px solid rgba(0,0,0,.15);
+  border-top-color:#555;border-radius:50%;
+  animation:spin .7s linear infinite;flex-shrink:0;
+}
+
+/* ── MELHORIAS VISUAIS ── */
+/* Hero com animação */
+.hero-logo {
+  animation: logoFloat 3s ease-in-out infinite;
+  transition: transform 0.3s ease;
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.hero-logo:hover {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Card com hover effect */
+.card {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px -15px rgba(212, 92, 122, 0.25);
+  border-color: var(--rose);
+}
+
+/* Inputs com focus effect moderno */
+.fg-input, .fg-select, .fg-textarea {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fg-input:focus, .fg-select:focus, .fg-textarea:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 4px rgba(212, 92, 122, 0.15),
+              0 8px 20px -8px rgba(212, 92, 122, 0.2);
+  border-color: var(--rose-dark);
+}
+
+/* Botões anamnese com animação */
+.an-btn {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.an-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.an-btn:hover::before {
+  left: 100%;
+}
+
+.an-btn.sel {
+  animation: btnSelect 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes btnSelect {
+  from { transform: scale(0.95); }
+  to { transform: scale(1); }
+}
+
+/* Botão submit com shimmer effect */
+.btn-submit {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-submit::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: shimmer 2.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.btn-submit:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px -10px rgba(212, 92, 122, 0.5);
+}
+
+.btn-submit:active {
+  transform: scale(0.98) translateY(0);
+}
+
+/* Termo checkbox com animação */
+#termo-box {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#termo-box:hover {
+  transform: translateX(4px);
+}
+
+#termo-cb {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#termo-cb.checked {
+  animation: checkPop 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes checkPop {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* Animação de entrada para o card */
+.wrap {
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hero divider com animação */
+.hero-divider span {
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* Success screen com animação melhorada */
+.success-screen.show {
+  animation: successPop 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes successPop {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.success-icon {
+  animation: iconSpin 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+             float 3s ease-in-out infinite 0.6s;
+}
+
+@keyframes iconSpin {
+  from { transform: rotate(-180deg) scale(0); }
+  to { transform: rotate(0) scale(1); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Mensagens de status com animação */
+.msg-loading.show, .msg-success.show, .msg-error.show {
+  animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── MOBILE FIRST ── */
+@media(max-width:500px){
+  .wrap{padding:20px 12px 40px;}
+  .card{padding:20px 14px;border-radius:16px;}
+  .hero h1{font-size:28px;}
+  .hero-logo{width:64px;height:64px;font-size:24px;}
+  .fg-input,.fg-select,.fg-textarea{padding:14px;font-size:15px;}
+  .an-q{font-size:14px;}
+  .an-btn{padding:12px 16px;font-size:14px;touch-action:manipulation;}
+  .btn-submit{padding:16px;font-size:16px;}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-deco">
+  <div class="bg-circle"></div>
+  <div class="bg-circle"></div>
+  <div class="bg-circle"></div>
+</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="hero-logo">ES</div>
+    <h1>Studio Emilly Santos</h1>
+    <p>Nail Designer · Beleza que transforma</p>
+    <div class="hero-divider"><span>✦</span></div>
+  </div>
+
+  <div class="card">
+
+    <!-- FORM -->
+    <div id="form-area">
+      <div class="stitle">Seus dados</div>
+
+      <div class="fgroup">
+        <label class="fg-label">Nome completo</label>
+        <input type="text" class="fg-input" id="c-nome" placeholder="Como prefere ser chamada?" autocomplete="name">
+      </div>
+
+      <div class="fgroup">
+        <label class="fg-label">WhatsApp</label>
+        <input type="tel" class="fg-input" id="c-tel" placeholder="(91) 9 0000-0000" inputmode="numeric" autocomplete="tel">
+      </div>
+
+      <div class="stitle" style="margin-top:20px;">Agendamento</div>
+
+      <div class="fgroup">
+        <label class="fg-label">Data</label>
+        <input type="date" class="fg-input" id="c-data" onchange="carregarHorarios()">
+      </div>
+
+      <div class="fgroup">
+        <label class="fg-label">Horário disponível</label>
+        <div id="horarios-wrap" style="margin-top:6px;">
+          <p style="font-size:13px;color:var(--muted);">Selecione uma data primeiro.</p>
+        </div>
+        <input type="hidden" id="c-hora">
+      </div>
+
+      <div class="fgroup">
+        <label class="fg-label">Procedimento</label>
+        <select class="fg-select" id="c-proc">
+          <option value="">Selecione o serviço...</option>
+          <option>Pé</option>
+          <option>Mão</option>
+          <option>Pé e mão</option>
+          <option>SPA dos pés</option>
+          <option>Pé e mão com SPA</option>
+          <option>Plástica dos pés</option>
+          <option>Postiça simples</option>
+          <option>Postiça decorada</option>
+          <option>Outro</option>
+        </select>
+      </div>
+
+      <div class="fgroup">
+        <label class="fg-label">Observações (opcional)</label>
+        <textarea class="fg-textarea" id="c-obs" placeholder="Algum detalhe ou preferência?"></textarea>
+      </div>
+
+      <!-- ═══ ANAMNESE ═══ -->
+      <div class="stitle" style="margin-top:20px;">Anamnese</div>
+
+      <!-- Diabetes -->
+      <div class="fgroup">
+        <span class="an-q">Tem diabetes?</span>
+        <div class="an-btns" onclick="anToggle(event,'diabetes')">
+          <button type="button" class="an-btn" data-group="diabetes" data-val="sim">Sim</button>
+          <button type="button" class="an-btn" data-group="diabetes" data-val="nao">Não</button>
+        </div>
+      </div>
+
+      <!-- Gestante -->
+      <div class="fgroup">
+        <span class="an-q">É gestante?</span>
+        <div class="an-btns" onclick="anToggle(event,'gestante')">
+          <button type="button" class="an-btn" data-group="gestante" data-val="sim">Sim</button>
+          <button type="button" class="an-btn" data-group="gestante" data-val="nao">Não</button>
+        </div>
+      </div>
+
+      <!-- Alergia -->
+      <div class="fgroup">
+        <span class="an-q">Possui alergia a esmalte, cosmético ou outro componente?</span>
+        <div class="an-btns" onclick="anToggle(event,'alergia')">
+          <button type="button" class="an-btn" data-group="alergia" data-val="sim">Sim</button>
+          <button type="button" class="an-btn" data-group="alergia" data-val="nao">Não</button>
+        </div>
+        <input type="text" class="fg-input" id="c-alergia-detalhe" placeholder="Se sim, especifique" style="margin-top:8px;">
+      </div>
+
+      <!-- Micosse -->
+      <div class="fgroup">
+        <span class="an-q">Possui onicomicose (micose/fungo nas unhas)?</span>
+        <div class="an-btns" onclick="anToggle(event,'micose')">
+          <button type="button" class="an-btn" data-group="micose" data-val="sim">Sim</button>
+          <button type="button" class="an-btn" data-group="micose" data-val="nao">Não</button>
+        </div>
+      </div>
+
+      <!-- Medicamento -->
+      <div class="fgroup">
+        <span class="an-q">Faz uso de algum medicamento?</span>
+        <div class="an-btns" onclick="anToggle(event,'medicamento')">
+          <button type="button" class="an-btn" data-group="medicamento" data-val="sim">Sim</button>
+          <button type="button" class="an-btn" data-group="medicamento" data-val="nao">Não</button>
+        </div>
+        <input type="text" class="fg-input" id="c-medicamento-detalhe" placeholder="Se sim, qual?" style="margin-top:8px;">
+      </div>
+
+      <!-- Onicocriptose -->
+      <div class="fgroup">
+        <span class="an-q">Possui onicocriptose (unha encravada)?</span>
+        <div class="an-btns" onclick="anToggle(event,'encravada')">
+          <button type="button" class="an-btn" data-group="encravada" data-val="sim">Sim</button>
+          <button type="button" class="an-btn" data-group="encravada" data-val="nao">Não</button>
+        </div>
+      </div>
+
+      <!-- Esporte -->
+      <div class="fgroup">
+        <span class="an-q">Pratica esportes de impacto?</span>
+        <div class="an-btns" onclick="anToggle(event,'esporte')">
+          <button type="button" class="an-btn" data-group="esporte" data-val="sim">Sim</button>
+          <button type="button" class="an-btn" data-group="esporte" data-val="nao">Não</button>
+        </div>
+      </div>
+
+      <!-- Termos -->
+      <div style="background:var(--blush);border-radius:12px;padding:14px 16px;margin-bottom:16px;border:2px solid var(--rose-light);">
+        <p style="font-size:11px;color:var(--muted);line-height:1.7;text-align:justify;">
+          Afirmo estar ciente dos benefícios, riscos, contraindicações e advertências a mim informados, me comprometo a seguir todas as orientações e a fazer o uso correto dos produtos recomendados. Declaro verdadeiras as informações preenchidas acima, isentando o profissional de qualquer culpa ou responsabilidade provenientes de omissão ou desconhecimento. Por fim, autorizo a realização do procedimento a mim indicado e o uso das imagens relativas ao mesmo para fins de divulgação, incluindo redes sociais.
+        </p>
+        <div onclick="termoCheckbox()" style="margin-top:12px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:10px;background:var(--white);border-radius:10px;border:2px solid var(--rose-light);touch-action:manipulation;" id="termo-box">
+          <span id="termo-cb" style="width:22px;height:22px;border:2px solid var(--rose-light);border-radius:6px;display:inline-block;flex-shrink:0;text-align:center;line-height:20px;font-size:14px;transition:all .15s;color:transparent;">✓</span>
+          <span style="font-size:12px;font-weight:700;color:var(--rose-dark);text-transform:none;letter-spacing:0;">Li e concordo com os termos acima ✓</span>
+        </div>
+      </div>
+
+      <button class="btn-submit" id="btn-enviar" onclick="enviarAgendamento()">
+        🌸 Solicitar Agendamento
+      </button>
+
+      <div class="msg-loading" id="msg-loading">
+        <div class="spinner"></div>
+        <span>Enviando seu agendamento...</span>
+      </div>
+      <div class="msg-error" id="msg-error">
+        <span>⚠️</span>
+        <span id="msg-error-text">Preencha todos os campos obrigatórios.</span>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="success-screen" id="success-screen">
+      <div class="success-icon">✓</div>
+      <h2>Pedido enviado!</h2>
+      <p>Sua solicitação foi recebida. A Emilly vai confirmar pelo WhatsApp em breve! 💖</p>
+
+      <div class="success-detail" id="success-detail"></div>
+
+      <button class="btn-novo" onclick="novoAgendamento()">+ Fazer outro agendamento</button>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  ⚠️  CONFIGURAÇÃO FIREBASE
+// ══════════════════════════════════════════════════════
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDBr3kQaZj_g_gxJ_h2f2zWv5C_-K9yEts",
+  authDomain: "studio-emilly.firebaseapp.com",
+  databaseURL: "https://studio-emilly-default-rtdb.firebaseio.com",
+  projectId: "studio-emilly",
+  storageBucket: "studio-emilly.appspot.com",
+  messagingSenderId: "360676621995",
+  appId: "1:360676621995:web:c0d9e78fea71c99ffc3e30"
+};
+
+// ════════════════════════════════════════
+//  ANAMNESE: estado via JS (sem checkbox)
+// ════════════════════════════════════════
+const anState = {
+  diabetes:'', gestante:'', alergia:'', micose:'',
+  medicamento:'', encravada:'', esporte:''
+};
+
+function anToggle(e, group){
+  const btn = e.target.closest('.an-btn');
+  if(!btn) return;
+  // Deseleciona todos do grupo
+  document.querySelectorAll('.an-btn[data-group="'+group+'"]').forEach(b=>{
+    b.classList.remove('sel');
+  });
+  if(btn.classList.contains('sel')){
+    // Se já tava selecionado, desmarca
+    anState[group] = '';
+  } else {
+    btn.classList.add('sel');
+    anState[group] = btn.dataset.val === 'sim' ? 'Sim' : 'Não';
+  }
+}
+
+// ── Termo checkbox ──
+let _termoChecked = false;
+function termoCheckbox(){
+  _termoChecked = !_termoChecked;
+  const box = document.getElementById('termo-box');
+  const cb = document.getElementById('termo-cb');
+  if(_termoChecked){
+    box.style.borderColor = 'var(--rose-dark)';
+    box.style.background = 'var(--blush)';
+    cb.style.borderColor = 'var(--rose)';
+    cb.style.background = 'var(--rose)';
+    cb.style.color = '#fff';
+  } else {
+    box.style.borderColor = 'var(--rose-light)';
+    box.style.background = 'var(--white)';
+    cb.style.borderColor = 'var(--rose-light)';
+    cb.style.background = 'transparent';
+    cb.style.color = 'var(--rose)';
+  }
+}
+
+// ════════════════════════════════════════
+//  FIREBASE INIT
+// ════════════════════════════════════════
+const HORARIOS_DIA = ['08:00','10:30','13:00','15:30','18:00'];
+let _agendamentosOcupados = {};
+let _folgasDatas = new Set();
+
+import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({initializeApp})=>{
+  import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js').then(({getDatabase, ref, push, onValue})=>{
+    const app = initializeApp(FIREBASE_CONFIG);
+    const db  = getDatabase(app);
+    window._fbPush = (data) => push(ref(db, 'agendamentos'), data);
+
+    onValue(ref(db,'agendamentos'), snap=>{
+      _agendamentosOcupados = {};
+      snap.forEach(child=>{
+        const a = child.val();
+        if(a.status !== 'Cancelado'){
+          if(!_agendamentosOcupados[a.data]) _agendamentosOcupados[a.data] = [];
+          _agendamentosOcupados[a.data].push(a.hora);
+        }
+      });
+      const data = document.getElementById('c-data').value;
+      if(data) carregarHorarios();
+    });
+
+    onValue(ref(db,'folgas'), snap=>{
+      _folgasDatas = new Set();
+      snap.forEach(child=>{ _folgasDatas.add(child.val().data); });
+      const data = document.getElementById('c-data').value;
+      if(data) carregarHorarios();
+    });
+  });
+});
+
+// ════════════════════════════════════════
+//  HORARIOS
+// ════════════════════════════════════════
+function carregarHorarios(){
+  const data = document.getElementById('c-data').value;
+  if(!data){ document.getElementById('horarios-wrap').innerHTML='<p style="font-size:13px;color:var(--muted);">Selecione a data acima.</p>'; return; }
+
+  if(_folgasDatas.has(data)){
+    document.getElementById('c-hora').value = '';
+    document.getElementById('horarios-wrap').innerHTML = '<div style="background:#fce8ef;border-radius:12px;padding:14px;text-align:center;border:1.5px solid var(--rose-light);"><div style="font-size:22px;margin-bottom:6px;">🚫</div><div style="font-size:13px;font-weight:600;color:var(--rose-dark);">Este dia não tem atendimento</div><div style="font-size:12px;color:var(--muted);margin-top:4px;">Escolha outra data</div></div>';
+    return;
+  }
+
+  const ocupados = _agendamentosOcupados[data] || [];
+  document.getElementById('c-hora').value = '';
+  const wrap = document.getElementById('horarios-wrap');
+  wrap.innerHTML = '';
+  HORARIOS_DIA.forEach(h => {
+    const livre = !ocupados.includes(h);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = h + (!livre ? ' (Ocupado)' : '');
+    btn.style.cssText = 'padding:10px 16px;border-radius:50px;border:1.5px solid '+(livre?'var(--rose-light)':'#eee')+';background:'+(livre?'var(--cream)':'#f5f5f5')+';color:'+(livre?'var(--text)':'#bbb')+';font-size:14px;cursor:'+(livre?'pointer':'not-allowed')+';margin:4px;font-family:DM Sans,sans-serif;';
+    if(livre) {
+      btn.addEventListener('click', () => selecionarHorario(h, btn));
+    } else {
+      btn.disabled = true;
+    }
+    wrap.appendChild(btn);
+  });
+}
+
+function selecionarHorario(hora, el){
+  document.getElementById('c-hora').value = hora;
+  document.querySelectorAll('#horarios-wrap button').forEach(b=>{
+    b.style.background = 'var(--cream)';
+    b.style.color = 'var(--text)';
+    b.style.borderColor = 'var(--rose-light)';
+    b.style.fontWeight = '400';
+    b.style.boxShadow = 'none';
+  });
+  el.style.background = 'linear-gradient(135deg,var(--rose-dark),var(--rose))';
+  el.style.color = '#fff';
+  el.style.borderColor = 'transparent';
+  el.style.fontWeight = '700';
+  el.style.boxShadow = '0 3px 10px rgba(212,92,122,.35)';
+}
+
+// ── Máscara tel ──
+document.getElementById('c-tel').addEventListener('input', function(e){
+  let v = e.target.value.replace(/\D/g,'');
+  if(v.length > 11) v = v.slice(0,11);
+  if(v.length===0){ e.target.value=''; return; }
+  if(v.length<=2) v='('+v;
+  else if(v.length<=7) v='('+v.slice(0,2)+') '+v.slice(2);
+  else v='('+v.slice(0,2)+') '+v.slice(2,7)+'-'+v.slice(7);
+  e.target.value=v;
+});
+
+// ── Data mínima: hoje ──
+const hoje = new Date().toISOString().slice(0,10);
+document.getElementById('c-data').min = hoje;
+document.getElementById('c-data').value = hoje;
+
+function showMsg(id){ ['msg-loading','msg-error'].forEach(i=>{ const el=document.getElementById(i); el.classList.remove('show'); }); if(id) document.getElementById(id).classList.add('show'); }
+
+// ════════════════════════════════════════
+//  ENVIAR
+// ════════════════════════════════════════
+async function enviarAgendamento(){
+  const nome = document.getElementById('c-nome').value.trim();
+  const tel  = document.getElementById('c-tel').value.trim();
+  const data = document.getElementById('c-data').value;
+  const hora = document.getElementById('c-hora').value;
+  const proc = document.getElementById('c-proc').value;
+  const obs  = document.getElementById('c-obs').value.trim();
+
+  const alergiaDetalhe = document.getElementById('c-alergia-detalhe').value.trim();
+  const medicamentoDetalhe = document.getElementById('c-medicamento-detalhe').value.trim();
+
+  if(!nome||!data||!hora||!proc){
+    document.getElementById('msg-error-text').textContent = '⚠️ Preencha nome, data, selecione um horário e procedimento.';
+    showMsg('msg-error');
+    return;
+  }
+
+  if(!_termoChecked){
+    document.getElementById('msg-error-text').textContent = '⚠️ Você precisa aceitar os termos para continuar.';
+    showMsg('msg-error');
+    return;
+  }
+
+  const btn = document.getElementById('btn-enviar');
+  btn.disabled = true;
+  showMsg('msg-loading');
+
+  const agend = {
+    id: Date.now(),
+    nome, tel, data, hora, proc, obs,
+    anamnese: {
+      diabetes: anState.diabetes,
+      gestante: anState.gestante,
+      alergia: anState.alergia,
+      alergiaDetalhe,
+      micose: anState.micose,
+      medicamento: anState.medicamento,
+      medicamentoDetalhe,
+      encravada: anState.encravada,
+      esporte: anState.esporte
+    },
+    status: 'Pendente',
+    origem: 'site',
+    criadoEm: new Date().toISOString()
+  };
+
+  try {
+    if(window._fbPush){
+      await window._fbPush(agend);
+    } else {
+      await new Promise((res,rej)=>{
+        let tries=0;
+        const t=setInterval(()=>{
+          tries++;
+          if(window._fbPush){ clearInterval(t); window._fbPush(agend).then(res).catch(rej); }
+          if(tries>20){ clearInterval(t); rej(new Error('Firebase não carregou')); }
+        },300);
+      });
+    }
+    // Notifica Telegram
+    fetch('/api/vercel/notify', {
+      method: 'POST',
+      keepalive: true,
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(agend)
+    }).then(r => r.json()).then(d => console.log('Telegram:', d)).catch(e => console.error('Telegram err:', e));
+
+    showMsg(null);
+    mostrarSucesso(agend);
+  } catch(err){
+    console.error(err);
+    document.getElementById('msg-error-text').textContent = '❌ Erro ao enviar. Tente novamente ou entre em contato pelo WhatsApp.';
+    showMsg('msg-error');
+    btn.disabled = false;
+  }
+}
+
+function mostrarSucesso(a){
+  const [y,m,d] = a.data.split('-');
+  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const dataFmt = d + ' de ' + meses[parseInt(m)-1];
+
+  document.getElementById('success-detail').innerHTML =
+    '<div class="sd-row"><span class="sd-label">Nome</span><span class="sd-val">'+a.nome+'</span></div>'+
+    '<div class="sd-row"><span class="sd-label">Data</span><span class="sd-val">📅 '+dataFmt+'</span></div>'+
+    '<div class="sd-row"><span class="sd-label">Horário</span><span class="sd-val">🕐 '+a.hora+'</span></div>'+
+    '<div class="sd-row"><span class="sd-label">Serviço</span><span class="sd-val">💅 '+a.proc+'</span></div>'+
+    (a.tel?'<div class="sd-row"><span class="sd-label">WhatsApp</span><span class="sd-val">'+a.tel+'</span></div>':'');
+
+  document.getElementById('form-area').style.display = 'none';
+  document.getElementById('success-screen').classList.add('show');
+}
+
+function novoAgendamento(){
+  document.getElementById('c-nome').value='';
+  document.getElementById('c-tel').value='';
+  document.getElementById('c-data').value=hoje;
+  document.getElementById('c-hora').value='';
+  carregarHorarios();
+  document.getElementById('c-proc').value='';
+  document.getElementById('c-obs').value='';
+  document.getElementById('btn-enviar').disabled=false;
+  showMsg(null);
+  document.getElementById('form-area').style.display='block';
+  document.getElementById('success-screen').classList.remove('show');
+
+  // Reseta anamnese
+  for(let k in anState) anState[k]='';
+  document.querySelectorAll('.an-btn').forEach(b=> b.classList.remove('sel'));
+  _termoChecked = false;
+  var box = document.getElementById('termo-box');
+  var cb = document.getElementById('termo-cb');
+  box.style.borderColor = 'var(--rose-light)';
+  box.style.background = 'var(--white)';
+  cb.style.borderColor = 'var(--rose-light)';
+  cb.style.background = 'transparent';
+  cb.style.color = 'var(--rose)';
+}
+</script>
+</body>
+</html>
