@@ -490,6 +490,27 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
       e.target.reset();
     });
 
+    // ═══ MIGRAR DADOS ANTIGOS DO LOCALSTORAGE ═══
+    const oldData = JSON.parse(localStorage.getItem('registros') || '[]');
+    if (oldData.length > 0) {
+      oldData.forEach(item => {
+        push(ref(db, 'registros'), {
+          nome: item.nome || '',
+          data: item.data || '',
+          tel: item.tel || '',
+          proc: item.proc || '',
+          valor: item.valor || '0.00',
+          pagamento: item.pagamento || '',
+          status: item.status || 'Confirmado',
+          horaInicio: item.horaInicio || '',
+          horaFim: item.horaFim || '',
+          criadoEm: new Date().toISOString()
+        });
+      });
+      localStorage.removeItem('registros');
+      toast('Dados antigos migrados!');
+    }
+
     // ═══ CARREGAR REGISTROS (HISTÓRICO) ═══
     onValue(ref(db, 'registros'), (snap) => {
       registrosData = [];
