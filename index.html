@@ -300,6 +300,7 @@ main {
   <button class="tab-btn active" onclick="switchTab('anotar', this)">📝 Anotar</button>
   <button class="tab-btn" onclick="switchTab('historico', this)">📋 Histórico</button>
   <button class="tab-btn" onclick="switchTab('agendamentos', this)">📅 Agendamentos</button>
+  <button class="tab-btn" onclick="switchTab('financeiro', this)">💰 Financeiro</button>
 </div>
 
 <main>
@@ -388,6 +389,15 @@ main {
     </div>
   </div>
 
+  <!-- ABA FINANCEIRO -->
+  <div class="tab-content" id="tab-financeiro">
+    <div class="card">
+      <h2 class="card-title">💰 Financeiro</h2>
+      <div id="financeiro-resumo"></div>
+      <div id="financeiro-detalhes" style="margin-top:20px;"></div>
+    </div>
+  </div>
+
 </main>
 
 <script>
@@ -441,6 +451,8 @@ function switchTab(tab, btn) {
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   if(btn) btn.classList.add('active');
   document.getElementById('tab-' + tab).classList.add('active');
+
+  if (tab === 'financeiro') renderFinanceiro();
 }
 
 // ════════════════════════════════════════════════════
@@ -650,6 +662,93 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
       document.getElementById('btn-submit').textContent = 'Anotar';
       document.getElementById('btn-submit').style.background = '';
       document.getElementById('form-anotar').reset();
+    };
+
+    // ═══ RENDER FINANCEIRO ═══
+    window.renderFinanceiro = function() {
+      const hoje = new Date();
+      const mesAtual = hoje.toISOString().slice(0,7); // YYYY-MM
+      const registrosMes = registrosData.filter(r => r.data && r.data.startsWith(mesAtual));
+
+      if (registrosMes.length === 0) {
+        document.getElementById('financeiro-resumo').innerHTML = '<div class="empty">Nenhum registro este mês</div>';
+        document.getElementById('financeiro-detalhes').innerHTML = '';
+        return;
+      }
+
+      // Totais
+      const total = registrosMes.reduce((sum, r) => sum + parseFloat(r.valor || 0), 0);
+      const count = registrosMes.length;
+      const media = total / count;
+
+      // Por procedimento
+      const porProc = {};
+      registrosMes.forEach(r => {
+        const p = r.proc || 'Outro';
+        if (!porProc[p]) porProc[p] = { qtd: 0, valor: 0 };
+        porProc[p].qtd++;
+        porProc[p].valor += parseFloat(r.valor || 0);
+      });
+
+      // Por forma de pagamento
+      const porPag = {};
+      registrosMes.forEach(r => {
+        const p = r.pagamento || 'Não informado';
+        if (!porPag[p]) porPag[p] = { qtd: 0, valor: 0 };
+        porPag[p].qtd++;
+        porPag[p].valor += parseFloat(r.valor || 0);
+      });
+
+      // Render resumo
+      const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+      const nomeMes = meses[hoje.getMonth()];
+
+      let html = `
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px;">
+          <div style="background: var(--bg); border-radius: 12px; padding: 16px; text-align: center;">
+            <div style="font-size: 24px; font-weight: 700; color: var(--pink);">R$ ${total.toFixed(2)}</div>
+            <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">Faturamento</div>
+          </div>
+          <div style="background: var(--bg); border-radius: 12px; padding: 16px; text-align: center;">
+            <div style="font-size: 24px; font-weight: 700; color: var(--success);">${count}</div>
+            <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">Procedimentos</div>
+          </div>
+          <div style="background: var(--bg); border-radius: 12px; padding: 16px; text-align: center;">
+            <div style="font-size: 24px; font-weight: 700; color: #3b82f6;">R$ ${media.toFixed(2)}</div>
+            <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">Média</div>
+          </div>
+        </div>
+        <div style="font-size: 14px; font-weight: 700; color: var(--pink); margin-bottom: 12px;">Resumo - ${nomeMes}</div>
+      `;
+
+      document.getElementById('financeiro-resumo').innerHTML = html;
+
+      // Detalhes
+      let detalhes = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">';
+
+      detalhes += '<div><div style="font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 8px;">Por Procedimento</div>';
+      Object.keys(porProc).sort((a,b) => porProc[b].valor - porProc[a].valor).forEach(p => {
+        detalhes += `
+          <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border);">
+            <span style="font-size: 13px;">${p} <span style="color: var(--muted); font-size: 11px;">(${porProc[p].qtd}x)</span></span>
+            <span style="font-size: 13px; font-weight: 600;">R$ ${porProc[p].valor.toFixed(2)}</span>
+          </div>
+        `;
+      });
+      detalhes += '</div>';
+
+      detalhes += '<div><div style="font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 8px;">Por Pagamento</div>';
+      Object.keys(porPag).sort((a,b) => porPag[b].valor - porPag[a].valor).forEach(p => {
+        detalhes += `
+          <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border);">
+            <span style="font-size: 13px;">${p} <span style="color: var(--muted); font-size: 11px;">(${porPag[p].qtd}x)</span></span>
+            <span style="font-size: 13px; font-weight: 600;">R$ ${porPag[p].valor.toFixed(2)}</span>
+          </div>
+        `;
+      });
+      detalhes += '</div></div>';
+
+      document.getElementById('financeiro-detalhes').innerHTML = detalhes;
     };
 
   });
