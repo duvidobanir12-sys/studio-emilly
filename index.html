@@ -169,6 +169,13 @@ main {
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 @media (max-width: 768px) {
   main { padding: 16px; }
   .card { padding: 16px; }
@@ -218,21 +225,35 @@ main {
           <input type="number" id="valor" placeholder="0,00" step="0.01" required>
         </div>
       </div>
-      <button type="submit" class="btn btn-primary">Anotar</button>
+      <button type="submit" class="btn btn-primary" id="btn-submit">Anotar</button>
     </form>
   </div>
 
   <!-- LISTA -->
   <div class="card">
     <h2 class="card-title">Procedimentos Anotados</h2>
-    <div id="lista"></div>
+    <div id="lista"><div class="loading">Carregando...</div></div>
   </div>
 
 </main>
 
 <script>
-let registros = JSON.parse(localStorage.getItem('registros') || '[]');
+// ═══════════════════════════════════════════════════
+//  CONFIGURAÇÃO FIREBASE (mesmo do agendar.html)
+// ═══════════════════════════════════════════════════
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDBr3kQaZj_g_gxJ_h2f2zWv5C_-K9yEts",
+  authDomain: "studio-emilly-santos.firebaseapp.com",
+  databaseURL: "https://studio-emilly-santos-default-rtdb.firebaseio.com",
+  projectId: "studio-emilly-santos",
+  storageBucket: "studio-emilly-santos.appspot.com",
+  messagingSenderId: "360676621995",
+  appId: "1:360676621995:web:c0d9e78fea71c99ffc3e30"
+};
 
+let editId = null;
+
+// MÁSCARA DE TELEFONE
 function maskTel(el) {
   let v = el.value.replace(/\D/g, '').slice(0, 11);
   if (v.length >= 2) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
@@ -240,6 +261,7 @@ function maskTel(el) {
   el.value = v;
 }
 
+// TOAST
 function toast(msg) {
   const el = document.createElement('div');
   el.className = 'toast';
@@ -248,52 +270,112 @@ function toast(msg) {
   setTimeout(() => el.remove(), 2500);
 }
 
-document.getElementById('form-anotar').addEventListener('submit', (e) => {
-  e.preventDefault();
-  const nome = document.getElementById('nome').value.trim();
-  const data = document.getElementById('data').value;
-  const tel = document.getElementById('tel').value.trim();
-  const proc = document.getElementById('proc').value;
-  const valor = document.getElementById('valor').value;
+// FIREBASE INIT
+import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({initializeApp}) => {
+  import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js').then(({getDatabase, ref, push, onValue, remove, set}) => {
+    const app = initializeApp(FIREBASE_CONFIG);
+    const db = getDatabase(app);
+    const registrosRef = ref(db, 'registros');
 
-  if (!nome || !data || !proc || !valor) {
-    toast('Preencha os campos obrigatórios');
-    return;
-  }
+    // CARREGAR REGISTROS
+    onValue(registrosRef, (snap) => {
+      let registros = [];
+      snap.forEach(child => {
+        registros.push({ id: child.key, ...child.val() });
+      });
+      render(registros);
+    });
 
-  registros.push({ id: Date.now(), nome, data, tel, proc, valor: parseFloat(valor).toFixed(2) });
-  localStorage.setItem('registros', JSON.stringify(registros));
-  e.target.reset();
-  render();
-  toast('Anotado!');
+    // SALVAR
+    document.getElementById('form-anotar').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const nome = document.getElementById('nome').value.trim();
+      const data = document.getElementById('data').value;
+      const tel = document.getElementById('tel').value.trim();
+      const proc = document.getElementById('proc').value;
+      const valor = document.getElementById('valor').value;
+
+      if (!nome || !data || !proc || !valor) {
+        toast('Preencha os campos obrigatórios');
+        return;
+      }
+
+      if (editId !== null) {
+        // EDITAR
+        set(ref(db, 'registros/' + editId), {
+          nome, data, tel, proc, valor: parseFloat(valor).toFixed(2)
+        }).then(() => {
+          toast('Atualizado!');
+          cancelEdit();
+        });
+      } else {
+        // NOVO
+        push(registrosRef, {
+          nome, data, tel, proc, valor: parseFloat(valor).toFixed(2)
+        }).then(() => {
+          toast('Anotado!');
+        });
+      }
+
+      e.target.reset();
+    });
+
+    // DELETAR
+    window.deletar = function(id) {
+      if (!confirm('Remover registro?')) return;
+      remove(ref(db, 'registros/' + id)).then(() => {
+        toast('Removido');
+      });
+    };
+
+    // EDITAR
+    window.editar = function(id) {
+      onValue(ref(db, 'registros/' + id), (snap) => {
+        const r = snap.val();
+        if (!r) return;
+        editId = id;
+        document.getElementById('nome').value = r.nome;
+        document.getElementById('data').value = r.data;
+        document.getElementById('tel').value = r.tel || '';
+        document.getElementById('proc').value = r.proc;
+        document.getElementById('valor').value = r.valor;
+        const btn = document.getElementById('btn-submit');
+        btn.textContent = 'Atualizar';
+        btn.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
+        toast('Editando...');
+      }, { onlyOnce: true });
+    };
+
+    // CANCELAR EDIÇÃO
+    window.cancelEdit = function() {
+      editId = null;
+      document.getElementById('btn-submit').textContent = 'Anotar';
+      document.getElementById('btn-submit').style.background = '';
+      document.getElementById('form-anotar').reset();
+    };
+
+    // RENDERIZAR
+    function render(registros) {
+      registros.sort((a,b) => new Date(b.data) - new Date(a.data));
+      const html = registros.length ? registros.map(r => `
+        <div class="entry">
+          <div class="entry-info">
+            <div class="entry-name">${r.nome}</div>
+            <div class="entry-desc">📅 ${new Date(r.data+'T00:00:00').toLocaleDateString('pt-BR')} • ${r.proc}${r.tel ? ' • 📱 '+r.tel : ''}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="entry-price">R$ ${r.valor}</div>
+            <button class="btn btn-danger" onclick="editar('${r.id}')">✏️</button>
+            <button class="btn btn-danger" onclick="deletar('${r.id}')">✕</button>
+          </div>
+        </div>
+      `).join('') : '<div class="empty">Nenhum registro anotado</div>';
+
+      document.getElementById('lista').innerHTML = html;
+    }
+
+  });
 });
-
-function deletar(id) {
-  registros = registros.filter(r => r.id !== id);
-  localStorage.setItem('registros', JSON.stringify(registros));
-  render();
-  toast('Removido');
-}
-
-function render() {
-  const sorted = registros.sort((a,b) => new Date(b.data) - new Date(a.data));
-  const html = sorted.length ? sorted.map(r => `
-    <div class="entry">
-      <div class="entry-info">
-        <div class="entry-name">${r.nome}</div>
-        <div class="entry-desc">📅 ${new Date(r.data+'T00:00:00').toLocaleDateString('pt-BR')} • ${r.proc}${r.tel ? ' • 📱 '+r.tel : ''}</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div class="entry-price">R$ ${r.valor}</div>
-        <button class="btn btn-danger" onclick="deletar(${r.id})">✕</button>
-      </div>
-    </div>
-  `).join('') : '<div class="empty">Nenhum registro anotado</div>';
-
-  document.getElementById('lista').innerHTML = html;
-}
-
-render();
 </script>
 
 </body>
