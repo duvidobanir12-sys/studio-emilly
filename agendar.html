@@ -736,6 +736,12 @@ function carregarHorarios(){
     return;
   }
 
+  // Loading enquanto carrega
+  if(Object.keys(_agendamentosOcupados).length === 0){
+    document.getElementById('horarios-wrap').innerHTML = '<p style="font-size:13px;color:var(--muted);">Carregando horários...</p>';
+    return;
+  }
+
   const ocupados = _agendamentosOcupados[data] || [];
   document.getElementById('c-hora').value = '';
   const wrap = document.getElementById('horarios-wrap');
