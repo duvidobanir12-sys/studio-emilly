@@ -389,7 +389,25 @@ function selecionarHorario(hora, el){
 }
 
 // ══════════════════════════════════════════════════════
-// FIREBASE INIT — CORRIGIDO (race condition resolvida)
+// MÁSCARAS E DATA INICIAL — seta ANTES do Firebase init
+// ══════════════════════════════════════════════════════
+document.getElementById('c-tel').addEventListener('input', function(e){
+  let v = e.target.value.replace(/\D/g,'');
+  if(v.length > 11) v = v.slice(0,11);
+  if(v.length === 0){ e.target.value = ''; return; }
+  if(v.length <= 2)  v = '(' + v;
+  else if(v.length <= 7) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
+  else v = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7);
+  e.target.value = v;
+});
+
+// Seta data de hoje IMEDIATAMENTE antes de qualquer coisa assíncrona
+const hoje = new Date().toISOString().slice(0,10);
+document.getElementById('c-data').min   = hoje;
+document.getElementById('c-data').value = hoje;
+
+// ══════════════════════════════════════════════════════
+// FIREBASE INIT
 // ══════════════════════════════════════════════════════
 import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({initializeApp}) => {
   import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js').then(({getDatabase, ref, push, onValue}) => {
@@ -397,48 +415,44 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
     const app = initializeApp(FIREBASE_CONFIG);
     const db  = getDatabase(app);
 
-    _fbPushFn = (data) => push(ref(db, 'agendamentos'), data);
-    window._fbPush = _fbPushFn;
+    window._fbPush = (dadosAgend) => push(ref(db, 'agendamentos'), dadosAgend);
 
     let agendLoaded = false;
     let folgasLoaded = false;
 
-    // Aguarda ambos os listeners antes de liberar
     function checkReady(){
-      if(agendLoaded && folgasLoaded){
-        _fbReady = true;
-        console.log('[Studio] Firebase pronto ✅ | Agendamentos:', _agendamentosOcupados, '| Folgas:', [..._folgasDatas]);
-        carregarHorarios(); // renderiza com dados reais
-      }
+      if(!agendLoaded || !folgasLoaded) return;
+      _fbReady = true;
+      console.log('[Studio] Firebase pronto ✅');
+      console.log('[Studio] Data no input:', document.getElementById('c-data').value);
+      console.log('[Studio] Agendamentos ocupados:', JSON.stringify(_agendamentosOcupados));
+      console.log('[Studio] Folgas:', [..._folgasDatas]);
+      carregarHorarios();
     }
 
     onValue(ref(db, 'agendamentos'), snap => {
       _agendamentosOcupados = {};
       snap.forEach(child => {
         const a = child.val();
-        if(a.status !== 'Cancelado'){
+        if(a && a.data && a.hora && a.status !== 'Cancelado'){
           if(!_agendamentosOcupados[a.data]) _agendamentosOcupados[a.data] = [];
           _agendamentosOcupados[a.data].push(a.hora);
         }
       });
       agendLoaded = true;
-      checkReady();
-      // Re-renderiza se já estava pronto (update em tempo real)
-      if(_fbReady){
-        const data = document.getElementById('c-data').value;
-        if(data) carregarHorarios();
-      }
+      if(_fbReady) carregarHorarios();
+      else checkReady();
     });
 
     onValue(ref(db, 'folgas'), snap => {
       _folgasDatas = new Set();
-      snap.forEach(child => _folgasDatas.add(child.val().data));
+      snap.forEach(child => {
+        const v = child.val();
+        if(v && v.data) _folgasDatas.add(v.data);
+      });
       folgasLoaded = true;
-      checkReady();
-      if(_fbReady){
-        const data = document.getElementById('c-data').value;
-        if(data) carregarHorarios();
-      }
+      if(_fbReady) carregarHorarios();
+      else checkReady();
     });
 
   }).catch(err => {
@@ -451,23 +465,6 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
   document.getElementById('horarios-wrap').innerHTML =
     '<p class="h-status" style="color:var(--rose-dark);">❌ Erro ao inicializar. Recarregue a página.</p>';
 });
-
-// ══════════════════════════════════════════════════════
-// MÁSCARAS E DATA INICIAL
-// ══════════════════════════════════════════════════════
-document.getElementById('c-tel').addEventListener('input', function(e){
-  let v = e.target.value.replace(/\D/g,'');
-  if(v.length > 11) v = v.slice(0,11);
-  if(v.length === 0){ e.target.value = ''; return; }
-  if(v.length <= 2)  v = '(' + v;
-  else if(v.length <= 7) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
-  else v = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7);
-  e.target.value = v;
-});
-
-const hoje = new Date().toISOString().slice(0,10);
-document.getElementById('c-data').min   = hoje;
-document.getElementById('c-data').value = hoje;
 
 function showMsg(id){
   ['msg-loading','msg-error'].forEach(i => document.getElementById(i).classList.remove('show'));
