@@ -416,13 +416,16 @@ const FIREBASE_CONFIG = {
 
 let editId = null;
 
-// MÁSCARA TEL
-function maskTel(el) {
-  let v = el.value.replace(/\D/g, '').slice(0, 11);
-  if (v.length >= 2) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
-  if (v.length >= 10) v = v.slice(0,10) + '-' + v.slice(10);
-  el.value = v;
-}
+// MÁSCARA TEL (igual agendar.html)
+document.getElementById('tel').addEventListener('input', function(e){
+  let v = e.target.value.replace(/\D/g,'');
+  if(v.length > 11) v = v.slice(0,11);
+  if(v.length===0){ e.target.value=''; return; }
+  if(v.length<=2) v='('+v;
+  else if(v.length<=7) v='('+v.slice(0,2)+') '+v.slice(2);
+  else v='('+v.slice(0,2)+') '+v.slice(2,7)+'-'+v.slice(7);
+  e.target.value=v;
+});
 
 // TOAST
 function toast(msg) {
