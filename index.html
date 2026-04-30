@@ -551,7 +551,7 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
             <div>
               <div class="entry-name">${r.nome}</div>
               <div class="entry-desc">
-                📅 ${new Date(r.data+'T00:00:00').toLocaleDateString('pt-BR')} • ${r.proc}
+                📅 ${r.data ? new Date(r.data+'T00:00:00').toLocaleDateString('pt-BR') : 'Data inválida'} • ${r.proc || 'Serviço'}
                 ${r.tel ? ' • 📱 '+r.tel : ''}
                 ${r.pagamento ? ' • 💰 '+r.pagamento : ''}
                 ${r.horaInicio ? ' • 🕐 '+r.horaInicio+(r.horaFim ? '-'+r.horaFim : '') : ''}
@@ -578,7 +578,7 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
             <div>
               <div class="entry-name">${a.nome}</div>
               <div class="entry-desc">
-                📅 ${new Date(a.data+'T00:00:00').toLocaleDateString('pt-BR')} às ${a.hora} • ${a.proc}
+                📅 ${(a.data ? new Date(a.data+'T00:00:00').toLocaleDateString('pt-BR') : 'Data inválida')} às ${a.hora || '??:??'} • ${a.proc || 'Serviço'}
                 ${a.tel ? ' • 📱 '+a.tel : ''}
               </div>
             </div>
