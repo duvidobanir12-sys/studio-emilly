@@ -64,12 +64,9 @@ header p { font-size: 11px; opacity: 0.85; letter-spacing: 1.5px; text-transform
   border-radius: 12px 12px 0 0;
 }
 
-.tab-btn:not(:last-child) { border-right: 1px solid var(--border); }
-
 .tab-btn.active {
   color: var(--pink);
   border-bottom-color: var(--pink);
-  background: var(--card);
 }
 
 .tab-content { display: none; }
@@ -284,13 +281,6 @@ main {
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
-.loading {
-  text-align: center;
-  padding: 20px;
-  color: var(--muted);
-  font-size: 13px;
-}
-
 @media (max-width: 768px) {
   main { padding: 16px; }
   .card { padding: 16px; }
@@ -307,9 +297,9 @@ main {
 </header>
 
 <div class="tabs">
-  <button class="tab-btn active" onclick="switchTab('anotar')">📝 Anotar</button>
-  <button class="tab-btn" onclick="switchTab('historico')">📋 Histórico</button>
-  <button class="tab-btn" onclick="switchTab('agendamentos')">📅 Agendamentos</button>
+  <button class="tab-btn active" onclick="switchTab('anotar', this)">📝 Anotar</button>
+  <button class="tab-btn" onclick="switchTab('historico', this)">📋 Histórico</button>
+  <button class="tab-btn" onclick="switchTab('agendamentos', this)">📅 Agendamentos</button>
 </div>
 
 <main>
@@ -330,7 +320,7 @@ main {
           </div>
           <div class="form-group">
             <label>Telefone</label>
-            <input type="tel" id="tel" placeholder="(11) 99999-9999" oninput="maskTel(this)">
+            <input type="tel" id="tel" placeholder="(11) 99999-9999">
           </div>
         </div>
         <div class="form-row">
@@ -386,7 +376,7 @@ main {
   <div class="tab-content" id="tab-historico">
     <div class="card">
       <h2 class="card-title">Histórico de Procedimentos</h2>
-      <div id="lista-historico"><div class="loading">Carregando...</div></div>
+      <div id="lista-historico"><div class="empty">Nenhum registro anotado</div></div>
     </div>
   </div>
 
@@ -394,7 +384,7 @@ main {
   <div class="tab-content" id="tab-agendamentos">
     <div class="card">
       <h2 class="card-title">Agendamentos Recebidos</h2>
-      <div id="lista-agendamentos"><div class="loading">Carregando...</div></div>
+      <div id="lista-agendamentos"><div class="empty">Nenhum agendamento recebido</div></div>
     </div>
   </div>
 
@@ -415,8 +405,13 @@ const FIREBASE_CONFIG = {
 };
 
 let editId = null;
+let db = null;
+let registrosData = [];
+let agendamentosData = [];
 
-// MÁSCARA TEL (igual agendar.html)
+// ════════════════════════════════════════════════════
+//  MÁSCARA TEL
+// ════════════════════════════════════════════════════
 document.getElementById('tel').addEventListener('input', function(e){
   let v = e.target.value.replace(/\D/g,'');
   if(v.length > 11) v = v.slice(0,11);
@@ -427,7 +422,9 @@ document.getElementById('tel').addEventListener('input', function(e){
   e.target.value=v;
 });
 
-// TOAST
+// ════════════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════════════
 function toast(msg) {
   const el = document.createElement('div');
   el.className = 'toast';
@@ -436,22 +433,23 @@ function toast(msg) {
   setTimeout(() => el.remove(), 2500);
 }
 
-// TABS
-function switchTab(tab) {
+// ════════════════════════════════════════════════════
+//  TABS
+// ════════════════════════════════════════════════════
+function switchTab(tab, btn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  event.target.classList.add('active');
+  if(btn) btn.classList.add('active');
   document.getElementById('tab-' + tab).classList.add('active');
-
-  if (tab === 'historico') renderHistorico();
-  if (tab === 'agendamentos') renderAgendamentos();
 }
 
-// FIREBASE INIT
+// ════════════════════════════════════════════════════
+//  FIREBASE INIT
+// ════════════════════════════════════════════════════
 import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({initializeApp}) => {
-  import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js').then(({getDatabase, ref, push, onValue, remove, set}) => {
+  import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js').then(({getDatabase, ref, push, onValue, remove, set, get}) => {
     const app = initializeApp(FIREBASE_CONFIG);
-    const db = getDatabase(app);
+    db = getDatabase(app);
 
     // ═══ SALVAR REGISTRO ═══
     document.getElementById('form-anotar').addEventListener('submit', (e) => {
@@ -492,83 +490,87 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
       e.target.reset();
     });
 
-    // ═══ RENDER HISTÓRICO ═══
-    window.renderHistorico = function() {
-      onValue(ref(db, 'registros'), (snap) => {
-        let registros = [];
-        snap.forEach(child => {
-          registros.push({ id: child.key, ...child.val() });
-        });
-        registros.sort((a,b) => new Date(b.data) - new Date(a.data));
-
-        const html = registros.length ? registros.map(r => `
-          <div class="entry confirmed">
-            <div class="entry-header">
-              <div>
-                <div class="entry-name">${r.nome}</div>
-                <div class="entry-desc">
-                  📅 ${new Date(r.data+'T00:00:00').toLocaleDateString('pt-BR')} • ${r.proc}
-                  ${r.tel ? ' • 📱 '+r.tel : ''}
-                  ${r.pagamento ? ' • 💰 '+r.pagamento : ''}
-                  ${r.horaInicio ? ' • 🕐 '+r.horaInicio+(r.horaFim ? '-'+r.horaFim : '') : ''}
-                </div>
-              </div>
-              <div class="entry-price">R$ ${r.valor}</div>
-            </div>
-            <div class="entry-actions">
-              <button class="btn btn-outline" onclick="editarRegistro('${r.id}')">✏️</button>
-              <button class="btn btn-danger" onclick="deletarRegistro('${r.id}')">✕</button>
-            </div>
-          </div>
-        `).join('') : '<div class="empty">Nenhum registro anotado</div>';
-
-        document.getElementById('lista-historico').innerHTML = html;
+    // ═══ CARREGAR REGISTROS (HISTÓRICO) ═══
+    onValue(ref(db, 'registros'), (snap) => {
+      registrosData = [];
+      snap.forEach(child => {
+        registrosData.push({ id: child.key, ...child.val() });
       });
-    };
+      registrosData.sort((a,b) => new Date(b.data) - new Date(a.data));
+      renderHistorico();
+    });
+
+    // ═══ CARREGAR AGENDAMENTOS ═══
+    onValue(ref(db, 'agendamentos'), (snap) => {
+      agendamentosData = [];
+      snap.forEach(child => {
+        agendamentosData.push({ id: child.key, ...child.val() });
+      });
+      agendamentosData.sort((a,b) => new Date(a.data+' '+a.hora) - new Date(b.data+' '+b.hora));
+      renderAgendamentos();
+    });
+
+    // ═══ RENDER HISTÓRICO ═══
+    function renderHistorico() {
+      const html = registrosData.length ? registrosData.map(r => `
+        <div class="entry confirmed">
+          <div class="entry-header">
+            <div>
+              <div class="entry-name">${r.nome}</div>
+              <div class="entry-desc">
+                📅 ${new Date(r.data+'T00:00:00').toLocaleDateString('pt-BR')} • ${r.proc}
+                ${r.tel ? ' • 📱 '+r.tel : ''}
+                ${r.pagamento ? ' • 💰 '+r.pagamento : ''}
+                ${r.horaInicio ? ' • 🕐 '+r.horaInicio+(r.horaFim ? '-'+r.horaFim : '') : ''}
+              </div>
+            </div>
+            <div class="entry-price">R$ ${r.valor}</div>
+          </div>
+          <div class="entry-actions">
+            <button class="btn btn-outline" onclick="editarRegistro('${r.id}')">✏️</button>
+            <button class="btn btn-danger" onclick="deletarRegistro('${r.id}')">✕</button>
+          </div>
+        </div>
+      `).join('') : '<div class="empty">Nenhum registro anotado</div>';
+
+      document.getElementById('lista-historico').innerHTML = html;
+    }
 
     // ═══ RENDER AGENDAMENTOS ═══
-    window.renderAgendamentos = function() {
-      onValue(ref(db, 'agendamentos'), (snap) => {
-        let agendamentos = [];
-        snap.forEach(child => {
-          agendamentos.push({ id: child.key, ...child.val() });
-        });
-        agendamentos.sort((a,b) => new Date(a.data+' '+a.hora) - new Date(b.data+' '+b.hora));
-
-        const html = agendamentos.length ? agendamentos.map(a => `
-          <div class="entry ${a.status === 'Confirmado' ? 'confirmed' : ''}">
-            <div class="entry-status status-${a.status ? a.status.toLowerCase() : 'pendente'}">${a.status || 'Pendente'}</div>
-            <div class="entry-header">
-              <div>
-                <div class="entry-name">${a.nome}</div>
-                <div class="entry-desc">
-                  📅 ${new Date(a.data+'T00:00:00').toLocaleDateString('pt-BR')} às ${a.hora} • ${a.proc}
-                  ${a.tel ? ' • 📱 '+a.tel : ''}
-                </div>
+    function renderAgendamentos() {
+      const html = agendamentosData.length ? agendamentosData.map(a => `
+        <div class="entry ${a.status === 'Confirmado' ? 'confirmed' : ''}">
+          <div class="entry-status status-${a.status ? a.status.toLowerCase() : 'pendente'}">${a.status || 'Pendente'}</div>
+          <div class="entry-header">
+            <div>
+              <div class="entry-name">${a.nome}</div>
+              <div class="entry-desc">
+                📅 ${new Date(a.data+'T00:00:00').toLocaleDateString('pt-BR')} às ${a.hora} • ${a.proc}
+                ${a.tel ? ' • 📱 '+a.tel : ''}
               </div>
-            </div>
-            ${a.anamnese ? `
-              <div class="anamnese-box" id="anamnese-${a.id}">
-                ${a.anamnese.diabetes ? '<div class="anamnese-row"><span class="anamnese-label">Diabetes:</span> '+a.anamnese.diabetes+'</div>' : ''}
-                ${a.anamnese.gestante ? '<div class="anamnese-row"><span class="anamnese-label">Gestante:</span> '+a.anamnese.gestante+'</div>' : ''}
-                ${a.anamnese.alergia ? '<div class="anamnese-row"><span class="anamnese-label">Alergia:</span> '+a.anamnese.alergia+(a.anamnese.alergiaDetalhe ? ' ('+a.anamnese.alergiaDetalhe+')' : '')+'</div>' : ''}
-                ${a.anamnese.micose ? '<div class="anamnese-row"><span class="anamnese-label">Micose:</span> '+a.anamnese.micose+'</div>' : ''}
-                ${a.anamnese.medicamento ? '<div class="anamnese-row"><span class="anamnese-label">Medicamento:</span> '+a.anamnese.medicamento+(a.anamnese.medicamentoDetalhe ? ' ('+a.anamnese.medicamentoDetalhe+')' : '')+'</div>' : ''}
-                ${a.anamnese.encravada ? '<div class="anamnese-row"><span class="anamnese-label">Unha encravada:</span> '+a.anamnese.encravada+'</div>' : ''}
-                ${a.anamnese.esporte ? '<div class="anamnese-row"><span class="anamnese-label">Esporte:</span> '+a.anamnese.esporte+'</div>' : ''}
-              </div>
-            ` : ''}
-            <div class="entry-actions">
-              ${a.status !== 'Confirmado' ? `<button class="btn btn-success" onclick="confirmarAgend('${a.id}')">✓ Confirmar</button>` : ''}
-              ${a.anamnese ? `<button class="btn btn-outline" onclick="toggleAnamnese('${a.id}')">📋 Anamnese</button>` : ''}
-              <button class="btn btn-danger" onclick="deletarAgend('${a.id}')">✕</button>
             </div>
           </div>
-        `).join('') : '<div class="empty">Nenhum agendamento recebido</div>';
+          ${a.anamnese ? `
+            <div class="anamnese-box" id="anamnese-${a.id}">
+              ${a.anamnese.diabetes ? '<div class="anamnese-row"><span class="anamnese-label">Diabetes:</span> '+a.anamnese.diabetes+'</div>' : ''}
+              ${a.anamnese.gestante ? '<div class="anamnese-row"><span class="anamnese-label">Gestante:</span> '+a.anamnese.gestante+'</div>' : ''}
+              ${a.anamnese.alergia ? '<div class="anamnese-row"><span class="anamnese-label">Alergia:</span> '+a.anamnese.alergia+(a.anamnese.alergiaDetalhe ? ' ('+a.anamnese.alergiaDetalhe+')' : '')+'</div>' : ''}
+              ${a.anamnese.micose ? '<div class="anamnese-row"><span class="anamnese-label">Micose:</span> '+a.anamnese.micose+'</div>' : ''}
+              ${a.anamnese.medicamento ? '<div class="anamnese-row"><span class="anamnese-label">Medicamento:</span> '+a.anamnese.medicamento+(a.anamnese.medicamentoDetalhe ? ' ('+a.anamnese.medicamentoDetalhe+')' : '')+'</div>' : ''}
+              ${a.anamnese.encravada ? '<div class="anamnese-row"><span class="anamnese-label">Unha encravada:</span> '+a.anamnese.encravada+'</div>' : ''}
+              ${a.anamnese.esporte ? '<div class="anamnese-row"><span class="anamnese-label">Esporte:</span> '+a.anamnese.esporte+'</div>' : ''}
+            </div>
+          ` : ''}
+          <div class="entry-actions">
+            ${a.status !== 'Confirmado' ? `<button class="btn btn-success" onclick="confirmarAgend('${a.id}')">✓ Confirmar</button>` : ''}
+            ${a.anamnese ? `<button class="btn btn-outline" onclick="toggleAnamnese('${a.id}')">📋 Anamnese</button>` : ''}
+            <button class="btn btn-danger" onclick="deletarAgend('${a.id}')">✕</button>
+          </div>
+        </div>
+      `).join('') : '<div class="empty">Nenhum agendamento recebido</div>';
 
-        document.getElementById('lista-agendamentos').innerHTML = html;
-      });
-    };
+      document.getElementById('lista-agendamentos').innerHTML = html;
+    }
 
     // ═══ CONFIRMAR AGENDAMENTO ═══
     window.confirmarAgend = function(id) {
@@ -593,7 +595,7 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
 
     // ═══ EDITAR REGISTRO ═══
     window.editarRegistro = function(id) {
-      onValue(ref(db, 'registros/' + id), (snap) => {
+      get(ref(db, 'registros/' + id)).then((snap) => {
         const r = snap.val();
         if (!r) return;
         editId = id;
@@ -609,11 +611,8 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
         document.getElementById('btn-submit').textContent = 'Atualizar';
         document.getElementById('btn-submit').style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
         toast('Editando...');
-        switchTab('anotar');
-        document.querySelectorAll('.tab-btn')[0].classList.add('active');
-        document.querySelectorAll('.tab-btn')[1].classList.remove('active');
-        document.querySelectorAll('.tab-btn')[2].classList.remove('active');
-      }, { onlyOnce: true });
+        switchTab('anotar', document.querySelectorAll('.tab-btn')[0]);
+      });
     };
 
     // ═══ DELETAR REGISTRO ═══
@@ -631,9 +630,6 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
       document.getElementById('btn-submit').style.background = '';
       document.getElementById('form-anotar').reset();
     };
-
-    // Inicializar
-    renderHistorico();
 
   });
 });
