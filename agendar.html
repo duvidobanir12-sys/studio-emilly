@@ -405,6 +405,7 @@ document.getElementById('c-tel').addEventListener('input', function(e){
 const hoje = new Date().toISOString().slice(0,10);
 document.getElementById('c-data').min   = hoje;
 document.getElementById('c-data').value = hoje;
+carregarHorarios(); // chama imediatamente para mostrar estado inicial
 
 // ══════════════════════════════════════════════════════
 // FIREBASE INIT
