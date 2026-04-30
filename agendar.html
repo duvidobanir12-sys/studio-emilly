@@ -737,8 +737,10 @@ function carregarHorarios(){
   }
 
   // Loading enquanto carrega
-  if(Object.keys(_agendamentosOcupados).length === 0){
-    document.getElementById('horarios-wrap').innerHTML = '<p style="font-size:13px;color:var(--muted);">Carregando horários...</p>';
+  const keys = Object.keys(_agendamentosOcupados);
+  console.log('Agendamentos ocupados:', keys);
+  if(keys.length === 0){
+    document.getElementById('horarios-wrap').innerHTML = '<p style="font-size:13px;color:var(--muted);">Carregando horários... Se demorar, recarregue a página.</p>';
     return;
   }
 
