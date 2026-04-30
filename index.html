@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Studio Emilly Santos</title>
+<title>Studio Emilly Santos - Painel</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -14,6 +14,8 @@
   --text: #1a1a2e;
   --muted: #6b7280;
   --border: #e5e7eb;
+  --success: #10b981;
+  --warning: #f59e0b;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,21 +39,58 @@ header {
 header h1 { font-size: 22px; font-weight: 700; margin-bottom: 2px; }
 header p { font-size: 11px; opacity: 0.85; letter-spacing: 1.5px; text-transform: uppercase; }
 
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 24px;
+  max-width: 700px;
+  margin: 20px auto 0;
+  width: 100%;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 8px;
+  border: none;
+  background: var(--card);
+  border-bottom: 3px solid var(--border);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.3s;
+  border-radius: 12px 12px 0 0;
+}
+
+.tab-btn:not(:last-child) { border-right: 1px solid var(--border); }
+
+.tab-btn.active {
+  color: var(--pink);
+  border-bottom-color: var(--pink);
+  background: var(--card);
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
 main {
   flex: 1;
-  padding: 24px;
+  padding: 20px 24px 40px;
   max-width: 700px;
   margin: 0 auto;
   width: 100%;
 }
 
+/* CARD */
 .card {
   background: var(--card);
-  border-radius: 16px;
+  border-radius: 0 0 16px 16px;
   padding: 24px;
-  margin-bottom: 20px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   border: 1px solid var(--border);
+  border-top: none;
 }
 
 .card-title {
@@ -64,9 +103,7 @@ main {
   gap: 8px;
 }
 
-.form-group {
-  margin-bottom: 12px;
-}
+.form-group { margin-bottom: 12px; }
 
 .form-group label {
   display: block;
@@ -126,22 +163,100 @@ main {
   border-radius: 8px;
 }
 
-/* LISTA */
+.btn-success {
+  background: var(--success);
+  color: white;
+  padding: 6px 10px;
+  font-size: 12px;
+  width: auto;
+  border-radius: 8px;
+}
+
+.btn-outline {
+  background: none;
+  border: 1.5px solid var(--pink);
+  color: var(--pink);
+  padding: 6px 10px;
+  font-size: 12px;
+  width: auto;
+  border-radius: 8px;
+}
+
+/* ENTRY */
 .entry {
-  display: flex;
-  gap: 12px;
   padding: 14px;
   border-left: 4px solid var(--pink);
   background: var(--bg);
   border-radius: 12px;
   margin-bottom: 10px;
-  align-items: center;
 }
 
-.entry-info { flex: 1; min-width: 0; }
-.entry-name { font-size: 14px; font-weight: 600; }
-.entry-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.entry.confirmed {
+  border-left-color: var(--success);
+}
+
+.entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.entry-name { font-size: 14px; font-weight: 600; flex: 1; }
 .entry-price { font-weight: 700; color: var(--pink); font-size: 15px; white-space: nowrap; }
+
+.entry-desc { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+
+.entry-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.entry-status {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.status-pendente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-confirmado {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-cancelado {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.anamnese-box {
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--muted);
+  display: none;
+}
+
+.anamnese-box.show { display: block; }
+
+.anamnese-row {
+  display: flex;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.anamnese-label { font-weight: 600; min-width: 100px; }
 
 .empty {
   text-align: center;
@@ -179,6 +294,8 @@ main {
 @media (max-width: 768px) {
   main { padding: 16px; }
   .card { padding: 16px; }
+  .tabs { padding: 0 16px; }
+  .tab-btn { font-size: 11px; padding: 10px 4px; }
 }
 </style>
 </head>
@@ -186,61 +303,107 @@ main {
 
 <header>
   <h1>Studio Emilly Santos</h1>
-  <p>Registro de Procedimentos</p>
+  <p>Painel de Controle</p>
 </header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('anotar')">📝 Anotar</button>
+  <button class="tab-btn" onclick="switchTab('historico')">📋 Histórico</button>
+  <button class="tab-btn" onclick="switchTab('agendamentos')">📅 Agendamentos</button>
+</div>
 
 <main>
 
-  <!-- ANOTAR -->
-  <div class="card">
-    <h2 class="card-title">Anotar Procedimento</h2>
-    <form id="form-anotar">
-      <div class="form-group">
-        <label>Nome</label>
-        <input type="text" id="nome" placeholder="Nome da cliente" required>
-      </div>
-      <div class="form-row">
+  <!-- ABA ANOTAR -->
+  <div class="tab-content active" id="tab-anotar">
+    <div class="card">
+      <h2 class="card-title">Anotar Procedimento</h2>
+      <form id="form-anotar">
         <div class="form-group">
-          <label>Data</label>
-          <input type="date" id="data" required>
+          <label>Nome</label>
+          <input type="text" id="nome" placeholder="Nome da cliente" required>
         </div>
-        <div class="form-group">
-          <label>Telefone</label>
-          <input type="tel" id="tel" placeholder="(11) 99999-9999" oninput="maskTel(this)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Data</label>
+            <input type="date" id="data" required>
+          </div>
+          <div class="form-group">
+            <label>Telefone</label>
+            <input type="tel" id="tel" placeholder="(11) 99999-9999" oninput="maskTel(this)">
+          </div>
         </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Procedimento</label>
-          <select id="proc" required>
-            <option value="">Selecione</option>
-            <option>Manicure</option>
-            <option>Pedicure</option>
-            <option>Unhas Postiças</option>
-            <option>Design de Sobrancelha</option>
-          </select>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Procedimento</label>
+            <select id="proc" required>
+              <option value="">Selecione</option>
+              <option>Manicure</option>
+              <option>Pedicure</option>
+              <option>Unhas Postiças</option>
+              <option>Design de Sobrancelha</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Valor (R$)</label>
+            <input type="number" id="valor" placeholder="0,00" step="0.01" required>
+          </div>
         </div>
-        <div class="form-group">
-          <label>Valor (R$)</label>
-          <input type="number" id="valor" placeholder="0,00" step="0.01" required>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Forma de Pagamento</label>
+            <select id="pagamento" required>
+              <option value="">Selecione</option>
+              <option>Dinheiro</option>
+              <option>PIX</option>
+              <option>Cartão</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="status">
+              <option value="Confirmado">Confirmado</option>
+              <option value="Pendente">Pendente</option>
+            </select>
+          </div>
         </div>
-      </div>
-      <button type="submit" class="btn btn-primary" id="btn-submit">Anotar</button>
-    </form>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Horário Início</label>
+            <input type="time" id="hora-inicio">
+          </div>
+          <div class="form-group">
+            <label>Horário Fim</label>
+            <input type="time" id="hora-fim">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" id="btn-submit">Anotar</button>
+      </form>
+    </div>
   </div>
 
-  <!-- LISTA -->
-  <div class="card">
-    <h2 class="card-title">Procedimentos Anotados</h2>
-    <div id="lista"><div class="loading">Carregando...</div></div>
+  <!-- ABA HISTÓRICO -->
+  <div class="tab-content" id="tab-historico">
+    <div class="card">
+      <h2 class="card-title">Histórico de Procedimentos</h2>
+      <div id="lista-historico"><div class="loading">Carregando...</div></div>
+    </div>
+  </div>
+
+  <!-- ABA AGENDAMENTOS -->
+  <div class="tab-content" id="tab-agendamentos">
+    <div class="card">
+      <h2 class="card-title">Agendamentos Recebidos</h2>
+      <div id="lista-agendamentos"><div class="loading">Carregando...</div></div>
+    </div>
   </div>
 
 </main>
 
 <script>
-// ═══════════════════════════════════════════════════
-//  CONFIGURAÇÃO FIREBASE (mesmo do agendar.html)
-// ═══════════════════════════════════════════════════
+// ════════════════════════════════════════════════════
+//  CONFIGURAÇÃO FIREBASE
+// ════════════════════════════════════════════════════
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyDBr3kQaZj_g_gxJ_h2f2zWv5C_-K9yEts",
   authDomain: "studio-emilly-santos.firebaseapp.com",
@@ -253,7 +416,7 @@ const FIREBASE_CONFIG = {
 
 let editId = null;
 
-// MÁSCARA DE TELEFONE
+// MÁSCARA TEL
 function maskTel(el) {
   let v = el.value.replace(/\D/g, '').slice(0, 11);
   if (v.length >= 2) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
@@ -270,23 +433,24 @@ function toast(msg) {
   setTimeout(() => el.remove(), 2500);
 }
 
+// TABS
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+
+  if (tab === 'historico') renderHistorico();
+  if (tab === 'agendamentos') renderAgendamentos();
+}
+
 // FIREBASE INIT
 import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({initializeApp}) => {
   import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js').then(({getDatabase, ref, push, onValue, remove, set}) => {
     const app = initializeApp(FIREBASE_CONFIG);
     const db = getDatabase(app);
-    const registrosRef = ref(db, 'registros');
 
-    // CARREGAR REGISTROS
-    onValue(registrosRef, (snap) => {
-      let registros = [];
-      snap.forEach(child => {
-        registros.push({ id: child.key, ...child.val() });
-      });
-      render(registros);
-    });
-
-    // SALVAR
+    // ═══ SALVAR REGISTRO ═══
     document.getElementById('form-anotar').addEventListener('submit', (e) => {
       e.preventDefault();
       const nome = document.getElementById('nome').value.trim();
@@ -294,25 +458,30 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
       const tel = document.getElementById('tel').value.trim();
       const proc = document.getElementById('proc').value;
       const valor = document.getElementById('valor').value;
+      const pagamento = document.getElementById('pagamento').value;
+      const status = document.getElementById('status').value;
+      const horaInicio = document.getElementById('hora-inicio').value;
+      const horaFim = document.getElementById('hora-fim').value;
 
-      if (!nome || !data || !proc || !valor) {
+      if (!nome || !data || !proc || !valor || !pagamento) {
         toast('Preencha os campos obrigatórios');
         return;
       }
 
+      const dados = {
+        nome, data, tel, proc,
+        valor: parseFloat(valor).toFixed(2),
+        pagamento, status, horaInicio, horaFim,
+        criadoEm: new Date().toISOString()
+      };
+
       if (editId !== null) {
-        // EDITAR
-        set(ref(db, 'registros/' + editId), {
-          nome, data, tel, proc, valor: parseFloat(valor).toFixed(2)
-        }).then(() => {
+        set(ref(db, 'registros/' + editId), dados).then(() => {
           toast('Atualizado!');
           cancelEdit();
         });
       } else {
-        // NOVO
-        push(registrosRef, {
-          nome, data, tel, proc, valor: parseFloat(valor).toFixed(2)
-        }).then(() => {
+        push(ref(db, 'registros'), dados).then(() => {
           toast('Anotado!');
         });
       }
@@ -320,16 +489,107 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
       e.target.reset();
     });
 
-    // DELETAR
-    window.deletar = function(id) {
-      if (!confirm('Remover registro?')) return;
-      remove(ref(db, 'registros/' + id)).then(() => {
+    // ═══ RENDER HISTÓRICO ═══
+    window.renderHistorico = function() {
+      onValue(ref(db, 'registros'), (snap) => {
+        let registros = [];
+        snap.forEach(child => {
+          registros.push({ id: child.key, ...child.val() });
+        });
+        registros.sort((a,b) => new Date(b.data) - new Date(a.data));
+
+        const html = registros.length ? registros.map(r => `
+          <div class="entry confirmed">
+            <div class="entry-header">
+              <div>
+                <div class="entry-name">${r.nome}</div>
+                <div class="entry-desc">
+                  📅 ${new Date(r.data+'T00:00:00').toLocaleDateString('pt-BR')} • ${r.proc}
+                  ${r.tel ? ' • 📱 '+r.tel : ''}
+                  ${r.pagamento ? ' • 💰 '+r.pagamento : ''}
+                  ${r.horaInicio ? ' • 🕐 '+r.horaInicio+(r.horaFim ? '-'+r.horaFim : '') : ''}
+                </div>
+              </div>
+              <div class="entry-price">R$ ${r.valor}</div>
+            </div>
+            <div class="entry-actions">
+              <button class="btn btn-outline" onclick="editarRegistro('${r.id}')">✏️</button>
+              <button class="btn btn-danger" onclick="deletarRegistro('${r.id}')">✕</button>
+            </div>
+          </div>
+        `).join('') : '<div class="empty">Nenhum registro anotado</div>';
+
+        document.getElementById('lista-historico').innerHTML = html;
+      });
+    };
+
+    // ═══ RENDER AGENDAMENTOS ═══
+    window.renderAgendamentos = function() {
+      onValue(ref(db, 'agendamentos'), (snap) => {
+        let agendamentos = [];
+        snap.forEach(child => {
+          agendamentos.push({ id: child.key, ...child.val() });
+        });
+        agendamentos.sort((a,b) => new Date(a.data+' '+a.hora) - new Date(b.data+' '+b.hora));
+
+        const html = agendamentos.length ? agendamentos.map(a => `
+          <div class="entry ${a.status === 'Confirmado' ? 'confirmed' : ''}">
+            <div class="entry-status status-${a.status ? a.status.toLowerCase() : 'pendente'}">${a.status || 'Pendente'}</div>
+            <div class="entry-header">
+              <div>
+                <div class="entry-name">${a.nome}</div>
+                <div class="entry-desc">
+                  📅 ${new Date(a.data+'T00:00:00').toLocaleDateString('pt-BR')} às ${a.hora} • ${a.proc}
+                  ${a.tel ? ' • 📱 '+a.tel : ''}
+                </div>
+              </div>
+            </div>
+            ${a.anamnese ? `
+              <div class="anamnese-box" id="anamnese-${a.id}">
+                ${a.anamnese.diabetes ? '<div class="anamnese-row"><span class="anamnese-label">Diabetes:</span> '+a.anamnese.diabetes+'</div>' : ''}
+                ${a.anamnese.gestante ? '<div class="anamnese-row"><span class="anamnese-label">Gestante:</span> '+a.anamnese.gestante+'</div>' : ''}
+                ${a.anamnese.alergia ? '<div class="anamnese-row"><span class="anamnese-label">Alergia:</span> '+a.anamnese.alergia+(a.anamnese.alergiaDetalhe ? ' ('+a.anamnese.alergiaDetalhe+')' : '')+'</div>' : ''}
+                ${a.anamnese.micose ? '<div class="anamnese-row"><span class="anamnese-label">Micose:</span> '+a.anamnese.micose+'</div>' : ''}
+                ${a.anamnese.medicamento ? '<div class="anamnese-row"><span class="anamnese-label">Medicamento:</span> '+a.anamnese.medicamento+(a.anamnese.medicamentoDetalhe ? ' ('+a.anamnese.medicamentoDetalhe+')' : '')+'</div>' : ''}
+                ${a.anamnese.encravada ? '<div class="anamnese-row"><span class="anamnese-label">Unha encravada:</span> '+a.anamnese.encravada+'</div>' : ''}
+                ${a.anamnese.esporte ? '<div class="anamnese-row"><span class="anamnese-label">Esporte:</span> '+a.anamnese.esporte+'</div>' : ''}
+              </div>
+            ` : ''}
+            <div class="entry-actions">
+              ${a.status !== 'Confirmado' ? `<button class="btn btn-success" onclick="confirmarAgend('${a.id}')">✓ Confirmar</button>` : ''}
+              ${a.anamnese ? `<button class="btn btn-outline" onclick="toggleAnamnese('${a.id}')">📋 Anamnese</button>` : ''}
+              <button class="btn btn-danger" onclick="deletarAgend('${a.id}')">✕</button>
+            </div>
+          </div>
+        `).join('') : '<div class="empty">Nenhum agendamento recebido</div>';
+
+        document.getElementById('lista-agendamentos').innerHTML = html;
+      });
+    };
+
+    // ═══ CONFIRMAR AGENDAMENTO ═══
+    window.confirmarAgend = function(id) {
+      set(ref(db, 'agendamentos/' + id + '/status'), 'Confirmado').then(() => {
+        toast('Agendamento confirmado!');
+      });
+    };
+
+    // ═══ DELETAR AGENDAMENTO ═══
+    window.deletarAgend = function(id) {
+      if (!confirm('Remover agendamento?')) return;
+      remove(ref(db, 'agendamentos/' + id)).then(() => {
         toast('Removido');
       });
     };
 
-    // EDITAR
-    window.editar = function(id) {
+    // ═══ TOGGLE ANAMNESE ═══
+    window.toggleAnamnese = function(id) {
+      const el = document.getElementById('anamnese-' + id);
+      if (el) el.classList.toggle('show');
+    };
+
+    // ═══ EDITAR REGISTRO ═══
+    window.editarRegistro = function(id) {
       onValue(ref(db, 'registros/' + id), (snap) => {
         const r = snap.val();
         if (!r) return;
@@ -339,14 +599,29 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
         document.getElementById('tel').value = r.tel || '';
         document.getElementById('proc').value = r.proc;
         document.getElementById('valor').value = r.valor;
-        const btn = document.getElementById('btn-submit');
-        btn.textContent = 'Atualizar';
-        btn.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
+        document.getElementById('pagamento').value = r.pagamento || '';
+        document.getElementById('status').value = r.status || 'Confirmado';
+        document.getElementById('hora-inicio').value = r.horaInicio || '';
+        document.getElementById('hora-fim').value = r.horaFim || '';
+        document.getElementById('btn-submit').textContent = 'Atualizar';
+        document.getElementById('btn-submit').style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
         toast('Editando...');
+        switchTab('anotar');
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.querySelectorAll('.tab-btn')[1].classList.remove('active');
+        document.querySelectorAll('.tab-btn')[2].classList.remove('active');
       }, { onlyOnce: true });
     };
 
-    // CANCELAR EDIÇÃO
+    // ═══ DELETAR REGISTRO ═══
+    window.deletarRegistro = function(id) {
+      if (!confirm('Remover registro?')) return;
+      remove(ref(db, 'registros/' + id)).then(() => {
+        toast('Removido');
+      });
+    };
+
+    // ═══ CANCELAR EDIÇÃO ═══
     window.cancelEdit = function() {
       editId = null;
       document.getElementById('btn-submit').textContent = 'Anotar';
@@ -354,25 +629,8 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
       document.getElementById('form-anotar').reset();
     };
 
-    // RENDERIZAR
-    function render(registros) {
-      registros.sort((a,b) => new Date(b.data) - new Date(a.data));
-      const html = registros.length ? registros.map(r => `
-        <div class="entry">
-          <div class="entry-info">
-            <div class="entry-name">${r.nome}</div>
-            <div class="entry-desc">📅 ${new Date(r.data+'T00:00:00').toLocaleDateString('pt-BR')} • ${r.proc}${r.tel ? ' • 📱 '+r.tel : ''}</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div class="entry-price">R$ ${r.valor}</div>
-            <button class="btn btn-danger" onclick="editar('${r.id}')">✏️</button>
-            <button class="btn btn-danger" onclick="deletar('${r.id}')">✕</button>
-          </div>
-        </div>
-      `).join('') : '<div class="empty">Nenhum registro anotado</div>';
-
-      document.getElementById('lista').innerHTML = html;
-    }
+    // Inicializar
+    renderHistorico();
 
   });
 });
