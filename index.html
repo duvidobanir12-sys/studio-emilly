@@ -8,12 +8,12 @@
 <style>
 :root {
   --pink: #c9184a;
-  --pink-light: #f8a5c2;
-  --bg: #fafafa;
+  --pink-dark: #a01435;
+  --bg: #f8f9fa;
   --card: #ffffff;
   --text: #1a1a2e;
   --muted: #6b7280;
-  --border: #f0f0f0;
+  --border: #e5e7eb;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,69 +22,40 @@ body {
   font-family: 'Outfit', sans-serif;
   background: var(--bg);
   color: var(--text);
-  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-/* HEADER */
 header {
-  background: linear-gradient(135deg, #c9184a 0%, #a01435 100%);
+  background: linear-gradient(135deg, var(--pink-dark), var(--pink));
+  padding: 20px 24px;
   color: white;
-  padding: 48px 24px 40px;
   text-align: center;
 }
 
-header h1 {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  margin-bottom: 6px;
-}
+header h1 { font-size: 22px; font-weight: 700; margin-bottom: 2px; }
+header p { font-size: 11px; opacity: 0.85; letter-spacing: 1.5px; text-transform: uppercase; }
 
-header p {
-  font-size: 13px;
-  opacity: 0.85;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-
-/* HERO CTA */
-.hero-cta {
-  text-align: center;
-  padding: 32px 24px 24px;
-}
-
-.btn-agendar {
-  display: inline-block;
-  background: var(--pink);
-  color: white;
-  text-decoration: none;
-  padding: 14px 36px;
-  border-radius: 50px;
-  font-weight: 600;
-  font-size: 15px;
-  transition: all 0.3s;
-  box-shadow: 0 4px 16px rgba(201,24,74,0.3);
-}
-
-.btn-agendar:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(201,24,74,0.4);
-}
-
-/* MAIN */
 main {
-  max-width: 800px;
+  flex: 1;
+  padding: 24px;
+  max-width: 700px;
   margin: 0 auto;
-  padding: 0 24px 48px;
+  width: 100%;
 }
 
-/* SECTION */
-.section {
-  margin-top: 40px;
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid var(--border);
 }
 
-.section-title {
-  font-size: 18px;
+.card-title {
+  font-size: 16px;
   font-weight: 700;
   color: var(--pink);
   margin-bottom: 16px;
@@ -93,80 +64,114 @@ main {
   gap: 8px;
 }
 
-/* SERVICES GRID */
-.services-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+.form-group {
+  margin-bottom: 12px;
 }
 
-.service-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  transition: all 0.3s;
-}
-
-.service-card:hover {
-  border-color: var(--pink-light);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-}
-
-.service-name {
-  font-size: 14px;
+.form-group label {
+  display: block;
+  font-size: 12px;
   font-weight: 600;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   margin-bottom: 4px;
 }
 
-.service-price {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--pink);
-}
-
-.service-desc {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 4px;
-}
-
-/* INFO LIST */
-.info-list {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.info-item {
-  padding: 14px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--border);
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
   font-size: 14px;
 }
 
-.info-item:last-child { border-bottom: none; }
-
-.info-label { color: var(--muted); font-size: 13px; }
-.info-value { font-weight: 600; }
-
-/* FOOTER */
-footer {
-  text-align: center;
-  padding: 24px;
-  font-size: 12px;
-  color: var(--muted);
-  border-top: 1px solid var(--border);
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--pink);
 }
 
-/* RESPONSIVE */
-@media (max-width: 480px) {
-  .services-grid { grid-template-columns: 1fr; }
-  header h1 { font-size: 24px; }
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--pink-dark), var(--pink));
+  color: white;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: white;
+  padding: 6px 10px;
+  font-size: 12px;
+  width: auto;
+  border-radius: 8px;
+}
+
+/* LISTA */
+.entry {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  border-left: 4px solid var(--pink);
+  background: var(--bg);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.entry-info { flex: 1; min-width: 0; }
+.entry-name { font-size: 14px; font-weight: 600; }
+.entry-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.entry-price { font-weight: 700; color: var(--pink); font-size: 15px; white-space: nowrap; }
+
+.empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--pink-dark), var(--pink));
+  color: white;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  z-index: 9999;
+  animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@media (max-width: 768px) {
+  main { padding: 16px; }
+  .card { padding: 16px; }
 }
 </style>
 </head>
@@ -174,70 +179,122 @@ footer {
 
 <header>
   <h1>Studio Emilly Santos</h1>
-  <p>Beleza & Estética</p>
+  <p>Registro de Procedimentos</p>
 </header>
-
-<div class="hero-cta">
-  <a href="agendar.html" class="btn-agendar">Agendar Horário</a>
-</div>
 
 <main>
 
-  <!-- SERVIÇOS -->
-  <div class="section">
-    <h2 class="section-title">Serviços & Preços</h2>
-    <div class="services-grid">
-      <div class="service-card">
-        <div class="service-name">Manicure</div>
-        <div class="service-price">R$ 35,00</div>
-        <div class="service-desc">Cuidado completo para suas unhas</div>
+  <!-- ANOTAR -->
+  <div class="card">
+    <h2 class="card-title">Anotar Procedimento</h2>
+    <form id="form-anotar">
+      <div class="form-group">
+        <label>Nome</label>
+        <input type="text" id="nome" placeholder="Nome da cliente" required>
       </div>
-      <div class="service-card">
-        <div class="service-name">Pedicure</div>
-        <div class="service-price">R$ 45,00</div>
-        <div class="service-desc">Pés impecáveis e relaxantes</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Data</label>
+          <input type="date" id="data" required>
+        </div>
+        <div class="form-group">
+          <label>Telefone</label>
+          <input type="tel" id="tel" placeholder="(11) 99999-9999" oninput="maskTel(this)">
+        </div>
       </div>
-      <div class="service-card">
-        <div class="service-name">Unhas Postiças</div>
-        <div class="service-price">R$ 120,00</div>
-        <div class="service-desc">Alongamento em gel ou acrílico</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Procedimento</label>
+          <select id="proc" required>
+            <option value="">Selecione</option>
+            <option>Manicure</option>
+            <option>Pedicure</option>
+            <option>Unhas Postiças</option>
+            <option>Design de Sobrancelha</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Valor (R$)</label>
+          <input type="number" id="valor" placeholder="0,00" step="0.01" required>
+        </div>
       </div>
-      <div class="service-card">
-        <div class="service-name">Design de Sobrancelha</div>
-        <div class="service-price">R$ 30,00</div>
-        <div class="service-desc">Modelagem personalizada</div>
-      </div>
-    </div>
+      <button type="submit" class="btn btn-primary">Anotar</button>
+    </form>
   </div>
 
-  <!-- INFORMAÇÕES -->
-  <div class="section">
-    <h2 class="section-title">Informações</h2>
-    <div class="info-list">
-      <div class="info-item">
-        <span class="info-label">Horário de atendimento</span>
-        <span class="info-value">Seg a Sáb</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">Telefone</span>
-        <span class="info-value">(11) 99999-9999</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">Endereço</span>
-        <span class="info-value">Rua Exemplo, 123</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">Cancelamento</span>
-        <span class="info-value">Até 2h antes</span>
-      </div>
-    </div>
+  <!-- LISTA -->
+  <div class="card">
+    <h2 class="card-title">Procedimentos Anotados</h2>
+    <div id="lista"></div>
   </div>
 
 </main>
 
-<footer>
-  Studio Emilly Santos &copy; 2026
-</footer>
+<script>
+let registros = JSON.parse(localStorage.getItem('registros') || '[]');
+
+function maskTel(el) {
+  let v = el.value.replace(/\D/g, '').slice(0, 11);
+  if (v.length >= 2) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
+  if (v.length >= 10) v = v.slice(0,10) + '-' + v.slice(10);
+  el.value = v;
+}
+
+function toast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2500);
+}
+
+document.getElementById('form-anotar').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const nome = document.getElementById('nome').value.trim();
+  const data = document.getElementById('data').value;
+  const tel = document.getElementById('tel').value.trim();
+  const proc = document.getElementById('proc').value;
+  const valor = document.getElementById('valor').value;
+
+  if (!nome || !data || !proc || !valor) {
+    toast('Preencha os campos obrigatórios');
+    return;
+  }
+
+  registros.push({ id: Date.now(), nome, data, tel, proc, valor: parseFloat(valor).toFixed(2) });
+  localStorage.setItem('registros', JSON.stringify(registros));
+  e.target.reset();
+  render();
+  toast('Anotado!');
+});
+
+function deletar(id) {
+  registros = registros.filter(r => r.id !== id);
+  localStorage.setItem('registros', JSON.stringify(registros));
+  render();
+  toast('Removido');
+}
+
+function render() {
+  const sorted = registros.sort((a,b) => new Date(b.data) - new Date(a.data));
+  const html = sorted.length ? sorted.map(r => `
+    <div class="entry">
+      <div class="entry-info">
+        <div class="entry-name">${r.nome}</div>
+        <div class="entry-desc">📅 ${new Date(r.data+'T00:00:00').toLocaleDateString('pt-BR')} • ${r.proc}${r.tel ? ' • 📱 '+r.tel : ''}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="entry-price">R$ ${r.valor}</div>
+        <button class="btn btn-danger" onclick="deletar(${r.id})">✕</button>
+      </div>
+    </div>
+  `).join('') : '<div class="empty">Nenhum registro anotado</div>';
+
+  document.getElementById('lista').innerHTML = html;
+}
+
+render();
+</script>
 
 </body>
 </html>
