@@ -548,16 +548,20 @@ async function enviarAgendamento(){
 // SUCESSO / RESET
 // ══════════════════════════════════════════════════════
 function mostrarSucesso(a){
-  const [y,m,d] = a.data.split('-');
+  const dataStr = a.data || '';
+  const [y,m,d] = dataStr.split('-');
   const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
                  'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  const dataFmt = d + ' de ' + meses[parseInt(m)-1];
+  const dataFmt = (d && m) ? (d + ' de ' + meses[parseInt(m)-1]) : 'Data inválida';
+  const horaFmt = a.hora || 'Não informado';
+  const procFmt = a.proc || 'Não informado';
+  const nomeFmt = a.nome || 'Cliente';
 
   document.getElementById('success-detail').innerHTML =
-    '<div class="sd-row"><span class="sd-label">Nome</span><span class="sd-val">'     + a.nome    + '</span></div>'+
+    '<div class="sd-row"><span class="sd-label">Nome</span><span class="sd-val">'     + nomeFmt    + '</span></div>'+
     '<div class="sd-row"><span class="sd-label">Data</span><span class="sd-val">📅 '  + dataFmt   + '</span></div>'+
-    '<div class="sd-row"><span class="sd-label">Horário</span><span class="sd-val">🕐 '+ a.hora   + '</span></div>'+
-    '<div class="sd-row"><span class="sd-label">Serviço</span><span class="sd-val">💅 '+ a.proc   + '</span></div>'+
+    '<div class="sd-row"><span class="sd-label">Horário</span><span class="sd-val">🕐 '+ horaFmt   + '</span></div>'+
+    '<div class="sd-row"><span class="sd-label">Serviço</span><span class="sd-val">💅 '+ procFmt   + '</span></div>'+
     (a.tel ? '<div class="sd-row"><span class="sd-label">WhatsApp</span><span class="sd-val">'+a.tel+'</span></div>' : '');
 
   document.getElementById('form-area').style.display = 'none';
