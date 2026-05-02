@@ -684,9 +684,17 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
     window.confirmarAgend = function(id, evt) {
       const btn = evt && evt.target;
       if (btn) { btn.disabled = true; btn.textContent = 'Confirmando...'; }
+      // 1. Atualiza no Firebase
       set(ref(db, 'agendamentos/' + id + '/status'), 'Confirmado')
         .then(() => {
-          // Firebase onValue vai re-renderizar as abas automaticamente
+          // 2. Atualiza o dado local imediatamente
+          const idx = agendamentosData.findIndex(a => a.id === id);
+          if (idx !== -1) {
+            agendamentosData[idx].status = 'Confirmado';
+          }
+          // 3. Re-renderiza as duas abas na hora
+          renderAgendamentos();
+          renderConfirmados();
           toast('Confirmado!');
         })
         .catch((err) => {
