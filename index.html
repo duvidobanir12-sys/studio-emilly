@@ -300,6 +300,7 @@ main {
   <button class="tab-btn active" onclick="switchTab('anotar', this)">📝 Anotar</button>
   <button class="tab-btn" onclick="switchTab('historico', this)">📋 Histórico</button>
   <button class="tab-btn" onclick="switchTab('agendamentos', this)">📅 Agendamentos</button>
+  <button class="tab-btn" onclick="switchTab('confirmados', this)">✅ Confirmados</button>
   <button class="tab-btn" onclick="switchTab('financeiro', this)">💰 Financeiro</button>
 </div>
 
@@ -389,6 +390,14 @@ main {
     </div>
   </div>
 
+  <!-- ABA AGENDAMENTOS CONFIRMADOS -->
+  <div class="tab-content" id="tab-confirmados">
+    <div class="card">
+      <h2 class="card-title">Agendamentos Confirmados</h2>
+      <div id="lista-confirmados"><div class="empty">Nenhum agendamento confirmado</div></div>
+    </div>
+  </div>
+
   <!-- ABA FINANCEIRO -->
   <div class="tab-content" id="tab-financeiro">
     <div class="card">
@@ -453,6 +462,7 @@ function switchTab(tab, btn) {
   document.getElementById('tab-' + tab).classList.add('active');
 
   if (tab === 'financeiro') renderFinanceiro();
+  if (tab === 'confirmados') renderConfirmados();
 }
 
 // ════════════════════════════════════════════════════
@@ -555,6 +565,7 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
         return (isNaN(da) ? 0 : da) - (isNaN(db) ? 0 : db);
       });
       renderAgendamentos();
+      renderConfirmados();
     });
 
     // ═══ RENDER HISTÓRICO ═══
@@ -583,9 +594,10 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
       document.getElementById('lista-historico').innerHTML = html;
     }
 
-    // ═══ RENDER AGENDAMENTOS ═══
+    // ═══ RENDER AGENDAMENTOS (apenas pendentes) ═══
     function renderAgendamentos() {
-      const html = agendamentosData.length ? agendamentosData.map(a => `
+      const pendentes = agendamentosData.filter(a => a.status !== 'Confirmado');
+      const html = pendentes.length ? pendentes.map(a => `
         <div class="entry ${a.status === 'Confirmado' ? 'confirmed' : ''}">
           <div class="entry-status status-${a.status ? a.status.toLowerCase() : 'pendente'}">${a.status || 'Pendente'}</div>
           <div class="entry-header">
@@ -618,6 +630,48 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
 
       document.getElementById('lista-agendamentos').innerHTML = html;
     }
+
+    // ═══ RENDER CONFIRMADOS ═══
+    window.renderConfirmados = function() {
+      const confirmados = agendamentosData.filter(a => a.status === 'Confirmado');
+      const html = confirmados.length ? confirmados.map(a => `
+        <div class="entry confirmed">
+          <div class="entry-status status-confirmado">Confirmado</div>
+          <div class="entry-header">
+            <div>
+              <div class="entry-name">${a.nome}</div>
+              <div class="entry-desc">
+                📅 ${(a.data ? new Date(a.data+'T00:00:00').toLocaleDateString('pt-BR') : 'Data inválida')} às ${a.hora || '??:??'} • ${a.proc || 'Serviço'}
+                ${a.tel ? ' • 📱 '+a.tel : ''}
+              </div>
+            </div>
+          </div>
+          ${a.anamnese ? `
+            <div class="anamnese-box" id="anamnese-conf-${a.id}">
+              ${a.anamnese.diabetes ? '<div class="anamnese-row"><span class="anamnese-label">Diabetes:</span> '+a.anamnese.diabetes+'</div>' : ''}
+              ${a.anamnese.gestante ? '<div class="anamnese-row"><span class="anamnese-label">Gestante:</span> '+a.anamnese.gestante+'</div>' : ''}
+              ${a.anamnese.alergia ? '<div class="anamnese-row"><span class="anamnese-label">Alergia:</span> '+a.anamnese.alergia+(a.anamnese.alergiaDetalhe ? ' ('+a.anamnese.alergiaDetalhe+')' : '')+'</div>' : ''}
+              ${a.anamnese.micose ? '<div class="anamnese-row"><span class="anamnese-label">Micose:</span> '+a.anamnese.micose+'</div>' : ''}
+              ${a.anamnese.medicamento ? '<div class="anamnese-row"><span class="anamnese-label">Medicamento:</span> '+a.anamnese.medicamento+(a.anamnese.medicamentoDetalhe ? ' ('+a.anamnese.medicamentoDetalhe+')' : '')+'</div>' : ''}
+              ${a.anamnese.encravada ? '<div class="anamnese-row"><span class="anamnese-label">Unha encravada:</span> '+a.anamnese.encravada+'</div>' : ''}
+              ${a.anamnese.esporte ? '<div class="anamnese-row"><span class="anamnese-label">Esporte:</span> '+a.anamnese.esporte+'</div>' : ''}
+            </div>
+          ` : ''}
+          <div class="entry-actions">
+            ${a.anamnese ? `<button class="btn btn-outline" onclick="toggleAnamneseConfirm('${a.id}')">📋 Anamnese</button>` : ''}
+            <button class="btn btn-danger" onclick="deletarAgend('${a.id}')">✕</button>
+          </div>
+        </div>
+      `).join('') : '<div class="empty">Nenhum agendamento confirmado</div>';
+
+      document.getElementById('lista-confirmados').innerHTML = html;
+    }
+
+    // ═══ TOGGLE ANAMNESE CONFIRMADOS ═══
+    window.toggleAnamneseConfirm = function(id) {
+      const el = document.getElementById('anamnese-conf-' + id);
+      if (el) el.classList.toggle('show');
+    };
 
     // ═══ CONFIRMAR AGENDAMENTO ═══
     window.confirmarAgend = function(id) {
