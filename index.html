@@ -44,7 +44,7 @@ header p { font-size: 11px; opacity: 0.85; letter-spacing: 1.5px; text-transform
   display: flex;
   flex-wrap: wrap;
   gap: 4px 0;
-  padding: 0 24px;
+  padding: 0 12px;
   max-width: 700px;
   margin: 20px auto 0;
   width: 100%;
@@ -52,8 +52,8 @@ header p { font-size: 11px; opacity: 0.85; letter-spacing: 1.5px; text-transform
 
 .tab-btn {
   flex: 1 1 18%;
-  min-width: 80px;
-  padding: 10px 4px;
+  min-width: 70px;
+  padding: 10px 2px;
   border: none;
   background: var(--card);
   border-bottom: 3px solid var(--border);
@@ -289,7 +289,7 @@ main {
   main { padding: 16px; }
   .card { padding: 16px; }
   .tabs { padding: 0 8px; }
-  .tab-btn { font-size: 10px; padding: 8px 2px; min-width: 60px; flex: 1 1 40%; }
+  .tab-btn { font-size: 9px; padding: 8px 1px; min-width: 55px; flex: 1 1 40%; }
 }
 </style>
 </head>
@@ -303,9 +303,9 @@ main {
 <div class="tabs">
   <button class="tab-btn active" onclick="switchTab('anotar', this)">📝 Anotar</button>
   <button class="tab-btn" onclick="switchTab('historico', this)">📋 Histórico</button>
-  <button class="tab-btn" onclick="switchTab('agendamentos', this)">📅 Agend</button>
-  <button class="tab-btn" onclick="switchTab('confirmados', this)">✅ Confirm</button>
-  <button class="tab-btn" onclick="switchTab('financeiro', this)">💰 Finan</button>
+  <button class="tab-btn" onclick="switchTab('agendamentos', this)">📅 Agendamentos</button>
+  <button class="tab-btn" onclick="switchTab('confirmados', this)">✅ Confirmados</button>
+  <button class="tab-btn" onclick="switchTab('financeiro', this)">💰 Financeiro</button>
 </div>
 
 <main>
@@ -679,12 +679,18 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
 
     // ═══ CONFIRMAR AGENDAMENTO ═══
     window.confirmarAgend = function(id) {
-      get(ref(db, 'agendamentos/' + id)).then((snap) => {
-        if (!snap.exists()) { toast('Agendamento não encontrado'); return; }
-        set(ref(db, 'agendamentos/' + id + '/status'), 'Confirmado').then(() => {
-          toast('Agendamento confirmado!');
-        });
-      }).catch(() => toast('Erro ao confirmar'));
+      // Find the entry in our local data to get the full path
+      const entry = agendamentosData.find(a => a.id === id);
+      if (!entry) {
+        toast('Agendamento não encontrado localmente');
+        return;
+      }
+      set(ref(db, 'agendamentos/' + id + '/status'), 'Confirmado').then(() => {
+        toast('Agendamento confirmado!');
+      }).catch((err) => {
+        console.error('[Studio] Erro ao confirmar:', err);
+        toast('Erro ao confirmar agendamento');
+      });
     };
 
     // ═══ DELETAR AGENDAMENTO ═══
