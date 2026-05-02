@@ -568,8 +568,11 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
         const db = new Date(b.data + 'T' + b.hora + ':00');
         return (isNaN(da) ? 0 : da) - (isNaN(db) ? 0 : db);
       });
+      console.log('[Studio] Agendamentos atualizados:', agendamentosData.length, 'itens');
       renderAgendamentos();
       renderConfirmados();
+    }, (err) => {
+      console.error('[Studio] Erro no onValue agendamentos:', err);
     });
 
     // ═══ RENDER HISTÓRICO ═══
@@ -679,21 +682,23 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
 
     // ═══ CONFIRMAR AGENDAMENTO ═══
     window.confirmarAgend = function(id) {
+      const item = agendamentosData.find(a => a.id === id);
+      if (!item) {
+        toast('Agendamento não encontrado. Recarregue a página.');
+        return;
+      }
+      toast('Confirmando...');
       set(ref(db, 'agendamentos/' + id + '/status'), 'Confirmado')
         .then(() => {
-          // Atualiza o dado local imediatamente para evitar delay do Firebase
-          const idx = agendamentosData.findIndex(a => a.id === id);
-          if (idx !== -1) {
-            agendamentosData[idx].status = 'Confirmado';
-          }
-          // Re-renderiza ambas as abas na hora
+          // Atualiza local imediatamente
+          item.status = 'Confirmado';
           renderAgendamentos();
           renderConfirmados();
           toast('Agendamento confirmado!');
         })
         .catch((err) => {
           console.error('[Studio] Erro ao confirmar:', err);
-          toast('Erro ao confirmar: ' + (err.message || 'desconhecido'));
+          toast('Erro: ' + (err.message || 'verifique conexão'));
         });
     };
 
