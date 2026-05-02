@@ -527,9 +527,16 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
     onValue(ref(db, 'registros'), (snap) => {
       registrosData = [];
       snap.forEach(child => {
-        registrosData.push({ id: child.key, ...child.val() });
+        const val = child.val();
+        if (val && val.nome && val.data && val.proc) {
+          registrosData.push({ id: child.key, ...val });
+        }
       });
-      registrosData.sort((a,b) => new Date(b.data) - new Date(a.data));
+      registrosData.sort((a,b) => {
+        const da = new Date(a.data + 'T00:00:00');
+        const db = new Date(b.data + 'T00:00:00');
+        return (isNaN(db) ? 0 : db) - (isNaN(da) ? 0 : da);
+      });
       renderHistorico();
     });
 
@@ -537,9 +544,16 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
     onValue(ref(db, 'agendamentos'), (snap) => {
       agendamentosData = [];
       snap.forEach(child => {
-        agendamentosData.push({ id: child.key, ...child.val() });
+        const val = child.val();
+        if (val && val.nome && val.data && val.hora && val.proc) {
+          agendamentosData.push({ id: child.key, ...val });
+        }
       });
-      agendamentosData.sort((a,b) => new Date(a.data+' '+a.hora) - new Date(b.data+' '+b.hora));
+      agendamentosData.sort((a,b) => {
+        const da = new Date(a.data + 'T' + a.hora + ':00');
+        const db = new Date(b.data + 'T' + b.hora + ':00');
+        return (isNaN(da) ? 0 : da) - (isNaN(db) ? 0 : db);
+      });
       renderAgendamentos();
     });
 
@@ -557,7 +571,7 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
                 ${r.horaInicio ? ' • 🕐 '+r.horaInicio+(r.horaFim ? '-'+r.horaFim : '') : ''}
               </div>
             </div>
-            <div class="entry-price">R$ ${r.valor}</div>
+            <div class="entry-price">R$ ${parseFloat(r.valor || 0).toFixed(2)}</div>
           </div>
           <div class="entry-actions">
             <button class="btn btn-outline" onclick="editarRegistro('${r.id}')">✏️</button>
@@ -607,9 +621,12 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
 
     // ═══ CONFIRMAR AGENDAMENTO ═══
     window.confirmarAgend = function(id) {
-      set(ref(db, 'agendamentos/' + id + '/status'), 'Confirmado').then(() => {
-        toast('Agendamento confirmado!');
-      });
+      get(ref(db, 'agendamentos/' + id)).then((snap) => {
+        if (!snap.exists()) { toast('Agendamento não encontrado'); return; }
+        set(ref(db, 'agendamentos/' + id + '/status'), 'Confirmado').then(() => {
+          toast('Agendamento confirmado!');
+        });
+      }).catch(() => toast('Erro ao confirmar'));
     };
 
     // ═══ DELETAR AGENDAMENTO ═══
