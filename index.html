@@ -428,6 +428,15 @@ let db = null;
 let registrosData = [];
 let agendamentosData = [];
 
+// ═══ FORMATAÇÃO SEGURA DE DATA (sem shift de timezone) ═══
+function formatDateBR(dateStr) {
+  if (!dateStr) return 'Data inválida';
+  const parts = dateStr.split('-');
+  if (parts.length !== 3) return 'Data inválida';
+  const [year, month, day] = parts;
+  return `${day}/${month}/${year}`;
+}
+
 // ════════════════════════════════════════════════════
 //  MÁSCARA TEL
 // ════════════════════════════════════════════════════
@@ -470,7 +479,7 @@ function switchTab(tab, btn) {
 //  FIREBASE INIT
 // ════════════════════════════════════════════════════
 import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({initializeApp}) => {
-  import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js').then(({getDatabase, ref, push, onValue, remove, set, get}) => {
+  import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js').then(({getDatabase, ref, push, onValue, remove, set, get, update}) => {
     const app = initializeApp(FIREBASE_CONFIG);
     db = getDatabase(app);
 
@@ -558,12 +567,13 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
     // ═══ RENDER HISTÓRICO ═══
     function renderHistorico() {
       const html = registrosData.length ? registrosData.map(r => `
-        <div class="entry confirmed">
+        <div class="entry${r.status === 'Confirmado' ? ' confirmed' : ''}">
+          <div class="entry-status status-${r.status ? r.status.toLowerCase() : 'pendente'}">${r.status || 'Pendente'}</div>
           <div class="entry-header">
             <div>
               <div class="entry-name">${r.nome}</div>
               <div class="entry-desc">
-                📅 ${r.data ? new Date(r.data+'T00:00:00').toLocaleDateString('pt-BR') : 'Data inválida'} • ${r.proc || 'Serviço'}
+                📅 ${formatDateBR(r.data)} • ${r.proc || 'Serviço'}
                 ${r.tel ? ' • 📱 '+r.tel : ''}
                 ${r.pagamento ? ' • 💰 '+r.pagamento : ''}
                 ${r.horaInicio ? ' • 🕐 '+r.horaInicio+(r.horaFim ? '-'+r.horaFim : '') : ''}
@@ -591,7 +601,7 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
             <div>
               <div class="entry-name">${a.nome}</div>
               <div class="entry-desc">
-                📅 ${(a.data ? new Date(a.data+'T00:00:00').toLocaleDateString('pt-BR') : 'Data inválida')} às ${a.hora || '??:??'} • ${a.proc || 'Serviço'}
+                📅 ${formatDateBR(a.data)} às ${a.hora || '??:??'} • ${a.proc || 'Serviço'}
                 ${a.tel ? ' • 📱 '+a.tel : ''}
               </div>
             </div>
@@ -628,7 +638,7 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
             <div>
               <div class="entry-name">${a.nome}</div>
               <div class="entry-desc">
-                📅 ${(a.data ? new Date(a.data+'T00:00:00').toLocaleDateString('pt-BR') : 'Data inválida')} às ${a.hora || '??:??'} • ${a.proc || 'Serviço'}
+                📅 ${formatDateBR(a.data)} às ${a.hora || '??:??'} • ${a.proc || 'Serviço'}
                 ${a.tel ? ' • 📱 '+a.tel : ''}
                 ${a.horaInicio ? ' • 🕐 '+a.horaInicio+(a.horaFim ? '-'+a.horaFim : '') : ''}
               </div>
@@ -671,17 +681,15 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
       toast('Agendamento confirmado!');
 
       // Atualiza no Firebase (usa update para não sobrescrever outros campos)
-      import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js').then(({update}) => {
-        update(ref(db, 'agendamentos/' + id), { status: 'Confirmado' })
-          .catch((err) => {
-            console.error('[Studio] Erro ao confirmar:', err);
-            toast('Erro ao confirmar');
-            // Reverte em caso de erro
-            agend.status = 'Pendente';
-            renderAgendamentos();
-            renderConfirmados();
-          });
-      });
+      update(ref(db, 'agendamentos/' + id), { status: 'Confirmado' })
+        .catch((err) => {
+          console.error('[Studio] Erro ao confirmar:', err);
+          toast('Erro ao confirmar');
+          // Reverte em caso de erro
+          agend.status = 'Pendente';
+          renderAgendamentos();
+          renderConfirmados();
+        });
     };
 
     // ═══ DELETAR AGENDAMENTO ═══
