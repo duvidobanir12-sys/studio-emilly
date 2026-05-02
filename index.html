@@ -679,18 +679,14 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
 
     // ═══ CONFIRMAR AGENDAMENTO ═══
     window.confirmarAgend = function(id) {
-      // Find the entry in our local data to get the full path
-      const entry = agendamentosData.find(a => a.id === id);
-      if (!entry) {
-        toast('Agendamento não encontrado localmente');
-        return;
-      }
-      set(ref(db, 'agendamentos/' + id + '/status'), 'Confirmado').then(() => {
-        toast('Agendamento confirmado!');
-      }).catch((err) => {
-        console.error('[Studio] Erro ao confirmar:', err);
-        toast('Erro ao confirmar agendamento');
-      });
+      set(ref(db, 'agendamentos/' + id + '/status'), 'Confirmado')
+        .then(() => {
+          toast('Agendamento confirmado!');
+        })
+        .catch((err) => {
+          console.error('[Studio] Erro ao confirmar:', err);
+          toast('Erro ao confirmar: ' + (err.message || 'desconhecido'));
+        });
     };
 
     // ═══ DELETAR AGENDAMENTO ═══
