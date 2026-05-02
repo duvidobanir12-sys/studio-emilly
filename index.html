@@ -568,7 +568,7 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
         const db = new Date(b.data + 'T' + b.hora + ':00');
         return (isNaN(da) ? 0 : da) - (isNaN(db) ? 0 : db);
       });
-      console.log('[Studio] Agendamentos atualizados:', agendamentosData.length, 'itens');
+      console.log('[Studio] onValue agendamentos:', agendamentosData.length, 'itens');
       renderAgendamentos();
       renderConfirmados();
     }, (err) => {
@@ -628,7 +628,7 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
             </div>
           ` : ''}
           <div class="entry-actions">
-            ${a.status !== 'Confirmado' ? `<button class="btn btn-success" onclick="confirmarAgend('${a.id}')">✓ Confirmar</button>` : ''}
+            ${a.status !== 'Confirmado' ? `<button class="btn btn-success" onclick="confirmarAgend('${a.id}', event)">✓ Confirmar</button>` : ''}
             ${a.anamnese ? `<button class="btn btn-outline" onclick="toggleAnamnese('${a.id}')">📋 Anamnese</button>` : ''}
             <button class="btn btn-danger" onclick="deletarAgend('${a.id}')">✕</button>
           </div>
@@ -681,24 +681,18 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
     };
 
     // ═══ CONFIRMAR AGENDAMENTO ═══
-    window.confirmarAgend = function(id) {
-      const item = agendamentosData.find(a => a.id === id);
-      if (!item) {
-        toast('Agendamento não encontrado. Recarregue a página.');
-        return;
-      }
-      toast('Confirmando...');
+    window.confirmarAgend = function(id, evt) {
+      const btn = evt && evt.target;
+      if (btn) { btn.disabled = true; btn.textContent = 'Confirmando...'; }
       set(ref(db, 'agendamentos/' + id + '/status'), 'Confirmado')
         .then(() => {
-          // Atualiza local imediatamente
-          item.status = 'Confirmado';
-          renderAgendamentos();
-          renderConfirmados();
-          toast('Agendamento confirmado!');
+          // Firebase onValue vai re-renderizar as abas automaticamente
+          toast('Confirmado!');
         })
         .catch((err) => {
           console.error('[Studio] Erro ao confirmar:', err);
-          toast('Erro: ' + (err.message || 'verifique conexão'));
+          toast('Erro ao confirmar');
+          if (btn) { btn.disabled = false; btn.textContent = '✓ Confirmar'; }
         });
     };
 
