@@ -42,30 +42,26 @@ header p { font-size: 11px; opacity: 0.85; letter-spacing: 1.5px; text-transform
 /* TABS */
 .tabs {
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px 0;
-  padding: 0 12px;
+  gap: 0;
+  padding: 0 24px;
   max-width: 700px;
   margin: 20px auto 0;
   width: 100%;
 }
 
 .tab-btn {
-  flex: 1 1 18%;
-  min-width: 70px;
-  padding: 10px 2px;
+  flex: 1;
+  padding: 12px 8px;
   border: none;
   background: var(--card);
   border-bottom: 3px solid var(--border);
   font-family: 'Outfit', sans-serif;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--muted);
   cursor: pointer;
   transition: all 0.3s;
   border-radius: 12px 12px 0 0;
-  white-space: nowrap;
-  text-align: center;
 }
 
 .tab-btn.active {
@@ -288,8 +284,8 @@ main {
 @media (max-width: 768px) {
   main { padding: 16px; }
   .card { padding: 16px; }
-  .tabs { padding: 0 8px; }
-  .tab-btn { font-size: 9px; padding: 8px 1px; min-width: 55px; flex: 1 1 40%; }
+  .tabs { padding: 0 16px; }
+  .tab-btn { font-size: 11px; padding: 10px 4px; }
 }
 </style>
 </head>
@@ -394,7 +390,7 @@ main {
     </div>
   </div>
 
-  <!-- ABA AGENDAMENTOS CONFIRMADOS -->
+  <!-- ABA CONFIRMADOS -->
   <div class="tab-content" id="tab-confirmados">
     <div class="card">
       <h2 class="card-title">Agendamentos Confirmados</h2>
@@ -541,16 +537,9 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
     onValue(ref(db, 'registros'), (snap) => {
       registrosData = [];
       snap.forEach(child => {
-        const val = child.val();
-        if (val && val.nome && val.data && val.proc) {
-          registrosData.push({ id: child.key, ...val });
-        }
+        registrosData.push({ id: child.key, ...child.val() });
       });
-      registrosData.sort((a,b) => {
-        const da = new Date(a.data + 'T00:00:00');
-        const db = new Date(b.data + 'T00:00:00');
-        return (isNaN(db) ? 0 : db) - (isNaN(da) ? 0 : da);
-      });
+      registrosData.sort((a,b) => new Date(b.data) - new Date(a.data));
       renderHistorico();
     });
 
@@ -558,22 +547,11 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
     onValue(ref(db, 'agendamentos'), (snap) => {
       agendamentosData = [];
       snap.forEach(child => {
-        const val = child.val();
-        if (val && val.nome && val.data && val.hora && val.proc) {
-          agendamentosData.push({ id: child.key, ...val });
-        }
+        agendamentosData.push({ id: child.key, ...child.val() });
       });
-      agendamentosData.sort((a,b) => {
-        const da = new Date(a.data + 'T' + a.hora + ':00');
-        const db = new Date(b.data + 'T' + b.hora + ':00');
-        return (isNaN(da) ? 0 : da) - (isNaN(db) ? 0 : db);
-      });
-      console.log('[Studio] onValue agendamentos:', agendamentosData.length, 'items',
-        agendamentosData.filter(a=>a.status==='Confirmado').length, 'confirmados');
+      agendamentosData.sort((a,b) => new Date(a.data+' '+a.hora) - new Date(b.data+' '+b.hora));
       renderAgendamentos();
       renderConfirmados();
-    }, (err) => {
-      console.error('[Studio] Erro no onValue agendamentos:', err);
     });
 
     // ═══ RENDER HISTÓRICO ═══
@@ -590,7 +568,7 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
                 ${r.horaInicio ? ' • 🕐 '+r.horaInicio+(r.horaFim ? '-'+r.horaFim : '') : ''}
               </div>
             </div>
-            <div class="entry-price">R$ ${parseFloat(r.valor || 0).toFixed(2)}</div>
+            <div class="entry-price">R$ ${r.valor}</div>
           </div>
           <div class="entry-actions">
             <button class="btn btn-outline" onclick="editarRegistro('${r.id}')">✏️</button>
@@ -606,7 +584,7 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
     function renderAgendamentos() {
       const pendentes = agendamentosData.filter(a => a.status !== 'Confirmado');
       const html = pendentes.length ? pendentes.map(a => `
-        <div class="entry ${a.status === 'Confirmado' ? 'confirmed' : ''}">
+        <div class="entry">
           <div class="entry-status status-${a.status ? a.status.toLowerCase() : 'pendente'}">${a.status || 'Pendente'}</div>
           <div class="entry-header">
             <div>
@@ -629,7 +607,7 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
             </div>
           ` : ''}
           <div class="entry-actions">
-            ${a.status !== 'Confirmado' ? `<button class="btn btn-success" onclick="confirmarAgend('${a.id}', event)">✓ Confirmar</button>` : ''}
+            <button class="btn btn-success" onclick="confirmarAgend('${a.id}')">✓ Confirmar</button>
             ${a.anamnese ? `<button class="btn btn-outline" onclick="toggleAnamnese('${a.id}')">📋 Anamnese</button>` : ''}
             <button class="btn btn-danger" onclick="deletarAgend('${a.id}')">✕</button>
           </div>
@@ -651,11 +629,13 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
               <div class="entry-desc">
                 📅 ${(a.data ? new Date(a.data+'T00:00:00').toLocaleDateString('pt-BR') : 'Data inválida')} às ${a.hora || '??:??'} • ${a.proc || 'Serviço'}
                 ${a.tel ? ' • 📱 '+a.tel : ''}
+                ${a.horaInicio ? ' • 🕐 '+a.horaInicio+(a.horaFim ? '-'+a.horaFim : '') : ''}
               </div>
             </div>
+            <div class="entry-price">R$ ${a.valor || '0.00'}</div>
           </div>
           ${a.anamnese ? `
-            <div class="anamnese-box" id="anamnese-conf-${a.id}">
+            <div class="anamnese-box" id="anamnese-${a.id}">
               ${a.anamnese.diabetes ? '<div class="anamnese-row"><span class="anamnese-label">Diabetes:</span> '+a.anamnese.diabetes+'</div>' : ''}
               ${a.anamnese.gestante ? '<div class="anamnese-row"><span class="anamnese-label">Gestante:</span> '+a.anamnese.gestante+'</div>' : ''}
               ${a.anamnese.alergia ? '<div class="anamnese-row"><span class="anamnese-label">Alergia:</span> '+a.anamnese.alergia+(a.anamnese.alergiaDetalhe ? ' ('+a.anamnese.alergiaDetalhe+')' : '')+'</div>' : ''}
@@ -666,41 +646,41 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
             </div>
           ` : ''}
           <div class="entry-actions">
-            ${a.anamnese ? `<button class="btn btn-outline" onclick="toggleAnamneseConfirm('${a.id}')">📋 Anamnese</button>` : ''}
+            ${a.anamnese ? `<button class="btn btn-outline" onclick="toggleAnamnese('${a.id}')">📋 Anamnese</button>` : ''}
             <button class="btn btn-danger" onclick="deletarAgend('${a.id}')">✕</button>
           </div>
         </div>
       `).join('') : '<div class="empty">Nenhum agendamento confirmado</div>';
 
       document.getElementById('lista-confirmados').innerHTML = html;
-    }
-
-    // ═══ TOGGLE ANAMNESE CONFIRMADOS ═══
-    window.toggleAnamneseConfirm = function(id) {
-      const el = document.getElementById('anamnese-conf-' + id);
-      if (el) el.classList.toggle('show');
     };
 
     // ═══ CONFIRMAR AGENDAMENTO ═══
-    window.confirmarAgend = function(id, evt) {
-      const btn = evt && evt.target;
-      if (btn) { btn.disabled = true; btn.textContent = 'Confirmando...'; }
-      set(ref(db, 'agendamentos/' + id + '/status'), 'Confirmado')
-        .then(() => {
-          // Atualiza local imediatamente para UI responsiva
-          const item = agendamentosData.find(a => a.id === id);
-          if (item) {
-            item.status = 'Confirmado';
+    window.confirmarAgend = function(id) {
+      // Atualiza localmente primeiro para resposta imediata
+      const agend = agendamentosData.find(a => a.id === id);
+      if (!agend) return;
+
+      // Atualiza o status localmente
+      agend.status = 'Confirmado';
+
+      // Re-renderiza ambas as abas imediatamente
+      renderAgendamentos();
+      renderConfirmados();
+      toast('Agendamento confirmado!');
+
+      // Atualiza no Firebase (usa update para não sobrescrever outros campos)
+      import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js').then(({update}) => {
+        update(ref(db, 'agendamentos/' + id), { status: 'Confirmado' })
+          .catch((err) => {
+            console.error('[Studio] Erro ao confirmar:', err);
+            toast('Erro ao confirmar');
+            // Reverte em caso de erro
+            agend.status = 'Pendente';
             renderAgendamentos();
             renderConfirmados();
-          }
-          toast('Confirmado!');
-        })
-        .catch((err) => {
-          console.error('[Studio] Erro ao confirmar:', err);
-          toast('Erro ao confirmar');
-          if (btn) { btn.disabled = false; btn.textContent = '✓ Confirmar'; }
-        });
+          });
+      });
     };
 
     // ═══ DELETAR AGENDAMENTO ═══
