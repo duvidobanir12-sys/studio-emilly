@@ -681,6 +681,14 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
     window.confirmarAgend = function(id) {
       set(ref(db, 'agendamentos/' + id + '/status'), 'Confirmado')
         .then(() => {
+          // Atualiza o dado local imediatamente para evitar delay do Firebase
+          const idx = agendamentosData.findIndex(a => a.id === id);
+          if (idx !== -1) {
+            agendamentosData[idx].status = 'Confirmado';
+          }
+          // Re-renderiza ambas as abas na hora
+          renderAgendamentos();
+          renderConfirmados();
           toast('Agendamento confirmado!');
         })
         .catch((err) => {
