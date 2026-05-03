@@ -3,7 +3,14 @@
     "allow": [
       "Bash(git rm:*)",
       "Bash(git commit:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(curl -s \"https://studio-emilly-default-rtdb.firebaseio.com/agendamentos.json?limitToFirst=3\")",
+      "Bash(curl -s \"https://studio-emilly-default-rtdb.firebaseio.com/agendamentos.json\")",
+      "Bash(python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); print\\(''''Total:'''', len\\(data\\) if data else 0\\); [print\\(k, v.get\\(''''nome'''',''''?''''\\), v.get\\(''''status'''',''''?''''\\)\\) for k,v in list\\(data.items\\(\\)\\)[:5]] if data else print\\(''''Vazio''''\\)\")",
+      "Bash(git push:*)",
+      "Bash(curl:*)",
+      "Bash(git checkout:*)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(''''status:'''', d.get\\(''''status''''\\)\\)\")"
     ]
   }
 }
