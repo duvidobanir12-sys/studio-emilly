@@ -3,11 +3,11 @@
     "agendamentos": {
       ".read": true,
       ".write": true,
-      ".validate": "newData.hasChildren(['nome', 'telefone', 'data', 'hora'])",
+      ".validate": "newData.hasChildren(['nome', 'tel', 'data', 'hora'])",
       "nome": {
         ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
       },
-      "telefone": {
+      "tel": {
         ".validate": "newData.isString() && newData.val().length >= 10 && newData.val().length <= 20"
       },
       "data": {
@@ -15,9 +15,6 @@
       },
       "hora": {
         ".validate": "newData.isString() && newData.val().matches(/^\\d{2}:\\d{2}$/)"
-      },
-      "$other": {
-        ".validate": false
       }
     },
     "registros": {
