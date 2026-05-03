@@ -397,8 +397,41 @@ function termoCheckbox(){
 // ══════════════════════════════════════════════════════
 // HORÁRIOS — CORRIGIDO
 // ══════════════════════════════════════════════════════
-let _restTimer = null;
-let _restFallbackActive = false;
+let _dadosCarregados = false;
+
+// Carrega dados via REST API instantaneamente (não espera Firebase SDK)
+(function cargaRapida(){
+  fetch('https://studio-emilly-default-rtdb.firebaseio.com/agendamentos.json')
+    .then(r => r.ok ? r.json() : {})
+    .catch(() => ({}))
+    .then(agendSnap => {
+      if(agendSnap && typeof agendSnap === 'object'){
+        _agendamentosOcupados = {};
+        Object.values(agendSnap).forEach(a => {
+          if(a && a.data && a.hora && a.status !== 'Cancelado'){
+            if(!_agendamentosOcupados[a.data]) _agendamentosOcupados[a.data] = [];
+            _agendamentosOcupados[a.data].push(a.hora);
+          }
+        });
+      }
+      return fetch('https://studio-emilly-default-rtdb.firebaseio.com/folgas.json');
+    })
+    .then(r => r && r.ok ? r.json() : {})
+    .catch(() => ({}))
+    .then(folgasSnap => {
+      _folgasDatas = new Set();
+      if(folgasSnap && typeof folgasSnap === 'object'){
+        Object.values(folgasSnap).forEach(v => {
+          if(v && v.data) _folgasDatas.add(v.data);
+        });
+      }
+      _dadosCarregados = true;
+      console.log('[Studio] ✅ Dados carregados via REST (rápido)');
+      // Renderiza horários imediatamente (não espera Firebase SDK)
+      carregarHorarios();
+    })
+    .catch(err => console.warn('[Studio] Carga rápida falhou:', err));
+})();
 
 function carregarHorarios(){
   const data = document.getElementById('c-data').value;
@@ -409,54 +442,9 @@ function carregarHorarios(){
     return;
   }
 
-  // Firebase ainda não inicializou
-  if(!_fbReady){
-    wrap.innerHTML = '<p class="h-status" id="h-status-msg">⏳ Conectando...</p>';
-
-    // Inicia o timeout de 10s apenas uma vez
-    if(!_restTimer && !_restFallbackActive){
-      _restTimer = setTimeout(() => {
-        if(!_fbReady){
-          console.log('[Studio] ⏱️ Timeout 10s — usando REST fallback');
-          // Usa fetch() REST direto
-          Promise.all([
-            fetch('https://studio-emilly-default-rtdb.firebaseio.com/agendamentos.json').then(r => r.ok ? r.json() : {}).catch(() => ({})),
-            fetch('https://studio-emilly-default-rtdb.firebaseio.com/folgas.json').then(r => r.ok ? r.json() : {}).catch(() => ({}))
-          ]).then(([agendSnap, folgasSnap]) => {
-            // Preenche _agendamentosOcupados e _folgasDatas manualmente
-            _agendamentosOcupados = {};
-            if(agendSnap){
-              Object.values(agendSnap).forEach(a => {
-                if(a && a.data && a.hora && a.status !== 'Cancelado'){
-                  if(!_agendamentosOcupados[a.data]) _agendamentosOcupados[a.data] = [];
-                  _agendamentosOcupados[a.data].push(a.hora);
-                }
-              });
-            }
-            _folgasDatas = new Set();
-            if(folgasSnap){
-              Object.values(folgasSnap).forEach(v => {
-                if(v && v.data) _folgasDatas.add(v.data);
-              });
-            }
-            // Define _fbReady = true e chama carregarHorarios()
-            _fbReady = true;
-            if(_restTimer) { clearTimeout(_restTimer); _restTimer = null; }
-            if(!window._fbPush){
-              window._fbPush = (dadosAgend) => {
-                console.warn('[Studio] 📡 REST mode: push não disponível sem SDK');
-                return Promise.reject(new Error('Firebase SDK não carregado — modo REST'));
-              };
-            }
-            console.log('[Studio] ✅ Dados carregados via REST fallback');
-            carregarHorarios();
-          }).catch(err => {
-            console.error('[Studio] Erro REST fallback:', err);
-            wrap.innerHTML = '<p class="h-status" style="color:var(--rose-dark);">❌ Erro de conexão. Recarregue a página.</p>';
-          });
-        }
-      }, 10000);
-    }
+  // Se os dados ainda não carregaram, mostra loading e aguarda (o REST já foi disparado no IIFE acima)
+  if(!_dadosCarregados && !_fbReady){
+    wrap.innerHTML = '<p class="h-status">⏳ Carregando horários...</p>';
     return;
   }
 
@@ -724,27 +712,26 @@ function loadFirebaseViaScriptTags(){
     return;
   }
 
-  // Carrega firebase-app
+  // Carrega Firebase compat SDK (mesmo que no <head>)
   const sdkVersion = '10.12.0';
   const appScript = document.createElement('script');
-  appScript.src = 'https://www.gstatic.com/firebasejs/' + sdkVersion + '/firebase-app.js';
+  appScript.src = 'https://www.gstatic.com/firebasejs/' + sdkVersion + '/firebase-app-compat.js';
   appScript.onload = () => {
-    console.log('[Studio] ✅ firebase-app.js carregado via script tag');
-    // Carrega firebase-database
+    console.log('[Studio] ✅ firebase-app-compat.js carregado via script tag');
     const dbScript = document.createElement('script');
-    dbScript.src = 'https://www.gstatic.com/firebasejs/' + sdkVersion + '/firebase-database.js';
+    dbScript.src = 'https://www.gstatic.com/firebasejs/' + sdkVersion + '/firebase-database-compat.js';
     dbScript.onload = () => {
-      console.log('[Studio] ✅ firebase-database.js carregado via script tag');
+      console.log('[Studio] ✅ firebase-database-compat.js carregado via script tag');
       initFirebaseWithSDK();
     };
     dbScript.onerror = () => {
-      console.error('[Studio] Falha ao carregar firebase-database.js via script tag');
+      console.error('[Studio] Falha ao carregar firebase-database-compat.js via script tag');
       fallbackToREST();
     };
     document.head.appendChild(dbScript);
   };
   appScript.onerror = () => {
-    console.error('[Studio] Falha ao carregar firebase-app.js via script tag');
+    console.error('[Studio] Falha ao carregar firebase-app-compat.js via script tag');
     fallbackToREST();
   };
   document.head.appendChild(appScript);
@@ -752,10 +739,15 @@ function loadFirebaseViaScriptTags(){
 
 function initFirebaseWithSDK(){
   try {
-    const app = firebase.initializeApp(FIREBASE_CONFIG);
-    const db  = firebase.database(app);
+    if(firebase.apps && firebase.apps.length > 0){
+      // App já inicializada (pelo IIFE no <head> ou retry)
+      window._fbApp = firebase.apps[0];
+    } else {
+      window._fbApp = firebase.initializeApp(FIREBASE_CONFIG);
+    }
+    window._fbDb  = firebase.database(window._fbApp);
 
-    window._fbPush = (dadosAgend) => firebase.database().ref('agendamentos').push(dadosAgend);
+    window._fbPush = (dadosAgend) => window._fbDb.ref('agendamentos').push(dadosAgend);
 
     let agendLoaded = false;
     let folgasLoaded = false;
@@ -764,12 +756,14 @@ function initFirebaseWithSDK(){
       if(!agendLoaded || !folgasLoaded) return;
       _fbReady = true;
       if(_restTimer) { clearTimeout(_restTimer); _restTimer = null; }
-      console.log('[Studio] Firebase pronto via script tags ✅');
-      carregarHorarios();
+      console.log('[Studio] Firebase pronto via SDK ✅');
+      // Só re-renderiza se os dados do SDK forem diferentes dos do REST
+      if(_dadosCarregados) carregarHorarios();
     }
 
     firebase.database().ref('agendamentos').on('value', snap => {
-      _agendamentosOcupados = {};
+      // Só atualiza se Firebase SDK carregou (não sobrescreve o REST rápido imediato)
+      if(!_dadosCarregados) _agendamentosOcupados = {};
       snap.forEach(child => {
         const a = child.val();
         if(a && a.data && a.hora && a.status !== 'Cancelado'){
@@ -783,7 +777,7 @@ function initFirebaseWithSDK(){
     });
 
     firebase.database().ref('folgas').on('value', snap => {
-      _folgasDatas = new Set();
+      if(!_dadosCarregados) _folgasDatas = new Set();
       snap.forEach(child => {
         const v = child.val();
         if(v && v.data) _folgasDatas.add(v.data);
