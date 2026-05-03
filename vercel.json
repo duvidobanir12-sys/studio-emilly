@@ -4,5 +4,13 @@
     { "source": "/api/vercel/notify", "destination": "/api/vercel/notify.js" },
     { "source": "/(.*)", "destination": "/relatorios.html" }
   ],
-  "buildCommand": null
+  "buildCommand": null,
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
+    }
+  ]
 }
