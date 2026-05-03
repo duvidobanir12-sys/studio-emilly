@@ -4,7 +4,7 @@
       ".read": true,
       "$key": {
         ".write": "auth != null || (!data.exists() && newData.hasChildren(['nome', 'tel', 'data', 'hora', 'status', 'origem']) && newData.child('status').val() === 'Pendente' && newData.child('origem').val() === 'site')",
-        ".validate": "newData.hasChildren(['nome', 'tel', 'data', 'hora', 'status', 'origem'])"
+        ".validate": "newData.exists() && newData.hasChildren(['nome', 'tel', 'data', 'hora', 'status', 'origem'])"
       }
     },
     "horarios_ocupados": {
