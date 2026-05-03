@@ -29,6 +29,14 @@ export default async function handler(req, res) {
   const chatIdsEnv = process.env.TELEGRAM_CHAT_IDS;
   const chatIds = chatIdsEnv ? chatIdsEnv.split(',').map(id => id.trim()) : ['8791111721', '5106987392'];
 
+  // Validate WhatsApp config (optional - won't fail if not configured)
+  const WHATSAPP_PHONE = process.env.WHATSAPP_PHONE;
+  const WHATSAPP_APIKEY = process.env.WHATSAPP_APIKEY;
+  const whatsappEnabled = WHATSAPP_PHONE && WHATSAPP_APIKEY;
+  if (!whatsappEnabled) {
+    console.log('WhatsApp notifications disabled - missing WHATSAPP_PHONE or WHATSAPP_APIKEY');
+  }
+
   // Validate request body exists
   if (!req.body || typeof req.body !== 'object') {
     return res.status(400).json({ error: 'Invalid request body' });
@@ -78,6 +86,9 @@ export default async function handler(req, res) {
   const msg = `🌸 Novo Agendamento!\n\n👤 Cliente: ${sanitizedAgend.nome}\n💅 Serviço: ${sanitizedAgend.proc}\n📅 Data: ${d}/${m}/${y}\n🕐 Horário: ${sanitizedAgend.hora}${sanitizedAgend.tel ? '\n📱 WhatsApp: ' + sanitizedAgend.tel : ''}${sanitizedAgend.obs ? '\n📝 Obs: ' + sanitizedAgend.obs : ''}`;
 
   const errors = [];
+  const sentPlatforms = [];
+
+  // Send to Telegram
   for (const chatId of chatIds) {
     try {
       const url = `https://api.telegram.org/bot${TG_TOKEN}/sendMessage`;
@@ -88,16 +99,46 @@ export default async function handler(req, res) {
       });
       const data = await resp.json().catch(() => ({}));
       console.log(`Telegram ${chatId}:`, resp.status, data);
-      if (!resp.ok) errors.push(`${chatId}: ${data.description || resp.status}`);
+      if (!resp.ok) {
+        errors.push(`Telegram ${chatId}: ${data.description || resp.status}`);
+      } else {
+        sentPlatforms.push(`Telegram ${chatId}`);
+      }
     } catch (e) {
       console.error(`Telegram err ${chatId}:`, e);
-      errors.push(`${chatId}: ${e.message}`);
+      errors.push(`Telegram ${chatId}: ${e.message}`);
     }
   }
 
-  if (errors.length === chatIds.length) {
+  // Send to WhatsApp via CallMeBot (if configured)
+  if (whatsappEnabled) {
+    try {
+      const encodedMsg = encodeURIComponent(msg);
+      const whatsappUrl = `https://api.callmebot.com/whatsapp.php?phone=${WHATSAPP_PHONE}&text=${encodedMsg}&apikey=${WHATSAPP_APIKEY}`;
+      const whatsappResp = await fetch(whatsappUrl);
+      const whatsappData = await whatsappResp.text().catch(() => '');
+      console.log('WhatsApp:', whatsappResp.status, whatsappData);
+
+      if (!whatsappResp.ok) {
+        errors.push(`WhatsApp: ${whatsappData || whatsappResp.status}`);
+      } else {
+        sentPlatforms.push('WhatsApp');
+      }
+    } catch (e) {
+      console.error('WhatsApp err:', e);
+      errors.push(`WhatsApp: ${e.message}`);
+    }
+  }
+
+  // Consider successful if at least one platform received the message
+  if (sentPlatforms.length === 0) {
     return res.status(502).json({ error: 'Failed to send notifications', details: errors });
   }
 
-  return res.status(200).json({ ok: true, sent: chatIds.length - errors.length });
+  return res.status(200).json({
+    ok: true,
+    sent: sentPlatforms.length,
+    platforms: sentPlatforms,
+    errors: errors.length > 0 ? errors : undefined
+  });
 }
