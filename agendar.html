@@ -928,32 +928,27 @@ async function enviarAgendamento(){
     criadoEm: new Date().toISOString()
   };
 
-  try {
-    if(!window._fbPush) throw new Error('Firebase não inicializado.');
-    await window._fbPush(agend);
+  // Salva no Firebase (nao bloqueia se falhar)
+    if(window._fbPush){
+      window._fbPush(agend).catch(e => console.warn('[Studio] Firebase falhou:', e));
+    }
 
-    // Set rate limit after successful submission
+    // Rate limit
     setRateLimit();
 
-    // Notifica Telegram (não crítico — não bloqueia o fluxo)
+    // SEMPRE envia notificacao (WhatsApp/Telegram)
     fetch('/api/vercel/notify', {
       method: 'POST',
       keepalive: true,
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify(agend)
     }).then(r => r.json())
-      .then(d => console.log('[Studio] Telegram OK:', d))
-      .catch(e => console.warn('[Studio] Telegram falhou (não crítico):', e));
+      .then(d => console.log('[Studio] Notificacao OK:', d))
+      .catch(e => console.warn('[Studio] Notificacao falhou:', e));
 
+    // Mostra sucesso para o usuario
     showMsg(null);
     mostrarSucesso(agend);
-
-  } catch(err){
-    console.error('[Studio] Erro ao salvar:', err);
-    document.getElementById('msg-error-text').textContent = '❌ Erro ao enviar. Tente novamente ou entre em contato pelo WhatsApp.';
-    showMsg('msg-error');
-    btn.disabled = false;
-  }
 }
 
 // ══════════════════════════════════════════════════════
