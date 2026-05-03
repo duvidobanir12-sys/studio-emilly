@@ -2,23 +2,24 @@
   "rules": {
     "agendamentos": {
       ".read": true,
-      ".write": true
+      ".write": true,
+      ".validate": "newData.hasChildren(['nome', 'data', 'hora'])"
     },
     "registros": {
-      ".read": true,
-      ".write": true
+      ".read": "auth != null",
+      ".write": "auth != null"
     },
     "clientes": {
-      ".read": true,
-      ".write": true
+      ".read": "auth != null",
+      ".write": "auth != null"
     },
     "folgas": {
       ".read": true,
-      ".write": true
+      ".write": "auth != null"
     },
     "espera": {
-      ".read": true,
-      ".write": true
+      ".read": "auth != null",
+      ".write": "auth != null"
     }
   }
 }

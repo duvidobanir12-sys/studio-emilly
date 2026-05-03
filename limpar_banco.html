@@ -5,7 +5,7 @@
 <title>Limpar Banco Firebase</title>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, ref, set } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { getDatabase, ref, set, getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyALLJn7hEnTxvTN2SNVzkAEs1HAwUG24hE",
@@ -20,8 +20,13 @@ const FIREBASE_CONFIG = {
 const app = initializeApp(FIREBASE_CONFIG);
 const db  = getDatabase(app);
 
+// IMPORTANT: This page should be protected by Firebase Auth in production.
+// The Firebase security rules should also prevent unauthorized writes.
+// See firebase.rules.json for the recommended security rules.
+
 async function limparBanco(){
   if(!confirm('Tem certeza que deseja APAGAR TODOS os dados de agendamentos e folgas?')) return;
+  if(!confirm('CONFIRMAÇÃO FINAL: Esta ação não pode ser desfeita. Continuar?')) return;
   try {
     await set(ref(db, 'agendamentos'), null);
     await set(ref(db, 'folgas'), null);
@@ -36,11 +41,17 @@ window.limparBanco = limparBanco;
 </script>
 <style>
 body{font-family:sans-serif;padding:40px;text-align:center;}
+.warning{background:#fce8ef;border:2px solid #c9184a;border-radius:10px;padding:16px;margin-bottom:20px;color:#a83055;}
 button{padding:14px 28px;font-size:16px;background:#c9184a;color:#fff;border:none;border-radius:10px;cursor:pointer;}
+button:hover{background:#a01435;}
 #status{margin-top:20px;font-size:14px;}
 </style>
 </head>
 <body>
+<div class="warning">
+  <strong>⚠️ Atenção:</strong> Esta página apaga TODOS os dados do Firebase.
+  Em produção, esta página deve ser protegida por autenticação.
+</div>
 <h2>🗑️ Limpar Banco Firebase</h2>
 <p>Este script vai apagar TODOS os dados de <b>agendamentos</b> e <b>folgas</b>.</p>
 <button onclick="limparBanco()">Zerar Banco</button>

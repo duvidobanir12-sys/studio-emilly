@@ -220,6 +220,12 @@ tr:hover{background:var(--cream);}
 </div>
 
 <script>
+// ═══ UTILITIES ═══
+function escapeHTML(str){
+    if(typeof str !== 'string') return String(str);
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 // ═══ CONFIGURAÇÕES FIREBASE ═══
 const FIREBASE_CONFIG = {
     apiKey: "AIzaSyALLJn7hEnTxvTN2SNVzkAEs1HAwUG24hE",
@@ -455,7 +461,7 @@ function renderServicos(fil){
     const max=sorted.length?sorted[0][1]:1;
     document.getElementById('top-servicos').innerHTML = sorted.length ? sorted.map(([nome,n])=>`
         <div class="top-svc">
-            <div class="top-svc-name">${nome}</div>
+            <div class="top-svc-name">${escapeHTML(nome)}</div>
             <div class="top-svc-bar"><div class="top-svc-fill" style="width:${Math.round(n/max*100)}%"></div></div>
             <div class="top-svc-count">${n}x</div>
         </div>`).join('') : '<div class="empty">Nenhum atendimento.</div>';
@@ -468,7 +474,7 @@ function renderServicosReceita(fil){
     const max=sorted.length?sorted[0][1]:1;
     document.getElementById('top-servicos-receita').innerHTML = sorted.length ? sorted.map(([nome,val])=>`
         <div class="top-svc">
-            <div class="top-svc-name">${nome}</div>
+            <div class="top-svc-name">${escapeHTML(nome)}</div>
             <div class="top-svc-bar"><div class="top-svc-fill" style="width:${Math.round(val/max*100)}%"></div></div>
             <div class="top-svc-count">${fmt(val)}</div>
         </div>`).join('') : '<div class="empty">Nenhum atendimento.</div>';
@@ -485,7 +491,7 @@ function renderTopClientes(fil){
     document.getElementById('top-clientes').innerHTML = sorted.length ? sorted.map((c,i)=>`
         <div class="top-client">
             <div class="top-client-pos">${i+1}</div>
-            <div class="top-client-name">${c.nome} <small style="color:var(--muted);font-weight:400">(${c.qtd}x)</small></div>
+            <div class="top-client-name">${escapeHTML(c.nome)} <small style="color:var(--muted);font-weight:400">(${c.qtd}x)</small></div>
             <div class="top-client-val">${fmt(c.valor)}</div>
         </div>`).join('') : '<div class="empty">Nenhum dado.</div>';
 }
@@ -510,14 +516,14 @@ function renderClientesSumidos(){
 
     document.getElementById('clientes-sumidos').innerHTML = sumidos.length ? sumidos.map(c=>`
         <div class="ghost-item">
-            <div class="ghost-item-name">${c.nome}${c.tel?` · 📱 ${c.tel}`:''}</div>
+            <div class="ghost-item-name">${escapeHTML(c.nome)}${c.tel?` · 📱 ${escapeHTML(c.tel)}`:''}</div>
             <div class="ghost-item-days">${c.dias} dias</div>
         </div>`).join('') : '<div class="empty">Todos os clientes compareceram recentemente! ✨</div>';
 }
 
 function renderTabela(fil){
     if(!fil.length){document.getElementById('tabela-container').innerHTML='<div class="empty">Nenhum atendimento.</div>';return;}
-    const rows=fil.map(r=>`<tr><td style="font-weight:600">${r.nome}</td><td>${fmtData(r.data)}</td><td>${r.hinicio||'–'}</td><td>${r.proc}</td><td style="font-weight:700;color:var(--rose-dark)">${fmt(r.valor)}</td><td>${r.pgto||'–'}</td><td>${r.obs||'–'}</td></tr>`).join('');
+    const rows=fil.map(r=>`<tr><td style="font-weight:600">${escapeHTML(r.nome)}</td><td>${fmtData(r.data)}</td><td>${escapeHTML(r.hinicio||'–')}</td><td>${escapeHTML(r.proc)}</td><td style="font-weight:700;color:var(--rose-dark)">${fmt(r.valor)}</td><td>${escapeHTML(r.pgto||'–')}</td><td>${escapeHTML(r.obs||'–')}</td></tr>`).join('');
     const total = fil.reduce((s,r)=>s+parseFloat(r.valor||0),0);
     document.getElementById('tabela-container').innerHTML=`<p style="font-size:11px;color:var(--muted);padding:6px 0;">${fil.length} registros · Total: <strong style="color:var(--rose-dark)">${fmt(total)}</strong></p><table><thead><tr><th>Cliente</th><th>Data</th><th>Hora</th><th>Serviço</th><th>Valor</th><th>Pagamento</th><th>Obs</th></tr></thead><tbody>${rows}</tbody></table>`;
 }

@@ -13,6 +13,11 @@
 firebase-service-account*.json
 serviceAccount*.json
 
+# Files with hardcoded secrets (never commit)
+checkAppointments.js
+api/vercel/notify.js
+workflows/lembrete.yml
+
 # Node modules (if applicable)
 node_modules/
 npm-debug.log*
