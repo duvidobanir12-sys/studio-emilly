@@ -751,8 +751,27 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
     // ═══ DELETAR AGENDAMENTO ═══
     window.deletarAgend = function(id) {
       if (!confirm('Remover agendamento?')) return;
+
+      // Find the appointment in local data to get data and hora
+      const agend = agendamentosData.find(a => a.id === id);
+
+      // Remove from agendamentos
       remove(ref(db, 'agendamentos/' + id)).then(() => {
-        toast('Removido');
+        // Also remove from horarios_ocupados
+        if (agend && agend.data && agend.hora) {
+          const key = agend.data + '_' + agend.hora;
+          remove(ref(db, 'horarios_ocupados/' + key)).then(() => {
+            toast('Removido com sucesso');
+          }).catch((err) => {
+            console.error('[Studio] Erro ao limpar horario ocupado:', err);
+            toast('Removido, mas horário pode estar desatualizado');
+          });
+        } else {
+          toast('Removido');
+        }
+      }).catch((err) => {
+        console.error('[Studio] Erro ao remover:', err);
+        toast('Erro ao remover');
       });
     };
 
