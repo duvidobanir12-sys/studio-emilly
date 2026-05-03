@@ -47,7 +47,11 @@ header p { font-size: 11px; opacity: 0.85; letter-spacing: 1.5px; text-transform
   max-width: 700px;
   margin: 20px auto 0;
   width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+.tabs::-webkit-scrollbar { display: none; }
 
 .tab-btn {
   flex: 1;
@@ -62,6 +66,8 @@ header p { font-size: 11px; opacity: 0.85; letter-spacing: 1.5px; text-transform
   cursor: pointer;
   transition: all 0.3s;
   border-radius: 12px 12px 0 0;
+  flex-shrink: 0;
+  min-width: 100px;
 }
 
 .tab-btn.active {
@@ -154,29 +160,32 @@ main {
 .btn-danger {
   background: #ef4444;
   color: white;
-  padding: 6px 10px;
+  padding: 8px 12px;
   font-size: 12px;
   width: auto;
   border-radius: 8px;
+  min-height: 36px;
 }
 
 .btn-success {
   background: var(--success);
   color: white;
-  padding: 6px 10px;
+  padding: 8px 12px;
   font-size: 12px;
   width: auto;
   border-radius: 8px;
+  min-height: 36px;
 }
 
 .btn-outline {
   background: none;
   border: 1.5px solid var(--pink);
   color: var(--pink);
-  padding: 6px 10px;
+  padding: 8px 12px;
   font-size: 12px;
   width: auto;
   border-radius: 8px;
+  min-height: 36px;
 }
 
 /* ENTRY */
@@ -559,7 +568,11 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
       snap.forEach(child => {
         agendamentosData.push({ id: child.key, ...child.val() });
       });
-      agendamentosData.sort((a,b) => new Date(a.data+' '+a.hora) - new Date(b.data+' '+b.hora));
+      agendamentosData.sort((a,b) => {
+        const dateA = new Date(a.data + 'T' + a.hora + ':00');
+        const dateB = new Date(b.data + 'T' + b.hora + ':00');
+        return dateA - dateB;
+      });
       renderAgendamentos();
       renderConfirmados();
     });
