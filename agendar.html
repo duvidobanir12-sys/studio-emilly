@@ -687,17 +687,25 @@ function loadFirebaseViaScriptTags() {
 // FIREBASE INIT
 // ══════════════════════════════════════════════════════
 
-// Check for test mode first
-if (isTestMode()) {
-  initTestMode();
-} else {
-  // HTML already loads firebase-app-compat.js and firebase-database-compat.js via <script> tags
-  // Those expose window.firebase (compat SDK), NOT modular SDK syntax
-  if (window.firebase && window.firebase.initializeApp) {
-    initFirebaseWithSDK();
+function initApp() {
+  // Check for test mode first
+  if (isTestMode()) {
+    initTestMode();
   } else {
-    loadFirebaseViaScriptTags();
+    // HTML already loads firebase-app-compat.js and firebase-database-compat.js via <script> tags
+    // Those expose window.firebase (compat SDK), NOT modular SDK syntax
+    if (window.firebase && window.firebase.initializeApp) {
+      initFirebaseWithSDK();
+    } else {
+      loadFirebaseViaScriptTags();
+    }
   }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
 }
 
 // ════════════════════════════════════════════════════
