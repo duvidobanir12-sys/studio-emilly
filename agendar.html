@@ -235,6 +235,11 @@ body{
         </div>
       </div>
 
+      <div class="fgroup" style="display:none !important;" aria-hidden="true">
+        <label class="fg-label">Não preencha este campo</label>
+        <input type="text" id="c-honeypot" name="honeypot" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;">
+      </div>
+
       <button class="btn-submit" id="btn-enviar" onclick="enviarAgendamento()">
         🌸 Solicitar Agendamento
       </button>
@@ -259,6 +264,61 @@ body{
 </div>
 
 <script>
+// ══════════════════════════════════════════════════════
+// SECURITY UTILITIES
+// ══════════════════════════════════════════════════════
+
+// HTML escape to prevent XSS
+function escapeHtml(text) {
+  if (typeof text !== 'string') return text;
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Sanitize input - remove excessive whitespace, limit length
+function sanitizeInput(text, maxLength) {
+  if (typeof text !== 'string') return '';
+  return text.trim().replace(/\s+/g, ' ').substring(0, maxLength || 500);
+}
+
+// Validate phone format (Brazilian format)
+function validatePhone(phone) {
+  const digits = phone.replace(/\D/g, '');
+  return digits.length >= 10 && digits.length <= 11;
+}
+
+// Validate name
+function validateName(name) {
+  if (!name || name.length < 2 || name.length > 100) return false;
+  // Must contain at least two parts (first and last name)
+  const parts = name.trim().split(/\s+/);
+  return parts.length >= 2 && parts.every(p => p.length >= 2);
+}
+
+// Rate limiting
+const RATE_LIMIT_KEY = 'studio_agend_last_submit';
+const RATE_LIMIT_SECONDS = 30;
+
+function checkRateLimit() {
+  const lastSubmit = localStorage.getItem(RATE_LIMIT_KEY);
+  if (!lastSubmit) return true;
+  const secondsSince = (Date.now() - parseInt(lastSubmit, 10)) / 1000;
+  return secondsSince >= RATE_LIMIT_SECONDS;
+}
+
+function getRateLimitRemaining() {
+  const lastSubmit = localStorage.getItem(RATE_LIMIT_KEY);
+  if (!lastSubmit) return 0;
+  const secondsSince = (Date.now() - parseInt(lastSubmit, 10)) / 1000;
+  const remaining = RATE_LIMIT_SECONDS - secondsSince;
+  return remaining > 0 ? Math.ceil(remaining) : 0;
+}
+
+function setRateLimit() {
+  localStorage.setItem(RATE_LIMIT_KEY, Date.now().toString());
+}
+
 // ══════════════════════════════════════════════════════
 // CONFIG FIREBASE
 // ══════════════════════════════════════════════════════
@@ -476,41 +536,89 @@ function showMsg(id){
 // ENVIAR AGENDAMENTO
 // ══════════════════════════════════════════════════════
 async function enviarAgendamento(){
-  const nome  = document.getElementById('c-nome').value.trim();
-  const tel   = document.getElementById('c-tel').value.trim();
+  // 1. Honeypot check (bot protection)
+  const honeypot = document.getElementById('c-honeypot');
+  if (honeypot && honeypot.value.trim() !== '') {
+    console.warn('[Studio] Bot detectado via honeypot');
+    // Silently reject - show fake success to confuse bot
+    document.getElementById('form-area').style.display = 'none';
+    document.getElementById('success-screen').classList.add('show');
+    return;
+  }
+
+  // 2. Rate limiting check
+  if (!checkRateLimit()) {
+    const remaining = getRateLimitRemaining();
+    document.getElementById('msg-error-text').textContent = '⚠️ Aguarde ' + remaining + ' segundo(s) antes de tentar novamente.';
+    showMsg('msg-error');
+    return;
+  }
+
+  // 3. Read and sanitize inputs
+  const nome  = sanitizeInput(document.getElementById('c-nome').value, 100);
+  const tel   = sanitizeInput(document.getElementById('c-tel').value, 20);
   const data  = document.getElementById('c-data').value;
   const hora  = document.getElementById('c-hora').value;
   const proc  = document.getElementById('c-proc').value;
-  const obs   = document.getElementById('c-obs').value.trim();
-  const alergiaDetalhe     = document.getElementById('c-alergia-detalhe').value.trim();
-  const medicamentoDetalhe = document.getElementById('c-medicamento-detalhe').value.trim();
+  const obs   = sanitizeInput(document.getElementById('c-obs').value, 500);
+  const alergiaDetalhe     = sanitizeInput(document.getElementById('c-alergia-detalhe').value, 200);
+  const medicamentoDetalhe = sanitizeInput(document.getElementById('c-medicamento-detalhe').value, 200);
 
+  // 4. Input validation
   if(!nome || !data || !hora || !proc){
     document.getElementById('msg-error-text').textContent = '⚠️ Preencha nome, data, selecione um horário e procedimento.';
     showMsg('msg-error');
     return;
   }
+
+  if(!validateName(nome)){
+    document.getElementById('msg-error-text').textContent = '⚠️ Informe seu nome completo (nome e sobrenome).';
+    showMsg('msg-error');
+    return;
+  }
+
+  if(tel && !validatePhone(tel)){
+    document.getElementById('msg-error-text').textContent = '⚠️ Informe um WhatsApp válido com DDD.';
+    showMsg('msg-error');
+    return;
+  }
+
   if(!_termoChecked){
     document.getElementById('msg-error-text').textContent = '⚠️ Você precisa aceitar os termos para continuar.';
     showMsg('msg-error');
     return;
   }
 
+  // 5. Validate date is not in the past
+  const hoje = new Date().toISOString().slice(0,10);
+  if(data < hoje){
+    document.getElementById('msg-error-text').textContent = '⚠️ A data não pode ser no passado.';
+    showMsg('msg-error');
+    return;
+  }
+
+  // 6. Disable button and show loading
   const btn = document.getElementById('btn-enviar');
   btn.disabled = true;
   showMsg('msg-loading');
 
+  // 7. Build sanitized appointment object
   const agend = {
     id: Date.now(),
-    nome, tel, data, hora, proc, obs,
+    nome: escapeHtml(nome),
+    tel: escapeHtml(tel),
+    data,
+    hora,
+    proc: escapeHtml(proc),
+    obs: escapeHtml(obs),
     anamnese: {
       diabetes: anState.diabetes,
       gestante: anState.gestante,
       alergia:  anState.alergia,
-      alergiaDetalhe,
+      alergiaDetalhe: escapeHtml(alergiaDetalhe),
       micose:   anState.micose,
       medicamento: anState.medicamento,
-      medicamentoDetalhe,
+      medicamentoDetalhe: escapeHtml(medicamentoDetalhe),
       encravada: anState.encravada,
       esporte:   anState.esporte
     },
@@ -522,6 +630,9 @@ async function enviarAgendamento(){
   try {
     if(!window._fbPush) throw new Error('Firebase não inicializado.');
     await window._fbPush(agend);
+
+    // Set rate limit after successful submission
+    setRateLimit();
 
     // Notifica Telegram (não crítico — não bloqueia o fluxo)
     fetch('/api/vercel/notify', {
@@ -557,12 +668,29 @@ function mostrarSucesso(a){
   const procFmt = a.proc || 'Não informado';
   const nomeFmt = a.nome || 'Cliente';
 
-  document.getElementById('success-detail').innerHTML =
-    '<div class="sd-row"><span class="sd-label">Nome</span><span class="sd-val">'     + nomeFmt    + '</span></div>'+
-    '<div class="sd-row"><span class="sd-label">Data</span><span class="sd-val">📅 '  + dataFmt   + '</span></div>'+
-    '<div class="sd-row"><span class="sd-label">Horário</span><span class="sd-val">🕐 '+ horaFmt   + '</span></div>'+
-    '<div class="sd-row"><span class="sd-label">Serviço</span><span class="sd-val">💅 '+ procFmt   + '</span></div>'+
-    (a.tel ? '<div class="sd-row"><span class="sd-label">WhatsApp</span><span class="sd-val">'+a.tel+'</span></div>' : '');
+  // Build success detail using DOM manipulation to prevent XSS
+  const detailDiv = document.getElementById('success-detail');
+  detailDiv.innerHTML = '';
+
+  function addRow(label, value) {
+    const row = document.createElement('div');
+    row.className = 'sd-row';
+    const lbl = document.createElement('span');
+    lbl.className = 'sd-label';
+    lbl.textContent = label;
+    const val = document.createElement('span');
+    val.className = 'sd-val';
+    val.textContent = value;
+    row.appendChild(lbl);
+    row.appendChild(val);
+    detailDiv.appendChild(row);
+  }
+
+  addRow('Nome', nomeFmt);
+  addRow('Data', '📅 ' + dataFmt);
+  addRow('Horário', '🕐 ' + horaFmt);
+  addRow('Serviço', '💅 ' + procFmt);
+  if (a.tel) addRow('WhatsApp', a.tel);
 
   document.getElementById('form-area').style.display = 'none';
   document.getElementById('success-screen').classList.add('show');
