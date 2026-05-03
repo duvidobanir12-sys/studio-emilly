@@ -1,1 +1,41 @@
+# Claude local settings (may contain auth tokens)
 .claude/settings.local.json
+
+# Environment variables and secrets
+.env
+.env.local
+.env.production
+.env.development
+.firebase/
+
+# Firebase service account keys
+*-firebase-adminsdk-*.json
+firebase-service-account*.json
+serviceAccount*.json
+
+# Node modules (if applicable)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS files
+Thumbs.db
+Desktop.ini
+
+# Vercel CLI secrets (if used)
+.vercel/
