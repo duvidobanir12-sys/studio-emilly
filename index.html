@@ -521,7 +521,14 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
         return;
       }
 
-      const dados = {
+      // Validate phone number if provided (minimum 10 digits after mask)
+      var telDigits = tel.replace(/\D/g, '');
+      if (telDigits.length > 0 && telDigits.length < 10) {
+        toast('Telefone inválido: mínimo 10 dígitos');
+        return;
+      }
+
+      var dados = {
         nome, data, tel, proc,
         valor: parseFloat(valor).toFixed(2),
         pagamento, status, horaInicio, horaFim,
@@ -529,17 +536,22 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
       };
 
       if (editId !== null) {
-        set(ref(db, 'registros/' + editId), dados).then(() => {
+        set(ref(db, 'registros/' + editId), dados).then(function() {
           toast('Atualizado!');
           cancelEdit();
+        }).catch(function(err) {
+          console.error('[Studio] Erro ao atualizar:', err);
+          toast('Erro ao atualizar. Tente novamente.');
         });
       } else {
-        push(ref(db, 'registros'), dados).then(() => {
+        push(ref(db, 'registros'), dados).then(function() {
           toast('Anotado!');
+          e.target.reset();
+        }).catch(function(err) {
+          console.error('[Studio] Erro ao salvar:', err);
+          toast('Erro ao salvar. Tente novamente.');
         });
       }
-
-      e.target.reset();
     });
 
     // ═══ MIGRAR DADOS ANTIGOS DO LOCALSTORAGE ═══
