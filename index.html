@@ -310,6 +310,15 @@ main {
 </style>
 </head>
 <body>
+<script>
+  (function(){
+    var senha = prompt('Digite a senha para acessar o painel:');
+    if(senha !== 'emilly2026'){
+      alert('Senha incorreta!');
+      window.location.href = '/agendar.html';
+    }
+  })();
+</script>
 
 <header>
   <h1>Studio Emilly Santos</h1>

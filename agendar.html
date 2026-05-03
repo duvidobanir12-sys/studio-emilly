@@ -399,32 +399,42 @@ function termoCheckbox(){
 // ══════════════════════════════════════════════════════
 let _dadosCarregados = false;
 
-// Define _fbPush imediatamente usando REST API (funciona mesmo sem SDK)
+// Define _fbPush imediatamente usando REST API (salva em dois nós)
 window._fbPush = (dadosAgend) => {
   const recordKey = 'rest_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
-  return fetch('https://studio-emilly-default-rtdb.firebaseio.com/agendamentos/' + recordKey + '.json', {
+
+  // 1. Salva no nó protegido (com dados pessoais - só Emilly vê)
+  const saveAgend = fetch('https://studio-emilly-default-rtdb.firebaseio.com/agendamentos/' + recordKey + '.json', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(dadosAgend)
-  }).then(r => {
-    if(!r.ok) throw new Error('Erro HTTP ' + r.status);
-    console.log('[Studio] ✅ Agendamento salvo via REST');
+  });
+
+  // 2. Salva no nó público (só data+hora - sem dados pessoais)
+  const saveHorario = fetch('https://studio-emilly-default-rtdb.firebaseio.com/horarios_ocupados/' + dadosAgend.data + '_' + dadosAgend.hora + '.json', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ data: dadosAgend.data, hora: dadosAgend.hora })
+  });
+
+  return Promise.all([saveAgend, saveHorario]).then(([r1, r2]) => {
+    if(!r1.ok) throw new Error('Erro HTTP ' + r1.status + ' ao salvar agendamento');
+    console.log('[Studio] ✅ Agendamento salvo');
     return { key: recordKey };
   });
 };
 
-// Carrega dados via REST API instantaneamente (não espera Firebase SDK)
 (function cargaRapida(){
-  fetch('https://studio-emilly-default-rtdb.firebaseio.com/agendamentos.json')
+  fetch('https://studio-emilly-default-rtdb.firebaseio.com/horarios_ocupados.json')
     .then(r => r.ok ? r.json() : {})
     .catch(() => ({}))
-    .then(agendSnap => {
-      if(agendSnap && typeof agendSnap === 'object'){
-        _agendamentosOcupados = {};
-        Object.values(agendSnap).forEach(a => {
-          if(a && a.data && a.hora && a.status !== 'Cancelado'){
-            if(!_agendamentosOcupados[a.data]) _agendamentosOcupados[a.data] = [];
-            _agendamentosOcupados[a.data].push(a.hora);
+    .then(snap => {
+      _agendamentosOcupados = {};
+      if(snap && typeof snap === 'object'){
+        Object.values(snap).forEach(h => {
+          if(h && h.data && h.hora){
+            if(!_agendamentosOcupados[h.data]) _agendamentosOcupados[h.data] = [];
+            _agendamentosOcupados[h.data].push(h.hora);
           }
         });
       }
@@ -440,8 +450,7 @@ window._fbPush = (dadosAgend) => {
         });
       }
       _dadosCarregados = true;
-      console.log('[Studio] ✅ Dados carregados via REST (rápido)');
-      // Renderiza horários imediatamente (não espera Firebase SDK)
+      console.log('[Studio] ✅ Horários carregados via REST (sem dados pessoais)');
       carregarHorarios();
     })
     .catch(err => console.warn('[Studio] Carga rápida falhou:', err));
