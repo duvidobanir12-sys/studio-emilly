@@ -2,20 +2,8 @@
   "rules": {
     "agendamentos": {
       ".read": true,
-      ".write": true,
-      ".validate": "newData.hasChildren(['nome', 'tel', 'data', 'hora'])",
-      "nome": {
-        ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
-      },
-      "tel": {
-        ".validate": "newData.isString() && newData.val().length >= 10 && newData.val().length <= 20"
-      },
-      "data": {
-        ".validate": "newData.isString() && newData.val().matches(/^\\d{4}-\\d{2}-\\d{2}$/)"
-      },
-      "hora": {
-        ".validate": "newData.isString() && newData.val().matches(/^\\d{2}:\\d{2}$/)"
-      }
+      ".write": "auth != null || (newData.hasChildren(['nome', 'tel', 'data', 'hora', 'status']) && newData.child('status').val() === 'Pendente' && newData.child('origem').val() === 'site' && !data.exists())",
+      ".validate": "newData.hasChildren(['nome', 'tel', 'data', 'hora'])"
     },
     "registros": {
       ".read": "auth != null",
