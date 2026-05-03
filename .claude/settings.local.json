@@ -10,7 +10,15 @@
       "Bash(git push:*)",
       "Bash(curl:*)",
       "Bash(git checkout:*)",
-      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(''''status:'''', d.get\\(''''status''''\\)\\)\")"
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(''''status:'''', d.get\\(''''status''''\\)\\)\")",
+      "Bash(findstr /v \"MD5\")",
+      "Bash(findstr /v \"^$\")",
+      "Bash(python3 -m json.tool)",
+      "Read(//c/Users/Juan/Downloads/OpenClaude/**)",
+      "Bash(wmic datafile:*)",
+      "Bash(ls:*)",
+      "WebSearch",
+      "Bash(grep -E \"\\\\.html$|index\")"
     ]
   }
 }
