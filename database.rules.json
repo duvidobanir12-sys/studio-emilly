@@ -3,7 +3,7 @@
     "agendamentos": {
       ".read": true,
       "$key": {
-        ".write": "auth != null || (!data.exists() && newData.exists() && newData.child('status').val() === 'Pendente' && newData.child('origem').val() === 'site')"
+        ".write": "auth != null || (!data.exists() && newData.exists() && newData.child('status').val() === 'Pendente' && newData.child('origem').val() === 'site') || (!newData.exists() && data.child('origem').val() === 'site')"
       }
     },
     "horarios_ocupados": {
