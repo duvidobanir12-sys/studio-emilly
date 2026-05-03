@@ -691,64 +691,14 @@ function loadFirebaseViaScriptTags() {
 if (isTestMode()) {
   initTestMode();
 } else {
-  // Firebase SDK loaded via <script> tags - use window.firebase
-  // (code below uses the compat SDK via window.firebase)
-
-    const app = initializeApp(FIREBASE_CONFIG);
-    const db  = getDatabase(app);
-
-    window._fbPush = (dadosAgend) => push(ref(db, 'agendamentos'), dadosAgend);
-
-    let agendLoaded = false;
-    let folgasLoaded = false;
-
-    function checkReady(){
-      // Cancela o timer de REST fallback se Firebase connectou primeiro
-      if(_restTimer) { clearTimeout(_restTimer); _restTimer = null; }
-      if(!agendLoaded || !folgasLoaded) return;
-      _fbReady = true;
-      console.log('[Studio] Firebase pronto ✅');
-      console.log('[Studio] Data no input:', document.getElementById('c-data').value);
-      console.log('[Studio] Agendamentos ocupados:', JSON.stringify(_agendamentosOcupados));
-      console.log('[Studio] Folgas:', [..._folgasDatas]);
-      carregarHorarios();
-    }
-
-    onValue(ref(db, 'agendamentos'), snap => {
-      _agendamentosOcupados = {};
-      snap.forEach(child => {
-        const a = child.val();
-        if(a && a.data && a.hora && a.status !== 'Cancelado'){
-          if(!_agendamentosOcupados[a.data]) _agendamentosOcupados[a.data] = [];
-          _agendamentosOcupados[a.data].push(a.hora);
-        }
-      });
-      agendLoaded = true;
-      if(_fbReady) carregarHorarios();
-      else checkReady();
-    });
-
-    onValue(ref(db, 'folgas'), snap => {
-      _folgasDatas = new Set();
-      snap.forEach(child => {
-        const v = child.val();
-        if(v && v.data) _folgasDatas.add(v.data);
-      });
-      folgasLoaded = true;
-      if(_fbReady) carregarHorarios();
-      else checkReady();
-    });
-
-  }).catch(err => {
-    console.error('[Studio] Erro Firebase Database:', err);
-    // Fallback direto para REST API
-    initFirebaseREST();
-  });
-}).catch(err => {
-  console.error('[Studio] Erro Firebase App:', err);
-  // Fallback direto para REST API
-  initFirebaseREST();
-});
+  // HTML already loads firebase-app-compat.js and firebase-database-compat.js via <script> tags
+  // Those expose window.firebase (compat SDK), NOT modular SDK syntax
+  if (window.firebase && window.firebase.initializeApp) {
+    initFirebaseWithSDK();
+  } else {
+    loadFirebaseViaScriptTags();
+  }
+}
 
 // ════════════════════════════════════════════════════
 // FALLBACK: Carrega Firebase via <script> tags
@@ -853,57 +803,12 @@ function fallbackToREST(){
 function retryFirebaseInit(){
   const wrap = document.getElementById('horarios-wrap');
   wrap.innerHTML = '<p class="h-status">🔄 Tentando reconectar...</p>';
-  // Tenta novamente com import()
-  import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({initializeApp}) => {
-    import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js').then(({getDatabase, ref, push, onValue}) => {
-      const app = initializeApp(FIREBASE_CONFIG);
-      const db  = getDatabase(app);
-      window._fbPush = (dadosAgend) => push(ref(db, 'agendamentos'), dadosAgend);
-
-      let agendLoaded = false;
-      let folgasLoaded = false;
-
-      function checkReady(){
-        if(!agendLoaded || !folgasLoaded) return;
-        _fbReady = true;
-        if(_restTimer) { clearTimeout(_restTimer); _restTimer = null; }
-        console.log('[Studio] Firebase pronto após retry ✅');
-        carregarHorarios();
-      }
-
-      onValue(ref(db, 'agendamentos'), snap => {
-        _agendamentosOcupados = {};
-        snap.forEach(child => {
-          const a = child.val();
-          if(a && a.data && a.hora && a.status !== 'Cancelado'){
-            if(!_agendamentosOcupados[a.data]) _agendamentosOcupados[a.data] = [];
-            _agendamentosOcupados[a.data].push(a.hora);
-          }
-        });
-        agendLoaded = true;
-        if(_fbReady) carregarHorarios();
-        else checkReady();
-      });
-
-      onValue(ref(db, 'folgas'), snap => {
-        _folgasDatas = new Set();
-        snap.forEach(child => {
-          const v = child.val();
-          if(v && v.data) _folgasDatas.add(v.data);
-        });
-        folgasLoaded = true;
-        if(_fbReady) carregarHorarios();
-        else checkReady();
-      });
-
-    }).catch(err => {
-      console.error('[Studio] Erro Firebase Database no retry:', err);
-      initFirebaseREST();
-    });
-  }).catch(err => {
-    console.error('[Studio] Erro Firebase App no retry:', err);
-    initFirebaseREST();
-  });
+  // Tenta novamente via script tags (compat SDK)
+  if (window.firebase && window.firebase.initializeApp) {
+    initFirebaseWithSDK();
+  } else {
+    loadFirebaseViaScriptTags();
+  }
 }
 
 function showMsg(id){
