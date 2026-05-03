@@ -399,6 +399,20 @@ function termoCheckbox(){
 // ══════════════════════════════════════════════════════
 let _dadosCarregados = false;
 
+// Define _fbPush imediatamente usando REST API (funciona mesmo sem SDK)
+window._fbPush = (dadosAgend) => {
+  const recordKey = 'rest_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
+  return fetch('https://studio-emilly-default-rtdb.firebaseio.com/agendamentos/' + recordKey + '.json', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dadosAgend)
+  }).then(r => {
+    if(!r.ok) throw new Error('Erro HTTP ' + r.status);
+    console.log('[Studio] ✅ Agendamento salvo via REST');
+    return { key: recordKey };
+  });
+};
+
 // Carrega dados via REST API instantaneamente (não espera Firebase SDK)
 (function cargaRapida(){
   fetch('https://studio-emilly-default-rtdb.firebaseio.com/agendamentos.json')
@@ -747,7 +761,8 @@ function initFirebaseWithSDK(){
     }
     window._fbDb  = firebase.database(window._fbApp);
 
-    window._fbPush = (dadosAgend) => window._fbDb.ref('agendamentos').push(dadosAgend);
+    // Mantém o _fbPush definido no topo (REST API) para garantir que o envio sempre funcione
+    // O SDK é usado apenas para leitura em tempo real
 
     let agendLoaded = false;
     let folgasLoaded = false;
