@@ -928,27 +928,27 @@ async function enviarAgendamento(){
     criadoEm: new Date().toISOString()
   };
 
-  // Salva no Firebase (nao bloqueia se falhar)
-    if(window._fbPush){
-      window._fbPush(agend).catch(e => console.warn('[Studio] Firebase falhou:', e));
-    }
+  // Salva no Firebase (não bloqueia se falhar)
+  if(window._fbPush){
+    window._fbPush(agend).catch(e => console.warn('[Studio] Firebase falhou:', e));
+  }
 
-    // Rate limit
-    setRateLimit();
+  // Rate limit
+  setRateLimit();
 
-    // SEMPRE envia notificacao (WhatsApp/Telegram)
-    fetch('/api/vercel/notify', {
-      method: 'POST',
-      keepalive: true,
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify(agend)
-    }).then(r => r.json())
-      .then(d => console.log('[Studio] Notificacao OK:', d))
-      .catch(e => console.warn('[Studio] Notificacao falhou:', e));
+  // SEMPRE envia notificação (WhatsApp/Telegram)
+  fetch('/api/vercel/notify', {
+    method: 'POST',
+    keepalive: true,
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(agend)
+  }).then(r => r.json())
+    .then(d => console.log('[Studio] Notificacao OK:', d))
+    .catch(e => console.warn('[Studio] Notificacao falhou:', e));
 
-    // Mostra sucesso para o usuario
-    showMsg(null);
-    mostrarSucesso(agend);
+  // Mostra sucesso para o usuario (GARANTIDO)
+  showMsg(null);
+  mostrarSucesso(agend);
 }
 
 // ══════════════════════════════════════════════════════
