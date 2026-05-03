@@ -1,6 +1,5 @@
 {
   "rewrites": [
-    { "source": "/painel", "destination": "/painel.html" },
     { "source": "/agendar", "destination": "/agendar.html" },
     { "source": "/api/vercel/notify", "destination": "/api/vercel/notify.js" },
     { "source": "/(.*)", "destination": "/relatorios.html" }
