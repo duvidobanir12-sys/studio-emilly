@@ -1,5 +1,6 @@
 # Claude local settings (may contain auth tokens)
 .claude/settings.local.json
+.claude/worktrees/
 
 # Environment variables and secrets
 .env
