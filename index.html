@@ -526,7 +526,8 @@ function switchTab(tab, btn) {
 // ════════════════════════════════════════════════════
 //  FIREBASE INIT (compat SDK - já carregado no header)
 // ════════════════════════════════════════════════════
-db = firebase.database();
+firebase.initializeApp(FIREBASE_CONFIG);
+ db = firebase.database();
 
 document.getElementById('form-anotar').addEventListener('submit', function(e) {
 
