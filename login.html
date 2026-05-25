@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login · Studio Emilly Santos</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pink: #c9184a;
+  --pink-dark: #a01435;
+  --bg: #f8f9fa;
+  --card: #ffffff;
+  --text: #1a1a2e;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --success: #10b981;
+}
+
+* { box-sizing: border-box; margin:0; padding:0; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: linear-gradient(135deg, var(--pink-dark), var(--pink));
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-card {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 40px 32px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  border: 1px solid var(--border);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-header .logo {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--pink-dark), var(--pink));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  margin: 0 auto 16px;
+}
+
+.login-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.login-header p {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--pink);
+}
+
+.btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--pink-dark), var(--pink));
+  color: white;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary:not(:disabled):hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.error-msg {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: none;
+}
+
+.error-msg.show {
+  display: block;
+}
+
+.loading {
+  display: none;
+  text-align: center;
+  padding: 10px;
+}
+
+.loading.show {
+  display: block;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(201, 24, 74, 0.2);
+  border-top-color: var(--pink);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 32px 20px;
+  }
+}
+</style>
+</head>
+<body>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+<div class="login-card">
+  <div class="login-header">
+    <div class="logo">ES</div>
+    <h1>Studio Emilly Santos</h1>
+    <p>Acesso ao painel administrativo</p>
+  </div>
+
+  <div class="error-msg" id="error-msg"></div>
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p>Entrando...</p>
+  </div>
+
+  <form id="login-form">
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="seu@email.com" required autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label for="senha">Senha</label>
+      <input type="password" id="senha" placeholder="Sua senha" required autocomplete="current-password">
+    </div>
+    <button type="submit" class="btn btn-primary" id="btn-login">Entrar</button>
+  </form>
+</div>
+
+<script>
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyALLJn7hEnTxvTN2SNVzkAEs1HAwUG24hE",
+  authDomain: "studio-emilly.firebaseapp.com",
+  databaseURL: "https://studio-emilly-default-rtdb.firebaseio.com",
+  projectId: "studio-emilly",
+  storageBucket: "studio-emilly.appspot.com",
+  messagingSenderId: "130072077830",
+  appId: "1:130072077830:web:694aa5bb37307dae260587"
+};
+
+firebase.initializeApp(FIREBASE_CONFIG);
+
+const form = document.getElementById('login-form');
+const errorMsg = document.getElementById('error-msg');
+const loading = document.getElementById('loading');
+const btnLogin = document.getElementById('btn-login');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const email = document.getElementById('email').value.trim();
+  const senha = document.getElementById('senha').value;
+
+  if (!email || !senha) {
+    showError('Preencha email e senha');
+    return;
+  }
+
+  btnLogin.disabled = true;
+  loading.classList.add('show');
+  errorMsg.classList.remove('show');
+
+  try {
+    await firebase.auth().signInWithEmailAndPassword(email, senha);
+    window.location.href = '/index.html';
+  } catch (err) {
+    let mensagem = 'Erro ao fazer login';
+    if (err.code === 'auth/invalid-email') mensagem = 'Email inválido';
+    else if (err.code === 'auth/user-not-found') mensagem = 'Usuário não encontrado';
+    else if (err.code === 'auth/wrong-password') mensagem = 'Senha incorreta';
+    else if (err.code === 'auth/too-many-requests') mensagem = 'Muitas tentativas. Tente mais tarde';
+    else mensagem = err.message;
+    showError(mensagem);
+    btnLogin.disabled = false;
+    loading.classList.remove('show');
+  }
+});
+
+function showError(msg) {
+  errorMsg.textContent = msg;
+  errorMsg.classList.add('show');
+}
+
+// Redirect if already logged in
+firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    window.location.href = '/index.html';
+  }
+});
+</script>
+</body>
+</html>

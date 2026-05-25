@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel</title>
+  <style>
+    body{font-family:Arial,sans-serif;background:#f5f5f5;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;}
+    .card{background:#fff;padding:2rem;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);width:360px; text-align:center;}
+    h1{margin-top:0;}
+    button{padding:0.6rem 1.2rem;background:#c9184a;color:#fff;border:none;border-radius:4px;cursor:pointer;}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Painel Administrativo</h1>
+    <p id="user-email"></p>
+    <button id="logoutBtn">Sair</button>
+  </div>
+
+  <script type="module" src="auth.js"></script>
+  <script type="module">
+    import { logOut, observeAuth } from "./auth.js";
+    const emailEl = document.getElementById('user-email');
+    observeAuth(user => {
+      if (!user) { window.location.href = 'login.html'; }
+      else { emailEl.textContent = `Logado como: ${user.email}`; }
+    });
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await logOut();
+      window.location.href = 'login.html';
+    });
+  </script>
+</body>
+</html>
