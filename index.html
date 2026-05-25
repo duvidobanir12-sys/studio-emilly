@@ -310,19 +310,44 @@ main {
 </style>
 </head>
 <body>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script>
-  (function(){
-    var senha = prompt('Digite a senha para acessar o painel:');
-    if(senha !== 'emilly2026'){
-      alert('Senha incorreta!');
-      window.location.href = '/agendar.html';
-    }
-  })();
-</script>
+// ════════════════════════════════════════════════════
+//  CONFIGURAÇÃO FIREBASE
+// ════════════════════════════════════════════════════
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyALLJn7hEnTxvTN2SNVzkAEs1HAwUG24hE",
+  authDomain: "studio-emilly.firebaseapp.com",
+  databaseURL: "https://studio-emilly-default-rtdb.firebaseio.com",
+  projectId: "studio-emilly",
+  storageBucket: "studio-emilly.appspot.com",
+  messagingSenderId: "130072077830",
+  appId: "1:130072077830:web:694aa5bb37307dae260587"
+};
+
+// Inicializa Firebase (compat SDK para usar com as regras atuais)
+firebase.initializeApp(FIREBASE_CONFIG);
+
+// Função de logout
+window.logout = function() {
+  firebase.auth().signOut().then(() => {
+    window.location.href = '/login.html';
+  });
+};
+
+// Protege a página - redireciona se não estiver logado
+firebase.auth().onAuthStateChanged(function(user) {
+  if (!user) {
+    window.location.href = '/login.html';
+  }
+});
 
 <header>
   <h1>Studio Emilly Santos</h1>
   <p>Painel de Controle</p>
+  <button onclick="logout()" style="position:absolute;top:20px;right:24px;background:none;border:1px solid white;color:white;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;">Sair</button>
 </header>
 
 <div class="tabs">
@@ -447,19 +472,6 @@ function escapeHTML(str){
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-// ════════════════════════════════════════════════════
-//  CONFIGURAÇÃO FIREBASE
-// ════════════════════════════════════════════════════
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyALLJn7hEnTxvTN2SNVzkAEs1HAwUG24hE",
-  authDomain: "studio-emilly.firebaseapp.com",
-  databaseURL: "https://studio-emilly-default-rtdb.firebaseio.com",
-  projectId: "studio-emilly",
-  storageBucket: "studio-emilly.appspot.com",
-  messagingSenderId: "130072077830",
-  appId: "1:130072077830:web:694aa5bb37307dae260587"
-};
-
 let editId = null;
 let db = null;
 let registrosData = [];
@@ -513,235 +525,220 @@ function switchTab(tab, btn) {
 }
 
 // ════════════════════════════════════════════════════
-//  FIREBASE INIT
+//  FIREBASE INIT (compat SDK - já carregado no header)
 // ════════════════════════════════════════════════════
-import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({initializeApp}) => {
-  import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js').then(({getDatabase, ref, push, onValue, remove, set, get, update}) => {
-    const app = initializeApp(FIREBASE_CONFIG);
-    db = getDatabase(app);
+db = firebase.database();
+
+document.getElementById('form-anotar').addEventListener('submit', function(e) {
 
     // ═══ SALVAR REGISTRO ═══
-    document.getElementById('form-anotar').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const nome = document.getElementById('nome').value.trim();
-      const data = document.getElementById('data').value;
-      const tel = document.getElementById('tel').value.trim();
-      const proc = document.getElementById('proc').value;
-      const valor = document.getElementById('valor').value;
-      const pagamento = document.getElementById('pagamento').value;
-      const status = document.getElementById('status').value;
-      const horaInicio = document.getElementById('hora-inicio').value;
-      const horaFim = document.getElementById('hora-fim').value;
+const nome = document.getElementById('nome').value.trim();
+const data = document.getElementById('data').value;
+const tel = document.getElementById('tel').value.trim();
+const proc = document.getElementById('proc').value;
+const valor = document.getElementById('valor').value;
+const pagamento = document.getElementById('pagamento').value;
+const status = document.getElementById('status').value;
+const horaInicio = document.getElementById('hora-inicio').value;
+const horaFim = document.getElementById('hora-fim').value;
 
-      if (!nome || !data || !proc || !valor || !pagamento) {
-        toast('Preencha os campos obrigatórios');
-        return;
-      }
+if (!nome || !data || !proc || !valor || !pagamento) {
+  toast('Preencha os campos obrigatórios');
+  return;
+}
 
-      // Validate phone number if provided (minimum 10 digits after mask)
-      var telDigits = tel.replace(/\D/g, '');
-      if (telDigits.length > 0 && telDigits.length < 10) {
-        toast('Telefone inválido: mínimo 10 dígitos');
-        return;
-      }
+var telDigits = tel.replace(/\D/g, '');
+if (telDigits.length > 0 && telDigits.length < 10) {
+  toast('Telefone inválido: mínimo 10 dígitos');
+  return;
+}
 
-      var dados = {
-        nome, data, tel, proc,
-        valor: parseFloat(valor).toFixed(2),
-        pagamento, status, horaInicio, horaFim,
-        criadoEm: new Date().toISOString()
-      };
+var dados = {
+  nome, data, tel, proc,
+  valor: parseFloat(valor).toFixed(2),
+  pagamento, status, horaInicio, horaFim,
+  criadoEm: new Date().toISOString()
+};
 
-      if (editId !== null) {
-        set(ref(db, 'registros/' + editId), dados).then(function() {
-          toast('Atualizado!');
-          cancelEdit();
-        }).catch(function(err) {
-          console.error('[Studio] Erro ao atualizar:', err);
-          toast('Erro ao atualizar. Tente novamente.');
-        });
-      } else {
-        push(ref(db, 'registros'), dados).then(function() {
-          toast('Anotado!');
-          e.target.reset();
-        }).catch(function(err) {
-          console.error('[Studio] Erro ao salvar:', err);
-          toast('Erro ao salvar. Tente novamente.');
-        });
-      }
+if (editId !== null) {
+  firebase.database().ref('registros/' + editId).set(dados).then(function() {
+    toast('Atualizado!');
+    cancelEdit();
+  }).catch(function(err) {
+    console.error('[Studio] Erro ao atualizar:', err);
+    toast('Erro ao atualizar. Tente novamente.');
+  });
+} else {
+  firebase.database().ref('registros').push(dados).then(function() {
+    toast('Anotado!');
+    document.getElementById('form-anotar').reset();
+  }).catch(function(err) {
+    console.error('[Studio] Erro ao salvar:', err);
+    toast('Erro ao salvar. Tente novamente.');
+  });
+}
+});
+
+// ═══ MIGRAR DADOS ANTIGOS DO LOCALSTORAGE ═══
+const oldData = JSON.parse(localStorage.getItem('registros') || '[]');
+if (oldData.length > 0) {
+  oldData.forEach(item => {
+    firebase.database().ref('registros').push({
+      nome: item.nome || '',
+      data: item.data || '',
+      tel: item.tel || '',
+      proc: item.proc || '',
+      valor: item.valor || '0.00',
+      pagamento: item.pagamento || '',
+      status: item.status || 'Confirmado',
+      horaInicio: item.horaInicio || '',
+      horaFim: item.horaFim || '',
+      criadoEm: new Date().toISOString()
     });
+  });
+  localStorage.removeItem('registros');
+  toast('Dados antigos migrados!');
+}
 
-    // ═══ MIGRAR DADOS ANTIGOS DO LOCALSTORAGE ═══
-    const oldData = JSON.parse(localStorage.getItem('registros') || '[]');
-    if (oldData.length > 0) {
-      oldData.forEach(item => {
-        push(ref(db, 'registros'), {
-          nome: item.nome || '',
-          data: item.data || '',
-          tel: item.tel || '',
-          proc: item.proc || '',
-          valor: item.valor || '0.00',
-          pagamento: item.pagamento || '',
-          status: item.status || 'Confirmado',
-          horaInicio: item.horaInicio || '',
-          horaFim: item.horaFim || '',
-          criadoEm: new Date().toISOString()
-        });
-      });
-      localStorage.removeItem('registros');
-      toast('Dados antigos migrados!');
-    }
+// ═══ CARREGAR REGISTROS (HISTÓRICO) ═══
+firebase.database().ref('registros').on('value', function(snap) {
+  registrosData = [];
+  snap.forEach(function(child) {
+    registrosData.push({ ...child.val(), id: child.key });
+  });
+  registrosData.sort((a,b) => new Date(b.data) - new Date(a.data));
+  renderHistorico();
+});
 
-    // ═══ CARREGAR REGISTROS (HISTÓRICO) ═══
-    onValue(ref(db, 'registros'), (snap) => {
-      registrosData = [];
-      snap.forEach(child => {
-        registrosData.push({ ...child.val(), id: child.key });
-      });
-      registrosData.sort((a,b) => new Date(b.data) - new Date(a.data));
-      renderHistorico();
-    });
+// ═══ CARREGAR AGENDAMENTOS ═══
+firebase.database().ref('agendamentos').on('value', function(snap) {
+  agendamentosData = [];
+  snap.forEach(function(child) {
+    agendamentosData.push({ ...child.val(), id: child.key });
+  });
+  agendamentosData.sort((a,b) => {
+    const dateA = new Date(a.data + 'T' + a.hora + ':00');
+    const dateB = new Date(b.data + 'T' + b.hora + ':00');
+    return dateA - dateB;
+  });
+  renderAgendamentos();
+  renderConfirmados();
+});
 
-    // ═══ CARREGAR AGENDAMENTOS ═══
-    onValue(ref(db, 'agendamentos'), (snap) => {
-      agendamentosData = [];
-      snap.forEach(child => {
-        agendamentosData.push({ ...child.val(), id: child.key });
-      });
-      agendamentosData.sort((a,b) => {
-        const dateA = new Date(a.data + 'T' + a.hora + ':00');
-        const dateB = new Date(b.data + 'T' + b.hora + ':00');
-        return dateA - dateB;
-      });
-      renderAgendamentos();
-      renderConfirmados();
-    });
-
-    // ═══ RENDER HISTÓRICO ═══
-    function renderHistorico() {
-      const html = registrosData.length ? registrosData.map(r => `
-        <div class="entry${r.status === 'Confirmado' ? ' confirmed' : ''}">
-          <div class="entry-status status-${r.status ? r.status.toLowerCase() : 'pendente'}">${r.status || 'Pendente'}</div>
-          <div class="entry-header">
-            <div>
-              <div class="entry-name">${r.nome}</div>
-              <div class="entry-desc">
-                📅 ${formatDateBR(r.data)} • ${r.proc || 'Serviço'}
-                ${r.tel ? ' • 📱 '+r.tel : ''}
-                ${r.pagamento ? ' • 💰 '+r.pagamento : ''}
-                ${r.horaInicio ? ' • 🕐 '+r.horaInicio+(r.horaFim ? '-'+r.horaFim : '') : ''}
-              </div>
-            </div>
-            <div class="entry-price">R$ ${r.valor}</div>
-          </div>
-          <div class="entry-actions">
-            <button class="btn btn-outline" onclick="editarRegistro('${r.id}')">✏️</button>
-            <button class="btn btn-danger" onclick="deletarRegistro('${r.id}')">✕</button>
+// ═══ RENDER HISTÓRICO ═══
+function renderHistorico() {
+  const html = registrosData.length ? registrosData.map(r => `
+    <div class="entry${r.status === 'Confirmado' ? ' confirmed' : ''}">
+      <div class="entry-status status-${r.status ? r.status.toLowerCase() : 'pendente'}">${r.status || 'Pendente'}</div>
+      <div class="entry-header">
+        <div>
+          <div class="entry-name">${r.nome}</div>
+          <div class="entry-desc">
+            📅 ${formatDateBR(r.data)} • ${r.proc || 'Serviço'}
+            ${r.tel ? ' • 📱 '+r.tel : ''}
+            ${r.pagamento ? ' • 💰 '+r.pagamento : ''}
+            ${r.horaInicio ? ' • 🕐 '+r.horaInicio+(r.horaFim ? '-'+r.horaFim : '') : ''}
           </div>
         </div>
-      `).join('') : '<div class="empty">Nenhum registro anotado</div>';
+        <div class="entry-price">R$ ${r.valor}</div>
+      </div>
+      <div class="entry-actions">
+        <button class="btn btn-outline" onclick="editarRegistro('${r.id}')">✏️</button>
+        <button class="btn btn-danger" onclick="deletarRegistro('${r.id}')">✕</button>
+      </div>
+    </div>
+  `).join('') : '<div class="empty">Nenhum registro anotado</div>';
+  document.getElementById('lista-historico').innerHTML = html;
+}
 
-      document.getElementById('lista-historico').innerHTML = html;
-    }
-
-    // ═══ RENDER AGENDAMENTOS (apenas pendentes) ═══
-    function renderAgendamentos() {
-      const pendentes = agendamentosData.filter(a => a.status !== 'Confirmado');
-      const html = pendentes.length ? pendentes.map(a => `
-        <div class="entry">
-          <div class="entry-status status-${a.status ? a.status.toLowerCase() : 'pendente'}">${a.status || 'Pendente'}</div>
-          <div class="entry-header">
-            <div>
-              <div class="entry-name">${a.nome}</div>
-              <div class="entry-desc">
-                📅 ${formatDateBR(a.data)} às ${a.hora || '??:??'} • ${a.proc || 'Serviço'}
-                ${a.tel ? ' • 📱 '+a.tel : ''}
-              </div>
-            </div>
-          </div>
-          ${a.anamnese ? `
-            <div class="anamnese-box" id="anamnese-${a.id}">
-              ${a.anamnese.diabetes ? '<div class="anamnese-row"><span class="anamnese-label">Diabetes:</span> '+a.anamnese.diabetes+'</div>' : ''}
-              ${a.anamnese.gestante ? '<div class="anamnese-row"><span class="anamnese-label">Gestante:</span> '+a.anamnese.gestante+'</div>' : ''}
-              ${a.anamnese.alergia ? '<div class="anamnese-row"><span class="anamnese-label">Alergia:</span> '+a.anamnese.alergia+(a.anamnese.alergiaDetalhe ? ' ('+a.anamnese.alergiaDetalhe+')' : '')+'</div>' : ''}
-              ${a.anamnese.micose ? '<div class="anamnese-row"><span class="anamnese-label">Micose:</span> '+a.anamnese.micose+'</div>' : ''}
-              ${a.anamnese.medicamento ? '<div class="anamnese-row"><span class="anamnese-label">Medicamento:</span> '+a.anamnese.medicamento+(a.anamnese.medicamentoDetalhe ? ' ('+a.anamnese.medicamentoDetalhe+')' : '')+'</div>' : ''}
-              ${a.anamnese.encravada ? '<div class="anamnese-row"><span class="anamnese-label">Unha encravada:</span> '+a.anamnese.encravada+'</div>' : ''}
-              ${a.anamnese.esporte ? '<div class="anamnese-row"><span class="anamnese-label">Esporte:</span> '+a.anamnese.esporte+'</div>' : ''}
-            </div>
-          ` : ''}
-          <div class="entry-actions">
-            <button class="btn btn-success" onclick="confirmarAgend('${a.id}')">✓ Confirmar</button>
-            ${a.anamnese ? `<button class="btn btn-outline" onclick="toggleAnamnese('${a.id}')">📋 Anamnese</button>` : ''}
-            <button class="btn btn-danger" onclick="deletarAgend('${a.id}')">✕</button>
+// ═══ RENDER AGENDAMENTOS (apenas pendentes) ═══
+function renderAgendamentos() {
+  const pendentes = agendamentosData.filter(a => a.status !== 'Confirmado');
+  const html = pendentes.length ? pendentes.map(a => `
+    <div class="entry">
+      <div class="entry-status status-${a.status ? a.status.toLowerCase() : 'pendente'}">${a.status || 'Pendente'}</div>
+      <div class="entry-header">
+        <div>
+          <div class="entry-name">${a.nome}</div>
+          <div class="entry-desc">
+            📅 ${formatDateBR(a.data)} às ${a.hora || '??:??'} • ${a.proc || 'Serviço'}
+            ${a.tel ? ' • 📱 '+a.tel : ''}
           </div>
         </div>
-      `).join('') : '<div class="empty">Nenhum agendamento recebido</div>';
+      </div>
+      ${a.anamnese ? `
+        <div class="anamnese-box" id="anamnese-${a.id}">
+          ${a.anamnese.diabetes ? '<div class="anamnese-row"><span class="anamnese-label">Diabetes:</span> '+a.anamnese.diabetes+'</div>' : ''}
+          ${a.anamnese.gestante ? '<div class="anamnese-row"><span class="anamnese-label">Gestante:</span> '+a.anamnese.gestante+'</div>' : ''}
+          ${a.anamnese.alergia ? '<div class="anamnese-row"><span class="anamnese-label">Alergia:</span> '+a.anamnese.alergia+(a.anamnese.alergiaDetalhe ? ' ('+a.anamnese.alergiaDetalhe+')' : '')+'</div>' : ''}
+          ${a.anamnese.micose ? '<div class="anamnese-row"><span class="anamnese-label">Micose:</span> '+a.anamnese.micose+'</div>' : ''}
+          ${a.anamnese.medicamento ? '<div class="anamnese-row"><span class="anamnese-label">Medicamento:</span> '+a.anamnese.medicamento+(a.anamnese.medicamentoDetalhe ? ' ('+a.anamnese.medicamentoDetalhe+')' : '')+'</div>' : ''}
+          ${a.anamnese.encravada ? '<div class="anamnese-row"><span class="anamnese-label">Unha encravada:</span> '+a.anamnese.encravada+'</div>' : ''}
+          ${a.anamnese.esporte ? '<div class="anamnese-row"><span class="anamnese-label">Esporte:</span> '+a.anamnese.esporte+'</div>' : ''}
+        </div>
+      ` : ''}
+      <div class="entry-actions">
+        <button class="btn btn-success" onclick="confirmarAgend('${a.id}')">✓ Confirmar</button>
+        ${a.anamnese ? `<button class="btn btn-outline" onclick="toggleAnamnese('${a.id}')">📋 Anamnese</button>` : ''}
+        <button class="btn btn-danger" onclick="deletarAgend('${a.id}')">✕</button>
+      </div>
+    </div>
+  `).join('') : '<div class="empty">Nenhum agendamento recebido</div>';
+  document.getElementById('lista-agendamentos').innerHTML = html;
+}
 
-      document.getElementById('lista-agendamentos').innerHTML = html;
-    }
-
-    // ═══ RENDER CONFIRMADOS ═══
-    window.renderConfirmados = function() {
-      const confirmados = agendamentosData.filter(a => a.status === 'Confirmado');
-      const html = confirmados.length ? confirmados.map(a => `
-        <div class="entry confirmed">
-          <div class="entry-status status-confirmado">Confirmado</div>
-          <div class="entry-header">
-            <div>
-              <div class="entry-name">${a.nome}</div>
-              <div class="entry-desc">
-                📅 ${formatDateBR(a.data)} às ${a.hora || '??:??'} • ${a.proc || 'Serviço'}
-                ${a.tel ? ' • 📱 '+a.tel : ''}
-                ${a.horaInicio ? ' • 🕐 '+a.horaInicio+(a.horaFim ? '-'+a.horaFim : '') : ''}
-              </div>
-            </div>
-            <div class="entry-price">R$ ${a.valor || '0.00'}</div>
-          </div>
-          ${a.anamnese ? `
-            <div class="anamnese-box" id="anamnese-${a.id}">
-              ${a.anamnese.diabetes ? '<div class="anamnese-row"><span class="anamnese-label">Diabetes:</span> '+a.anamnese.diabetes+'</div>' : ''}
-              ${a.anamnese.gestante ? '<div class="anamnese-row"><span class="anamnese-label">Gestante:</span> '+a.anamnese.gestante+'</div>' : ''}
-              ${a.anamnese.alergia ? '<div class="anamnese-row"><span class="anamnese-label">Alergia:</span> '+a.anamnese.alergia+(a.anamnese.alergiaDetalhe ? ' ('+a.anamnese.alergiaDetalhe+')' : '')+'</div>' : ''}
-              ${a.anamnese.micose ? '<div class="anamnese-row"><span class="anamnese-label">Micose:</span> '+a.anamnese.micose+'</div>' : ''}
-              ${a.anamnese.medicamento ? '<div class="anamnese-row"><span class="anamnese-label">Medicamento:</span> '+a.anamnese.medicamento+(a.anamnese.medicamentoDetalhe ? ' ('+a.anamnese.medicamentoDetalhe+')' : '')+'</div>' : ''}
-              ${a.anamnese.encravada ? '<div class="anamnese-row"><span class="anamnese-label">Unha encravada:</span> '+a.anamnese.encravada+'</div>' : ''}
-              ${a.anamnese.esporte ? '<div class="anamnese-row"><span class="anamnese-label">Esporte:</span> '+a.anamnese.esporte+'</div>' : ''}
-            </div>
-          ` : ''}
-          <div class="entry-actions">
-            ${a.anamnese ? `<button class="btn btn-outline" onclick="toggleAnamnese('${a.id}')">📋 Anamnese</button>` : ''}
-            <button class="btn btn-danger" onclick="deletarAgend('${a.id}')">✕</button>
+// ═══ RENDER CONFIRMADOS ═══
+window.renderConfirmados = function() {
+  const confirmados = agendamentosData.filter(a => a.status === 'Confirmado');
+  const html = confirmados.length ? confirmados.map(a => `
+    <div class="entry confirmed">
+      <div class="entry-status status-confirmado">Confirmado</div>
+      <div class="entry-header">
+        <div>
+          <div class="entry-name">${a.nome}</div>
+          <div class="entry-desc">
+            📅 ${formatDateBR(a.data)} às ${a.hora || '??:??'} • ${a.proc || 'Serviço'}
+            ${a.tel ? ' • 📱 '+a.tel : ''}
+            ${a.horaInicio ? ' • 🕐 '+a.horaInicio+(a.horaFim ? '-'+a.horaFim : '') : ''}
           </div>
         </div>
-      `).join('') : '<div class="empty">Nenhum agendamento confirmado</div>';
-
-      document.getElementById('lista-confirmados').innerHTML = html;
-    };
+        <div class="entry-price">R$ ${a.valor || '0.00'}</div>
+      </div>
+      ${a.anamnese ? `
+        <div class="anamnese-box" id="anamnese-${a.id}">
+          ${a.anamnese.diabetes ? '<div class="anamnese-row"><span class="anamnese-label">Diabetes:</span> '+a.anamnese.diabetes+'</div>' : ''}
+          ${a.anamnese.gestante ? '<div class="anamnese-row"><span class="anamnese-label">Gestante:</span> '+a.anamnese.gestante+'</div>' : ''}
+          ${a.anamnese.alergia ? '<div class="anamnese-row"><span class="anamnese-label">Alergia:</span> '+a.anamnese.alergia+(a.anamnese.alergiaDetalhe ? ' ('+a.anamnese.alergiaDetalhe+')' : '')+'</div>' : ''}
+          ${a.anamnese.micose ? '<div class="anamnese-row"><span class="anamnese-label">Micose:</span> '+a.anamnese.micose+'</div>' : ''}
+          ${a.anamnese.medicamento ? '<div class="anamnese-row"><span class="anamnese-label">Medicamento:</span> '+a.anamnese.medicamento+(a.anamnese.medicamentoDetalhe ? ' ('+a.anamnese.medicamentoDetalhe+')' : '')+'</div>' : ''}
+          ${a.anamnese.encravada ? '<div class="anamnese-row"><span class="anamnese-label">Unha encravada:</span> '+a.anamnese.encravada+'</div>' : ''}
+          ${a.anamnese.esporte ? '<div class="anamnese-row"><span class="anamnese-label">Esporte:</span> '+a.anamnese.esporte+'</div>' : ''}
+        </div>
+      ` : ''}
+      <div class="entry-actions">
+        ${a.anamnese ? `<button class="btn btn-outline" onclick="toggleAnamnese('${a.id}')">📋 Anamnese</button>` : ''}
+        <button class="btn btn-danger" onclick="deletarAgend('${a.id}')">✕</button>
+      </div>
+    </div>
+  `).join('') : '<div class="empty">Nenhum agendamento confirmado</div>';
+  document.getElementById('lista-confirmados').innerHTML = html;
+};
 
     // ═══ CONFIRMAR AGENDAMENTO ═══
     window.confirmarAgend = function(id) {
-      // Atualiza localmente primeiro para resposta imediata
       const agend = agendamentosData.find(a => a.id === id);
       if (!agend) {
         console.error('[Studio] Agendamento not found:', id);
         return;
       }
-
-      // Atualiza o status localmente
       agend.status = 'Confirmado';
-
-      // Re-renderiza ambas as abas imediatamente
       renderAgendamentos();
       renderConfirmados();
       toast('Agendamento confirmado!');
-
-      // Atualiza no Firebase (usa update para não sobrescrever outros campos)
-      update(ref(db, 'agendamentos/' + id), { status: 'Confirmado' })
+      firebase.database().ref('agendamentos/' + id).update({ status: 'Confirmado' })
         .catch((err) => {
           console.error('[Studio] Erro ao confirmar:', err);
           toast('Erro ao confirmar');
-          // Reverte em caso de erro
           agend.status = 'Pendente';
           renderAgendamentos();
           renderConfirmados();
@@ -751,16 +748,11 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
     // ═══ DELETAR AGENDAMENTO ═══
     window.deletarAgend = function(id) {
       if (!confirm('Remover agendamento?')) return;
-
-      // Find the appointment in local data to get data and hora
       const agend = agendamentosData.find(a => a.id === id);
-
-      // Remove from agendamentos
-      remove(ref(db, 'agendamentos/' + id)).then(() => {
-        // Also remove from horarios_ocupados
+      firebase.database().ref('agendamentos/' + id).remove().then(() => {
         if (agend && agend.data && agend.hora) {
           const key = agend.data + '_' + agend.hora;
-          remove(ref(db, 'horarios_ocupados/' + key)).then(() => {
+          firebase.database().ref('horarios_ocupados/' + key).remove().then(() => {
             toast('Removido com sucesso');
           }).catch((err) => {
             console.error('[Studio] Erro ao limpar horario ocupado:', err);
@@ -783,7 +775,7 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
 
     // ═══ EDITAR REGISTRO ═══
     window.editarRegistro = function(id) {
-      get(ref(db, 'registros/' + id)).then((snap) => {
+      firebase.database().ref('registros/' + id).once('value').then((snap) => {
         const r = snap.val();
         if (!r) return;
         editId = id;
@@ -806,7 +798,7 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
     // ═══ DELETAR REGISTRO ═══
     window.deletarRegistro = function(id) {
       if (!confirm('Remover registro?')) return;
-      remove(ref(db, 'registros/' + id)).then(() => {
+      firebase.database().ref('registros/' + id).remove().then(() => {
         toast('Removido');
       });
     };
@@ -907,7 +899,7 @@ import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js').then(({init
     };
 
   });
-});
+};
 </script>
 
 </body>
