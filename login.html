@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login · Studio Emilly Santos</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink: #c9184a;
+    --pink-dark: #a01435;
+    --pink-light: #fce8ef;
+    --pink-soft: #f7c5d2;
+    --bg: #fff5f8;
+    --white: #ffffff;
+    --text: #3a1a24;
+    --muted: #9a6475;
+    --border: #f0cdd8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    position: relative;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Background decorativo */
+  .bg-deco {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .bg-circle {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--pink-dark);
+  }
+  .bg-circle:nth-child(1) { width: 500px; height: 500px; top: -200px; right: -150px; opacity: 0.06; }
+  .bg-circle:nth-child(2) { width: 300px; height: 300px; bottom: -100px; left: -100px; opacity: 0.04; }
+  .bg-circle:nth-child(3) { width: 100px; height: 100px; top: 30%; left: 10%; opacity: 0.03; }
+
+  /* Container principal */
+  .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 400px;
+    animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Logo / Hero */
+  .hero { text-align: center; margin-bottom: 32px; }
+
+  .logo {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--pink-dark), var(--pink));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px; font-weight: 700; color: #fff;
+    margin: 0 auto 16px;
+    box-shadow: 0 12px 40px rgba(160, 20, 53, 0.35);
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-8px); }
+  }
+
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px; font-weight: 700;
+    color: var(--pink-dark);
+    margin-bottom: 4px;
+  }
+
+  .hero p {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+
+  /* Card */
+  .card {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 32px 28px;
+    box-shadow: 0 12px 48px rgba(160, 20, 53, 0.12);
+    border: 1.5px solid var(--border);
+  }
+
+  .card-title {
+    font-size: 18px; font-weight: 700;
+    color: var(--text);
+    margin-bottom: 24px;
+    text-align: center;
+  }
+
+  /* Form */
+  .fgroup { margin-bottom: 16px; }
+
+  .fg-label {
+    display: block;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .fg-input {
+    width: 100%; padding: 13px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-appearance: none;
+  }
+
+  .fg-input:focus {
+    border-color: var(--pink);
+    background: var(--white);
+    box-shadow: 0 0 0 4px rgba(201, 24, 74, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .fg-input::placeholder { color: #c9a0ae; }
+
+  /* Password wrapper */
+  .pw-wrap { position: relative; }
+  .pw-toggle {
+    position: absolute;
+    right: 14px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 18px;
+    padding: 4px;
+    line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pw-toggle:hover { color: var(--pink); }
+
+  /* Botão principal */
+  .btn-login {
+    width: 100%; padding: 15px;
+    background: linear-gradient(135deg, var(--pink-dark), var(--pink));
+    color: #fff; border: none;
+    border-radius: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer; margin-top: 8px;
+    box-shadow: 0 8px 28px rgba(160, 20, 53, 0.35);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative; overflow: hidden;
+    letter-spacing: 0.3px;
+    -webkit-appearance: none;
+  }
+
+  .btn-login::after {
+    content: '';
+    position: absolute; top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: shimmer 2.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0%   { left: -100%; }
+    100% { left: 100%; }
+  }
+
+  .btn-login:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 36px rgba(160, 20, 53, 0.45);
+  }
+
+  .btn-login:active { transform: scale(0.98); }
+
+  .btn-login:disabled {
+    opacity: 0.65; cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Spinner */
+  .spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Mensagem de erro */
+  .msg-error {
+    display: none;
+    background: #fce8ef;
+    border: 1.5px solid var(--pink-soft);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 13px; font-weight: 500;
+    color: var(--pink-dark);
+    margin-top: 12px;
+    text-align: center;
+    animation: slideIn 0.3s ease;
+  }
+  .msg-error.show { display: block; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Esqueci senha */
+  .forgot {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .forgot a {
+    color: var(--pink);
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .forgot a:hover { text-decoration: underline; }
+
+  /* Reset senha modal overlay */
+  .reset-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(58, 26, 36, 0.4);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    backdrop-filter: blur(4px);
+  }
+  .reset-overlay.show { display: flex; }
+
+  .reset-card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 28px 24px;
+    width: 100%; max-width: 360px;
+    box-shadow: 0 20px 60px rgba(160, 20, 53, 0.2);
+    animation: fadeInUp 0.3s ease;
+  }
+  .reset-card h3 {
+    font-size: 18px; font-weight: 700;
+    color: var(--text); margin-bottom: 8px;
+  }
+  .reset-card p {
+    font-size: 13px; color: var(--muted);
+    margin-bottom: 20px; line-height: 1.6;
+  }
+  .reset-actions { display: flex; gap: 10px; margin-top: 16px; }
+  .btn-cancel {
+    flex: 1; padding: 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px; background: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 600;
+    color: var(--muted); cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-cancel:hover { border-color: var(--pink); color: var(--pink); }
+  .btn-reset {
+    flex: 1; padding: 12px;
+    background: linear-gradient(135deg, var(--pink-dark), var(--pink));
+    border: none; border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 700;
+    color: #fff; cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(160, 20, 53, 0.3);
+  }
+  .btn-reset:hover { transform: translateY(-1px); }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 11px;
+    color: var(--pink-soft);
+    letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 400px) {
+    .card { padding: 24px 18px; border-radius: 20px; }
+    .logo { width: 68px; height: 68px; font-size: 26px; }
+    .hero h1 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Firebase SDK (compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+<div class="bg-deco">
+  <div class="bg-circle"></div>
+  <div class="bg-circle"></div>
+  <div class="bg-circle"></div>
+</div>
+
+<div class="container">
+  <div class="hero">
+    <div class="logo">ES</div>
+    <h1>Studio Emilly Santos</h1>
+    <p>Painel de Controle · Acesso Restrito</p>
+  </div>
+
+  <div class="card">
+    <p class="card-title">Entrar na sua conta</p>
+
+    <div class="fgroup">
+      <label class="fg-label">E-mail</label>
+      <input
+        type="email"
+        class="fg-input"
+        id="inp-email"
+        placeholder="seuemail@exemplo.com"
+        autocomplete="email"
+        inputmode="email"
+      >
+    </div>
+
+    <div class="fgroup">
+      <label class="fg-label">Senha</label>
+      <div class="pw-wrap">
+        <input
+          type="password"
+          class="fg-input"
+          id="inp-senha"
+          placeholder="••••••••"
+          autocomplete="current-password"
+        >
+        <button class="pw-toggle" type="button" onclick="toggleSenha()" title="Mostrar/ocultar senha">
+          <span id="eye-icon">👁️</span>
+        </button>
+      </div>
+    </div>
+
+    <button class="btn-login" id="btn-login" onclick="fazerLogin()">
+      Entrar
+    </button>
+
+    <div class="msg-error" id="msg-error">
+      ❌ <span id="error-text">E-mail ou senha inválidos.</span>
+    </div>
+
+    <div class="forgot">
+      <a onclick="abrirReset()">Esqueci minha senha</a>
+    </div>
+  </div>
+
+  <div class="footer">Studio Emilly Santos &copy; 2025</div>
+</div>
+
+<!-- Modal Reset Senha -->
+<div class="reset-overlay" id="reset-overlay" onclick="fecharReset(event)">
+  <div class="reset-card">
+    <h3>🔑 Recuperar senha</h3>
+    <p>Digite seu e-mail e enviaremos um link para redefinir sua senha.</p>
+    <div class="fgroup">
+      <label class="fg-label">E-mail</label>
+      <input type="email" class="fg-input" id="inp-reset-email" placeholder="seuemail@exemplo.com" inputmode="email">
+    </div>
+    <div class="msg-error" id="reset-msg" style="margin-top:0; margin-bottom:0;"></div>
+    <div class="reset-actions">
+      <button class="btn-cancel" onclick="fecharReset()">Cancelar</button>
+      <button class="btn-reset" onclick="enviarReset()">Enviar link</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ══════════════════════════════════
+  // FIREBASE CONFIG
+  // ══════════════════════════════════
+  const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyALLJn7hEnTxvTN2SNVzkAEs1HAwUG24hE",
+    authDomain: "studio-emilly.firebaseapp.com",
+    databaseURL: "https://studio-emilly-default-rtdb.firebaseio.com",
+    projectId: "studio-emilly",
+    storageBucket: "studio-emilly.appspot.com",
+    messagingSenderId: "130072077830",
+    appId: "1:130072077830:web:694aa5bb37307dae260587"
+  };
+
+  firebase.initializeApp(FIREBASE_CONFIG);
+
+  // Se já estiver logado, redireciona
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+      window.location.replace('/index.html');
+    }
+  });
+
+  // ══ Toggle senha visível ══
+  function toggleSenha() {
+    const inp = document.getElementById('inp-senha');
+    const eye = document.getElementById('eye-icon');
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      eye.textContent = '🙈';
+    } else {
+      inp.type = 'password';
+      eye.textContent = '👁️';
+    }
+  }
+
+  // ══ Enter no campo ══
+  document.getElementById('inp-senha').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') fazerLogin();
+  });
+  document.getElementById('inp-email').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('inp-senha').focus();
+  });
+
+  // ══ Login ══
+  async function fazerLogin() {
+    const email = document.getElementById('inp-email').value.trim();
+    const senha = document.getElementById('inp-senha').value;
+    const btn   = document.getElementById('btn-login');
+    const errEl = document.getElementById('msg-error');
+
+    errEl.classList.remove('show');
+
+    if (!email || !senha) {
+      document.getElementById('error-text').textContent = 'Preencha e-mail e senha.';
+      errEl.classList.add('show');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Entrando...';
+
+    try {
+      await firebase.auth().signInWithEmailAndPassword(email, senha);
+      // onAuthStateChanged vai redirecionar automaticamente
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerHTML = 'Entrar';
+      document.getElementById('error-text').textContent = traduzirErro(err.code);
+      errEl.classList.add('show');
+    }
+  }
+
+  // ══ Traduzir erros Firebase ══
+  function traduzirErro(code) {
+    const erros = {
+      'auth/invalid-email':       'E-mail inválido.',
+      'auth/user-not-found':      'Nenhuma conta com esse e-mail.',
+      'auth/wrong-password':      'Senha incorreta.',
+      'auth/invalid-credential':  'E-mail ou senha incorretos.',
+      'auth/too-many-requests':   'Muitas tentativas. Aguarde alguns minutos.',
+      'auth/network-request-failed': 'Sem conexão com a internet.',
+    };
+    return erros[code] || 'Erro ao entrar. Tente novamente.';
+  }
+
+  // ══ Recuperar senha ══
+  function abrirReset() {
+    const email = document.getElementById('inp-email').value.trim();
+    if (email) document.getElementById('inp-reset-email').value = email;
+    document.getElementById('reset-overlay').classList.add('show');
+    document.getElementById('reset-msg').classList.remove('show');
+  }
+
+  function fecharReset(e) {
+    if (e && e.target !== document.getElementById('reset-overlay')) return;
+    document.getElementById('reset-overlay').classList.remove('show');
+  }
+
+  async function enviarReset() {
+    const email = document.getElementById('inp-reset-email').value.trim();
+    const msg   = document.getElementById('reset-msg');
+    msg.classList.remove('show');
+
+    if (!email) {
+      msg.textContent = '⚠️ Digite seu e-mail.';
+      msg.classList.add('show');
+      return;
+    }
+
+    try {
+      await firebase.auth().sendPasswordResetEmail(email);
+      msg.style.background = '#e0f7e9';
+      msg.style.borderColor = '#a7f3d0';
+      msg.style.color = '#1a7a3c';
+      msg.textContent = '✅ Link enviado! Verifique sua caixa de entrada.';
+      msg.classList.add('show');
+      setTimeout(() => fecharReset(), 3000);
+    } catch (err) {
+      msg.style.background = '#fce8ef';
+      msg.style.borderColor = '#f7c5d2';
+      msg.style.color = '#a01435';
+      msg.textContent = '❌ ' + traduzirErro(err.code);
+      msg.classList.add('show');
+    }
+  }
+</script>
+</body>
+</html>
