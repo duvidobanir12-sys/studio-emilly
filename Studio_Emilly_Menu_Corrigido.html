@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio Emilly Santos</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --c:       #b01840;
+  --c-dark:  #7d0f2a;
+  --c-deep:  #4a0718;
+  --c-soft:  #e8b4bf;
+  --c-pale:  #fdf0f3;
+  --c-mist:  #f7e8ec;
+  --ink:     #1a0810;
+  --ink2:    #4a2030;
+  --ink3:    #8a5060;
+  --line:    #ecdde1;
+  --white:   #ffffff;
+  --success: #146c43;
+  --s-bg:    #d1e7dd;
+  --warn:    #664d03;
+  --w-bg:    #fff3cd;
+  --danger:  #842029;
+  --d-bg:    #f8d7da;
+  --r: 12px;
+  --r-sm: 8px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f9f4f5;
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* ─── LOADING ────────────────────────────── */
+#loading-screen {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--c-deep);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 28px;
+}
+.load-wordmark {
+  text-align: center;
+}
+.load-wordmark span {
+  display: block;
+  font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums;
+  font-size: 36px; font-weight: 300; letter-spacing: 6px;
+  color: #fff; text-transform: uppercase;
+  animation: fadein 1s ease forwards;
+}
+.load-wordmark em {
+  display: block; font-style: normal;
+  font-family: 'Inter', sans-serif;
+  font-size: 10px; letter-spacing: 4px;
+  color: rgba(255,255,255,.4); text-transform: uppercase;
+  margin-top: 6px;
+}
+.load-line {
+  width: 120px; height: 1px;
+  background: rgba(255,255,255,.15); position: relative; overflow: hidden;
+}
+.load-line::after {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(255,255,255,.7);
+  animation: lineload 1.6s ease forwards;
+  transform: translateX(-100%);
+}
+@keyframes lineload { to { transform: translateX(0); } }
+@keyframes fadein   { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* ─── APP ─────────────────────────────────── */
+#app { display: none; flex-direction: column; min-height: 100vh; }
+
+/* ─── SIDEBAR LAYOUT ──────────────────────── */
+.layout { display: flex; min-height: calc(100vh - 60px); }
+
+/* ─── TOPBAR ──────────────────────────────── */
+.topbar {
+  height: 60px;
+  background: var(--c-deep);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px;
+  position: sticky; top: 0; z-index: 200;
+}
+.topbar-brand {
+  display: flex; align-items: center; gap: 16px;
+}
+.topbar-logo {
+  width: 32px; height: 32px;
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+}
+.topbar-logo svg { width: 18px; height: 18px; }
+.topbar-name {
+  font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums;
+  font-size: 20px; font-weight: 400; letter-spacing: 1.5px;
+  color: #fff; text-transform: uppercase;
+}
+.topbar-sep {
+  width: 1px; height: 20px; background: rgba(255,255,255,.2);
+}
+.topbar-sub {
+  font-size: 10px; letter-spacing: 2.5px; color: rgba(255,255,255,.4);
+  text-transform: uppercase;
+}
+.topbar-right {
+  display: flex; align-items: center; gap: 20px;
+}
+.topbar-date {
+  font-size: 12px; color: rgba(255,255,255,.45); letter-spacing: .5px;
+}
+#btn-logout {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.15);
+  color: rgba(255,255,255,.7);
+  padding: 6px 14px; border-radius: var(--r-sm);
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: all .2s;
+  letter-spacing: .3px;
+}
+#btn-logout:hover { background: rgba(255,255,255,.14); color: #fff; }
+#btn-logout svg { width: 13px; height: 13px; }
+
+/* ─── SIDEBAR ─────────────────────────────── */
+.sidebar {
+  width: 220px; flex-shrink: 0;
+  background: var(--white);
+  border-right: 1px solid var(--line);
+  padding: 24px 0;
+  display: flex; flex-direction: column;
+  position: sticky; top: 60px; height: calc(100vh - 60px);
+  overflow-y: auto;
+}
+.sidebar-section-label {
+  font-size: 9px; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--ink3);
+  padding: 0 20px; margin-bottom: 6px; margin-top: 16px;
+}
+.sidebar-section-label:first-child { margin-top: 0; }
+
+.nav-item {
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 20px;
+  border: none; background: none; width: 100%;
+  font-family: 'Inter', sans-serif; font-size: 13.5px; font-weight: 500;
+  color: var(--ink2); cursor: pointer;
+  transition: all .15s;
+  border-left: 2px solid transparent;
+  text-align: left;
+}
+.nav-item svg { width: 16px; height: 16px; flex-shrink: 0; opacity: .6; transition: opacity .15s; }
+.nav-item:hover { background: var(--c-mist); color: var(--c); }
+.nav-item:hover svg { opacity: 1; }
+.nav-item.active {
+  background: var(--c-pale); color: var(--c);
+  border-left-color: var(--c); font-weight: 600;
+}
+.nav-item.active svg { opacity: 1; }
+
+.sidebar-footer {
+  margin-top: auto; padding: 16px 20px;
+  border-top: 1px solid var(--line);
+}
+.sidebar-footer p {
+  font-size: 11px; color: var(--ink3); letter-spacing: .3px; line-height: 1.6;
+}
+
+/* ─── MAIN ────────────────────────────────── */
+.main-content {
+  flex: 1; padding: 32px 36px 60px;
+  min-width: 0; overflow: hidden;
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: pageIn .25s ease; }
+@keyframes pageIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* ─── PAGE HEADER ─────────────────────────── */
+.page-header { margin-bottom: 28px; }
+.page-header h2 {
+  font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums;
+  font-size: 30px; font-weight: 500; color: var(--ink);
+  letter-spacing: .5px; line-height: 1.2;
+}
+.page-header p {
+  font-size: 13px; color: var(--ink3); margin-top: 5px;
+  font-weight: 400;
+}
+.page-divider {
+  height: 1px; background: var(--line); margin-bottom: 28px;
+}
+
+/* ─── FORM ────────────────────────────────── */
+.form-panel {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  overflow: hidden;
+  max-width: 640px;
+}
+.form-panel-head {
+  background: linear-gradient(110deg, var(--c-deep) 0%, var(--c-dark) 50%, var(--c) 100%);
+  padding: 22px 28px;
+  display: flex; align-items: center; gap: 14px;
+}
+.form-panel-head-icon {
+  width: 38px; height: 38px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,.08);
+}
+.form-panel-head-icon svg { width: 18px; height: 18px; }
+.form-panel-head-text h3 {
+  font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums;
+  font-size: 19px; font-weight: 500; color: #fff; letter-spacing: .5px;
+}
+.form-panel-head-text p { font-size: 11.5px; color: rgba(255,255,255,.55); margin-top: 2px; }
+.form-panel-body { padding: 28px; }
+
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; }
+.field-grid .span-2 { grid-column: 1 / -1; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label {
+  font-size: 10.5px; font-weight: 600; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--ink2);
+}
+.field input, .field select {
+  width: 100%; padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 400;
+  color: var(--ink); background: #fff;
+  transition: border-color .2s, box-shadow .2s;
+  appearance: none; -webkit-appearance: none;
+}
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238a5060'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+  padding-right: 36px; cursor: pointer;
+}
+.field input:focus, .field select:focus {
+  outline: none; border-color: var(--c);
+  box-shadow: 0 0 0 3px rgba(176,24,64,.08);
+}
+.field input::placeholder { color: #c8a0ab; font-weight: 300; }
+
+/* Edit mode banner */
+.edit-banner {
+  display: none; align-items: center; justify-content: space-between;
+  background: #fff8e1; border: 1px solid #ffe082;
+  border-radius: var(--r-sm); padding: 10px 14px; margin-bottom: 16px;
+  font-size: 12.5px; color: #7a5800;
+}
+
+/* ─── BUTTONS ─────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  border: none; border-radius: var(--r-sm);
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .18s; white-space: nowrap; letter-spacing: .2px;
+}
+.btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+.btn-primary {
+  width: 100%; padding: 13px 20px; font-size: 14px;
+  background: linear-gradient(110deg, var(--c-dark), var(--c));
+  color: #fff; letter-spacing: .5px; margin-top: 4px;
+  box-shadow: 0 3px 12px rgba(176,24,64,.28);
+}
+.btn-primary:hover { box-shadow: 0 6px 20px rgba(176,24,64,.38); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); box-shadow: 0 2px 8px rgba(176,24,64,.25); }
+
+.btn-sm { padding: 7px 13px; font-size: 12px; }
+
+.btn-outline {
+  background: #fff; border: 1px solid var(--line);
+  color: var(--ink2); padding: 7px 13px;
+}
+.btn-outline:hover { border-color: var(--c); color: var(--c); background: var(--c-pale); }
+
+.btn-confirm {
+  background: var(--s-bg); color: var(--success);
+  border: 1px solid #a3cfbb; padding: 7px 13px;
+}
+.btn-confirm:hover { background: #badbcc; }
+
+.btn-danger {
+  background: var(--d-bg); color: var(--danger);
+  border: 1px solid #f5c2c7; padding: 7px 13px;
+}
+.btn-danger:hover { background: #f1aeb5; }
+
+.btn-text {
+  background: none; border: none; color: var(--c);
+  padding: 7px 0; font-size: 12px; cursor: pointer;
+  font-family: 'Inter', sans-serif; font-weight: 500;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+
+/* ─── CARD LIST ───────────────────────────── */
+.card-list { display: flex; flex-direction: column; gap: 1px; }
+.card-list-inner {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+
+.record-row {
+  display: flex; align-items: center;
+  padding: 16px 20px; gap: 16px;
+  border-bottom: 1px solid var(--line);
+  transition: background .15s;
+  position: relative;
+}
+.record-row:last-child { border-bottom: none; }
+.record-row:hover { background: var(--c-pale); }
+
+.record-accent {
+  width: 3px; height: 36px; border-radius: 99px; flex-shrink: 0;
+  background: linear-gradient(180deg, var(--c-dark), var(--c-soft));
+}
+.record-accent.green { background: linear-gradient(180deg, var(--success), #6dbf9e); }
+
+.record-main { flex: 1; min-width: 0; }
+.record-name {
+  font-size: 14.5px; font-weight: 600; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.record-meta {
+  font-size: 12px; color: var(--ink3); margin-top: 3px;
+  display: flex; flex-wrap: wrap; gap: 0 12px;
+}
+.record-meta span { display: flex; align-items: center; gap: 4px; }
+.record-meta svg { width: 11px; height: 11px; opacity: .6; }
+
+.record-right { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+
+.record-price {
+  font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums;
+  font-size: 20px; font-weight: 600; color: var(--c);
+  letter-spacing: .5px;
+}
+
+.record-actions { display: flex; gap: 6px; }
+
+/* ─── BADGE ───────────────────────────────── */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 2px 9px; border-radius: 4px;
+  font-size: 10px; font-weight: 700; letter-spacing: .8px;
+  text-transform: uppercase;
+}
+.badge-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.badge-pendente   { background: var(--w-bg); color: var(--warn); }
+.badge-confirmado { background: var(--s-bg); color: var(--success); }
+.badge-cancelado  { background: var(--d-bg); color: var(--danger); }
+
+/* ─── ANAMNESE ────────────────────────────── */
+.anamnese-panel {
+  background: var(--c-mist); border-top: 1px solid var(--line);
+  padding: 14px 56px 14px 20px;
+  display: none;
+}
+.anamnese-panel.open { display: block; }
+.anamnese-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 6px;
+}
+.anamnese-item {
+  font-size: 12px; color: var(--ink2);
+}
+.anamnese-item strong { font-weight: 600; color: var(--ink); }
+
+/* ─── STATS ───────────────────────────────── */
+.stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 28px; }
+.stat-block {
+  background: var(--white); border: 1px solid var(--line);
+  border-radius: var(--r); padding: 22px 20px;
+  position: relative; overflow: hidden;
+}
+.stat-block::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+}
+.stat-block.crimson::before { background: linear-gradient(90deg,var(--c-dark),var(--c)); }
+.stat-block.emerald::before { background: linear-gradient(90deg,#0c6b39,#1aaa5c); }
+.stat-block.sapphire::before { background: linear-gradient(90deg,#1345a0,#3a7bd5); }
+.stat-num {
+  font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums;
+  font-size: 32px; font-weight: 600; line-height: 1;
+  margin-bottom: 6px;
+}
+.stat-block.crimson  .stat-num { color: var(--c); }
+.stat-block.emerald  .stat-num { color: #0c6b39; }
+.stat-block.sapphire .stat-num { color: #1345a0; }
+.stat-label { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--ink3); }
+
+/* ─── BREAKDOWN ───────────────────────────── */
+.breakdown-wrapper {
+  background: var(--white); border: 1px solid var(--line);
+  border-radius: var(--r); overflow: hidden;
+}
+.breakdown-header {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--line);
+  font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums;
+  font-size: 17px; font-weight: 500; color: var(--ink);
+  letter-spacing: .3px;
+}
+.breakdown-cols { display: grid; grid-template-columns: 1fr 1fr; }
+.breakdown-col { padding: 20px 22px; }
+.breakdown-col:first-child { border-right: 1px solid var(--line); }
+.breakdown-col-title {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--ink3); margin-bottom: 14px;
+}
+.breakdown-item {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 9px 0; border-bottom: 1px solid var(--line);
+}
+.breakdown-item:last-child { border-bottom: none; }
+.breakdown-item-name { font-size: 13.5px; color: var(--ink2); }
+.breakdown-item-count { font-size: 11px; color: var(--ink3); margin-left: 4px; }
+.breakdown-item-val { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+
+/* ─── EMPTY ───────────────────────────────── */
+.empty-view {
+  background: var(--white); border: 1px solid var(--line);
+  border-radius: var(--r); padding: 64px 32px; text-align: center;
+}
+.empty-view-icon {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--c-mist); margin: 0 auto 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+.empty-view-icon svg { width: 22px; height: 22px; color: var(--c-soft); }
+.empty-view p { font-size: 14px; color: var(--ink3); }
+
+/* ─── TOAST ───────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  padding: 11px 20px; border-radius: var(--r-sm);
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+  z-index: 9999; white-space: nowrap;
+  animation: toastUp .3s cubic-bezier(.34,1.56,.64,1);
+  box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  display: flex; align-items: center; gap: 8px;
+}
+.toast svg { width: 14px; height: 14px; flex-shrink: 0; }
+.toast-neutral { background: var(--ink); color: #fff; }
+.toast-ok   { background: #0c6b39; color: #fff; }
+.toast-err  { background: #b01840; color: #fff; }
+@keyframes toastUp { from{opacity:0;transform:translateX(-50%) translateY(12px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+
+/* ─── RESPONSIVE ──────────────────────────── */
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main-content { padding: 20px 16px 60px; }
+  .layout { display: block; }
+  .topbar { padding: 0 16px; }
+  .topbar-sub, .topbar-sep, .topbar-date { display: none; }
+  .topbar-name { font-size: 16px; letter-spacing: 1px; }
+  .mobile-nav {
+    display: flex !important;
+    overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    background: var(--white); border-bottom: 1px solid var(--line);
+    padding: 0 4px;
+  }
+  .mobile-nav::-webkit-scrollbar { display: none; }
+  .mobile-nav .nav-item {
+    flex-direction: column; gap: 4px; padding: 10px 14px;
+    font-size: 10px; flex-shrink: 0;
+    border-left: none; border-bottom: 2px solid transparent;
+    border-radius: 0;
+  }
+  .mobile-nav .nav-item.active { border-bottom-color: var(--c); background: none; }
+  .mobile-nav .nav-item svg { opacity: 1; }
+  .field-grid { grid-template-columns: 1fr; }
+  .field-grid .span-2 { grid-column: 1; }
+  .stats-row { grid-template-columns: 1fr; }
+  .breakdown-cols { grid-template-columns: 1fr; }
+  .breakdown-col:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+  .record-actions { flex-direction: column; gap: 4px; }
+  .record-right { flex-direction: column; align-items: flex-end; gap: 6px; }
+  .form-panel-body { padding: 18px; }
+}
+.mobile-nav { display: none; }
+
+.sidebar.collapsed{width:0;padding:0;overflow:hidden;border-right:none;transition:.3s}
+.main-content{transition:.3s}
+
+
+.sidebar.hidden{display:none !important;}
+#menu-toggle{display:flex;align-items:center;justify-content:center}
+        </style>
+
+</head>
+<body>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+<!-- Loading -->
+<div id="loading-screen">
+  <div class="load-wordmark">
+    <span>Emilly Santos</span>
+    <em>Studio &nbsp;·&nbsp; Painel</em>
+  </div>
+  <div class="load-line"></div>
+</div>
+
+<!-- App -->
+<div id="app" style="display:none; flex-direction:column; min-height:100vh;">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <button id="menu-toggle" style="background:none;border:none;color:white;cursor:pointer;margin-right:12px;font-size:22px;">☰</button>
+    <div class="topbar-brand">
+      <div class="topbar-logo">
+        <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 2C5.13 2 2 5.13 2 9s3.13 7 7 7 7-3.13 7-7-3.13-7-7-7zm0 2.5c.97 0 1.75.78 1.75 1.75S9.97 8 9 8 7.25 7.22 7.25 6.25 8.03 4.5 9 4.5zm0 9.5c-1.75 0-3.29-.9-4.2-2.26.02-1.39 2.8-2.16 4.2-2.16s4.18.77 4.2 2.16A4.986 4.986 0 019 14z" fill="rgba(255,255,255,.6)"/>
+        </svg>
+      </div>
+      <span class="topbar-name">Emilly Santos</span>
+      <div class="topbar-sep"></div>
+      <span class="topbar-sub">Painel de Controle</span>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-date" id="header-date"></span>
+      <button id="btn-logout" onclick="logout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Sair
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Nav -->
+  
+
+  <!-- Layout -->
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section-label">Principal</div>
+      <button class="nav-item active" onclick="switchTab('anotar',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Anotar Procedimento
+      </button>
+      <button class="nav-item" onclick="switchTab('historico',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Histórico
+      </button>
+      <div class="sidebar-section-label">Agenda</div>
+      <button class="nav-item" onclick="switchTab('agendamentos',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Agendamentos
+      </button>
+      <button class="nav-item" onclick="switchTab('confirmados',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20,6 9,17 4,12"/></svg>
+        Confirmados
+      </button>
+      <div class="sidebar-section-label">Relatórios</div>
+      <button class="nav-item" onclick="switchTab('financeiro',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        Financeiro
+      </button>
+      <div class="sidebar-footer">
+        <p>Studio Emilly Santos<br>Painel interno v2</p>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+
+      <!-- ABA ANOTAR -->
+      <div class="tab-content active" id="tab-anotar">
+        <div class="page-header">
+          <h2>Registrar Procedimento</h2>
+          <p>Preencha os dados do atendimento realizado</p>
+        </div>
+        <div class="page-divider"></div>
+        <div class="form-panel">
+          <div class="form-panel-head">
+            <div class="form-panel-head-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1.8"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </div>
+            <div class="form-panel-head-text">
+              <h3>Novo Registro</h3>
+              <p>Campos obrigatórios: nome, data, procedimento, valor e pagamento</p>
+            </div>
+          </div>
+          <div class="form-panel-body">
+            <div id="edit-banner" class="edit-banner">
+              <span>Modo de edição ativo — alterações serão salvas no registro existente</span>
+              <button class="btn-text" onclick="cancelEdit()">Cancelar</button>
+            </div>
+            <div class="field-grid">
+              <div class="field span-2">
+                <label>Nome da Cliente</label>
+                <input type="text" id="nome" placeholder="Nome completo">
+              </div>
+              <div class="field">
+                <label>Data</label>
+                <input type="date" id="data">
+              </div>
+              <div class="field">
+                <label>Telefone</label>
+                <input type="tel" id="tel" placeholder="(11) 99999-9999">
+              </div>
+              <div class="field">
+                <label>Procedimento</label>
+                <select id="proc">
+                  <option value="">Selecione</option>
+                  <option>Manicure</option>
+                  <option>Pedicure</option>
+                  <option>Unhas Postiças</option>
+                  <option>Design de Sobrancelha</option>
+                  <option>Pé</option>
+                  <option>Mão</option>
+                  <option>Pé e mão</option>
+                  <option>SPA dos pés</option>
+                  <option>Postiça simples</option>
+                  <option>Postiça decorada</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Valor (R$)</label>
+                <input type="number" id="valor" placeholder="0,00" step="0.01" min="0">
+              </div>
+              <div class="field">
+                <label>Forma de Pagamento</label>
+                <select id="pagamento">
+                  <option value="">Selecione</option>
+                  <option>Dinheiro</option>
+                  <option>PIX</option>
+                  <option>Cartão</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Status</label>
+                <select id="status">
+                  <option value="Confirmado">Confirmado</option>
+                  <option value="Pendente">Pendente</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Horário Início</label>
+                <input type="time" id="hora-inicio">
+              </div>
+              <div class="field">
+                <label>Horário Fim</label>
+                <input type="time" id="hora-fim">
+              </div>
+            </div>
+            <button class="btn btn-primary" id="btn-submit" onclick="salvarRegistro()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+              <span id="btn-label">Anotar Procedimento</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABA HISTÓRICO -->
+      <div class="tab-content" id="tab-historico">
+        <div class="page-header">
+          <h2>Histórico</h2>
+          <p>Todos os procedimentos registrados</p>
+        </div>
+        <div class="page-divider"></div>
+        <div id="lista-historico"></div>
+      </div>
+
+      <!-- ABA AGENDAMENTOS -->
+      <div class="tab-content" id="tab-agendamentos">
+        <div class="page-header">
+          <h2>Agendamentos</h2>
+          <p>Solicitações pendentes de confirmação</p>
+        </div>
+        <div class="page-divider"></div>
+        <div id="lista-agendamentos"></div>
+      </div>
+
+      <!-- ABA CONFIRMADOS -->
+      <div class="tab-content" id="tab-confirmados">
+        <div class="page-header">
+          <h2>Confirmados</h2>
+          <p>Agendamentos já confirmados</p>
+        </div>
+        <div class="page-divider"></div>
+        <div id="lista-confirmados"></div>
+      </div>
+
+      <!-- ABA FINANCEIRO -->
+      <div class="tab-content" id="tab-financeiro">
+        <div class="page-header">
+          <h2>Financeiro</h2>
+          <p id="fin-month-label">Resumo do mês atual</p>
+        </div>
+        <div class="page-divider"></div>
+        <div id="financeiro-body"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+// ── FIREBASE ─────────────────────────────────────────────────────────
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyALLJn7hEnTxvTN2SNVzkAEs1HAwUG24hE",
+  authDomain: "studio-emilly.firebaseapp.com",
+  databaseURL: "https://studio-emilly-default-rtdb.firebaseio.com",
+  projectId: "studio-emilly",
+  storageBucket: "studio-emilly.appspot.com",
+  messagingSenderId: "130072077830",
+  appId: "1:130072077830:web:694aa5bb37307dae260587"
+};
+firebase.initializeApp(FIREBASE_CONFIG);
+const auth = firebase.auth();
+const db   = firebase.database();
+
+// ── DATE ──────────────────────────────────────────────────────────────
+(function(){
+  const d = new Date();
+  const days   = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  document.getElementById('header-date').textContent =
+    days[d.getDay()] + ', ' + d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+})();
+
+// ── AUTH ──────────────────────────────────────────────────────────────
+auth.onAuthStateChanged(user => {
+  document.getElementById('loading-screen').style.display = 'none';
+  if (!user) { window.location.replace('/login.html'); return; }
+  const app = document.getElementById('app');
+  app.style.display = 'flex';
+  iniciarApp();
+});
+function logout() { auth.signOut().then(() => window.location.replace('/login.html')); }
+
+// ── GLOBALS ───────────────────────────────────────────────────────────
+let editId = null;
+let registrosData = [];
+let agendamentosData = [];
+
+// ── UTILS ─────────────────────────────────────────────────────────────
+function fdate(s) {
+  if (!s) return '—';
+  const p = s.split('-');
+  return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : '—';
+}
+
+const ICONS = {
+  cal: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+  scissors: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>`,
+  phone: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8 19.79 19.79 0 01.01 2.2 2 2 0 012 .01h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>`,
+  credit: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`,
+  clock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>`,
+};
+
+function toast(msg, type = 'neutral') {
+  const icons = { ok: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>`, err: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`, neutral: '' };
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.innerHTML = (icons[type]||'') + msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2600);
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────
+function switchTab(tab, btn) {
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  // highlight both sidebar + mobile
+  document.querySelectorAll('.nav-item').forEach(b => {
+    if (b.getAttribute('onclick') === `switchTab('${tab}',this)`) b.classList.add('active');
+  });
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (tab === 'financeiro')  renderFinanceiro();
+  if (tab === 'historico')   renderHistorico();
+  if (tab === 'confirmados') renderConfirmados();
+}
+
+// ── MASK ──────────────────────────────────────────────────────────────
+function mascaraTel(input) {
+  let v = input.value.replace(/\D/g,'').slice(0,11);
+  if (!v) { input.value=''; return; }
+  if (v.length<=2) v='('+v;
+  else if (v.length<=7) v='('+v.slice(0,2)+') '+v.slice(2);
+  else v='('+v.slice(0,2)+') '+v.slice(2,7)+'-'+v.slice(7);
+  input.value = v;
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+function iniciarApp() {
+  document.getElementById('tel').addEventListener('input', function(){ mascaraTel(this); });
+
+  const old = JSON.parse(localStorage.getItem('registros')||'[]');
+  if (old.length) {
+    old.forEach(item => db.ref('registros').push({
+      nome: item.nome||'', data: item.data||'', tel: item.tel||'',
+      proc: item.proc||'', valor: item.valor||'0.00',
+      pagamento: item.pagamento||'', status: item.status||'Confirmado',
+      horaInicio: item.horaInicio||'', horaFim: item.horaFim||'',
+      criadoEm: new Date().toISOString()
+    }));
+    localStorage.removeItem('registros');
+    toast('Dados migrados com sucesso', 'ok');
+  }
+
+  db.ref('registros').on('value', snap => {
+    registrosData = [];
+    snap.forEach(c => registrosData.push({...c.val(), id: c.key}));
+    registrosData.sort((a,b) => new Date(b.data)-new Date(a.data));
+    renderHistorico();
+  });
+
+  db.ref('agendamentos').on('value', snap => {
+    agendamentosData = [];
+    snap.forEach(c => agendamentosData.push({...c.val(), id: c.key}));
+    agendamentosData.sort((a,b) =>
+      new Date(a.data+'T'+(a.hora||'00:00')+':00') - new Date(b.data+'T'+(b.hora||'00:00')+':00')
+    );
+    renderAgendamentos();
+    renderConfirmados();
+  });
+}
+
+// ── SAVE ──────────────────────────────────────────────────────────────
+function salvarRegistro() {
+  const nome       = document.getElementById('nome').value.trim();
+  const data       = document.getElementById('data').value;
+  const tel        = document.getElementById('tel').value.trim();
+  const proc       = document.getElementById('proc').value;
+  const valor      = document.getElementById('valor').value;
+  const pagamento  = document.getElementById('pagamento').value;
+  const status     = document.getElementById('status').value;
+  const horaInicio = document.getElementById('hora-inicio').value;
+  const horaFim    = document.getElementById('hora-fim').value;
+
+  if (!nome||!data||!proc||!valor||!pagamento) { toast('Preencha os campos obrigatórios','err'); return; }
+  if (tel.replace(/\D/g,'').length>0 && tel.replace(/\D/g,'').length<10) { toast('Telefone inválido','err'); return; }
+
+  const dados = { nome, data, tel, proc, valor: parseFloat(valor).toFixed(2), pagamento, status, horaInicio, horaFim, criadoEm: new Date().toISOString() };
+
+  if (editId) {
+    db.ref('registros/'+editId).set(dados)
+      .then(() => { toast('Registro atualizado','ok'); cancelEdit(); })
+      .catch(() => toast('Erro ao atualizar','err'));
+  } else {
+    db.ref('registros').push(dados)
+      .then(() => {
+        toast('Procedimento anotado','ok');
+        ['nome','data','tel','valor','hora-inicio','hora-fim'].forEach(id => document.getElementById(id).value='');
+        document.getElementById('proc').value='';
+        document.getElementById('pagamento').value='';
+      })
+      .catch(() => toast('Erro ao salvar','err'));
+  }
+}
+
+// ── RENDER UTILS ──────────────────────────────────────────────────────
+function makeRecordRow(opts) {
+  // opts: { id, name, badge, metaItems, price, actions, extra, accent }
+  const meta = opts.metaItems.map(m => `<span>${ICONS[m.icon]||''}${m.text}</span>`).join('');
+  return `
+    <div class="record-row">
+      <div class="record-accent${opts.accent?(' '+opts.accent):''}"></div>
+      <div class="record-main">
+        <div class="record-name">${opts.name}</div>
+        ${opts.badge ? `<div style="margin:4px 0;">${opts.badge}</div>` : ''}
+        <div class="record-meta">${meta}</div>
+        ${opts.extra||''}
+      </div>
+      <div class="record-right">
+        ${opts.price ? `<div class="record-price">R$&nbsp;${opts.price}</div>` : ''}
+        <div class="record-actions">${opts.actions}</div>
+      </div>
+    </div>
+  `;
+}
+function badge(status) {
+  const s = (status||'pendente').toLowerCase();
+  return `<span class="badge badge-${s}"><span class="badge-dot"></span>${status||'Pendente'}</span>`;
+}
+function emptyView(text) {
+  return `<div class="empty-view"><div class="empty-view-icon">${ICONS.scissors}</div><p>${text}</p></div>`;
+}
+function wrapList(rows) {
+  return `<div class="card-list"><div class="card-list-inner">${rows}</div></div>`;
+}
+
+// ── RENDER HISTÓRICO ──────────────────────────────────────────────────
+function renderHistorico() {
+  const el = document.getElementById('lista-historico');
+  if (!registrosData.length) { el.innerHTML = emptyView('Nenhum registro anotado'); return; }
+  el.innerHTML = wrapList(registrosData.map(r => makeRecordRow({
+    id: r.id,
+    accent: r.status==='Confirmado' ? 'green' : '',
+    name: r.nome,
+    badge: badge(r.status),
+    metaItems: [
+      { icon:'cal',     text: fdate(r.data) },
+      ...(r.proc     ? [{icon:'scissors', text: r.proc}] : []),
+      ...(r.tel      ? [{icon:'phone',    text: r.tel}]  : []),
+      ...(r.pagamento? [{icon:'credit',   text: r.pagamento}] : []),
+      ...(r.horaInicio ? [{icon:'clock', text: r.horaInicio+(r.horaFim?'–'+r.horaFim:'')}] : []),
+    ],
+    price: r.valor,
+    actions: `
+      <button class="btn btn-outline btn-sm" onclick="editarRegistro('${r.id}')">Editar</button>
+      <button class="btn btn-danger btn-sm" onclick="deletarRegistro('${r.id}')">Remover</button>
+    `
+  })).join(''));
+}
+
+// ── RENDER AGENDAMENTOS ───────────────────────────────────────────────
+function renderAgendamentos() {
+  const el = document.getElementById('lista-agendamentos');
+  const list = agendamentosData.filter(a => a.status !== 'Confirmado');
+  if (!list.length) { el.innerHTML = emptyView('Nenhum agendamento pendente'); return; }
+  el.innerHTML = wrapList(list.map(a => makeRecordRow({
+    id: a.id,
+    name: a.nome,
+    badge: badge(a.status),
+    metaItems: [
+      { icon:'cal',   text: fdate(a.data)+' às '+(a.hora||'??:??') },
+      ...(a.proc ? [{icon:'scissors', text: a.proc}] : []),
+      ...(a.tel  ? [{icon:'phone',    text: a.tel}]  : []),
+    ],
+    extra: a.anamnese ? `<div class="anamnese-panel" id="anamnese-${a.id}">${buildAnamnese(a.anamnese)}</div>` : '',
+    actions: `
+      <button class="btn btn-confirm btn-sm" onclick="confirmarAgend('${a.id}')">Confirmar</button>
+      ${a.anamnese ? `<button class="btn btn-outline btn-sm" onclick="toggleAnamnese('${a.id}')">Anamnese</button>` : ''}
+      <button class="btn btn-danger btn-sm" onclick="deletarAgend('${a.id}')">Remover</button>
+    `
+  })).join(''));
+}
+
+// ── RENDER CONFIRMADOS ────────────────────────────────────────────────
+function renderConfirmados() {
+  const el = document.getElementById('lista-confirmados');
+  const list = agendamentosData.filter(a => a.status === 'Confirmado');
+  if (!list.length) { el.innerHTML = emptyView('Nenhum agendamento confirmado'); return; }
+  el.innerHTML = wrapList(list.map(a => makeRecordRow({
+    id: a.id,
+    accent: 'green',
+    name: a.nome,
+    badge: badge('Confirmado'),
+    metaItems: [
+      { icon:'cal',   text: fdate(a.data)+' às '+(a.hora||'??:??') },
+      ...(a.proc ? [{icon:'scissors', text: a.proc}] : []),
+      ...(a.tel  ? [{icon:'phone',    text: a.tel}]  : []),
+    ],
+    extra: a.anamnese ? `<div class="anamnese-panel" id="anamnese-${a.id}">${buildAnamnese(a.anamnese)}</div>` : '',
+    price: a.valor||'0.00',
+    actions: `
+      ${a.anamnese ? `<button class="btn btn-outline btn-sm" onclick="toggleAnamnese('${a.id}')">Anamnese</button>` : ''}
+      <button class="btn btn-danger btn-sm" onclick="deletarAgend('${a.id}')">Remover</button>
+    `
+  })).join(''));
+}
+
+// ── ANAMNESE ──────────────────────────────────────────────────────────
+function buildAnamnese(a) {
+  if (!a) return '';
+  const fields = [
+    ['Diabetes',a.diabetes],['Gestante',a.gestante],
+    ['Alergia',a.alergia+(a.alergiaDetalhe?' ('+a.alergiaDetalhe+')':'')],
+    ['Micose',a.micose],
+    ['Medicamento',a.medicamento+(a.medicamentoDetalhe?' ('+a.medicamentoDetalhe+')':'')],
+    ['Unha encravada',a.encravada],['Esporte',a.esporte],
+  ].filter(r=>r[1]);
+  if (!fields.length) return '<p style="font-size:12px;color:#8a5060">Sem dados de anamnese</p>';
+  return `<div class="anamnese-grid">${fields.map(r=>`<div class="anamnese-item"><strong>${r[0]}:</strong> ${r[1]}</div>`).join('')}</div>`;
+}
+
+// ── AÇÕES ─────────────────────────────────────────────────────────────
+window.confirmarAgend = id => {
+  db.ref('agendamentos/'+id).update({status:'Confirmado'})
+    .then(()=>toast('Agendamento confirmado','ok'))
+    .catch(()=>toast('Erro ao confirmar','err'));
+};
+window.deletarAgend = id => {
+  if (!confirm('Remover agendamento?')) return;
+  const a = agendamentosData.find(x=>x.id===id);
+  db.ref('agendamentos/'+id).remove().then(()=>{
+    if (a?.data&&a?.hora) db.ref('horarios_ocupados/'+a.data+'_'+a.hora).remove();
+    toast('Removido');
+  }).catch(()=>toast('Erro','err'));
+};
+window.toggleAnamnese = id => {
+  document.getElementById('anamnese-'+id)?.classList.toggle('open');
+};
+window.editarRegistro = id => {
+  db.ref('registros/'+id).once('value').then(snap=>{
+    const r = snap.val(); if (!r) return;
+    editId = id;
+    document.getElementById('nome').value        = r.nome;
+    document.getElementById('data').value        = r.data;
+    document.getElementById('tel').value         = r.tel||'';
+    document.getElementById('proc').value        = r.proc;
+    document.getElementById('valor').value       = r.valor;
+    document.getElementById('pagamento').value   = r.pagamento||'';
+    document.getElementById('status').value      = r.status||'Confirmado';
+    document.getElementById('hora-inicio').value = r.horaInicio||'';
+    document.getElementById('hora-fim').value    = r.horaFim||'';
+    document.getElementById('btn-label').textContent = 'Salvar Alterações';
+    document.getElementById('btn-submit').style.background = 'linear-gradient(110deg,#1d4ed8,#3b82f6)';
+    document.getElementById('edit-banner').style.display = 'flex';
+    toast('Editando registro');
+    switchTab('anotar', null);
+  });
+};
+window.deletarRegistro = id => {
+  if (!confirm('Remover registro?')) return;
+  db.ref('registros/'+id).remove().then(()=>toast('Removido')).catch(()=>toast('Erro','err'));
+};
+window.cancelEdit = () => {
+  editId = null;
+  document.getElementById('btn-label').textContent = 'Anotar Procedimento';
+  document.getElementById('btn-submit').style.background = '';
+  document.getElementById('edit-banner').style.display = 'none';
+  ['nome','data','tel','valor','hora-inicio','hora-fim'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('proc').value='';
+  document.getElementById('pagamento').value='';
+};
+
+// ── FINANCEIRO ────────────────────────────────────────────────────────
+function renderFinanceiro() {
+  const hoje = new Date();
+  const mesAtual = hoje.toISOString().slice(0,7);
+  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  document.getElementById('fin-month-label').textContent = meses[hoje.getMonth()]+' de '+hoje.getFullYear();
+  const list = registrosData.filter(r=>r.data?.startsWith(mesAtual));
+
+  if (!list.length) {
+    document.getElementById('financeiro-body').innerHTML = emptyView('Nenhum registro este mês');
+    return;
+  }
+
+  const total = list.reduce((s,r)=>s+parseFloat(r.valor||0),0);
+  const count = list.length;
+  const media = total/count;
+  const porProc={}, porPag={};
+  list.forEach(r=>{
+    const p=r.proc||'Outro';
+    porProc[p]=porProc[p]||{qtd:0,v:0}; porProc[p].qtd++; porProc[p].v+=parseFloat(r.valor||0);
+    const pg=r.pagamento||'Não informado';
+    porPag[pg]=porPag[pg]||{qtd:0,v:0}; porPag[pg].qtd++; porPag[pg].v+=parseFloat(r.valor||0);
+  });
+
+  const procRows = Object.keys(porProc).sort((a,b)=>porProc[b].v-porProc[a].v).map(p=>`
+    <div class="breakdown-item">
+      <span class="breakdown-item-name">${p}<span class="breakdown-item-count">(${porProc[p].qtd}x)</span></span>
+      <span class="breakdown-item-val">R$ ${porProc[p].v.toFixed(2)}</span>
+    </div>`).join('');
+
+  const pagRows = Object.keys(porPag).sort((a,b)=>porPag[b].v-porPag[a].v).map(p=>`
+    <div class="breakdown-item">
+      <span class="breakdown-item-name">${p}<span class="breakdown-item-count">(${porPag[p].qtd}x)</span></span>
+      <span class="breakdown-item-val">R$ ${porPag[p].v.toFixed(2)}</span>
+    </div>`).join('');
+
+  document.getElementById('financeiro-body').innerHTML = `
+    <div class="stats-row">
+      <div class="stat-block crimson">
+        <div class="stat-num">R$&nbsp;${total.toFixed(2)}</div>
+        <div class="stat-label">Faturamento</div>
+      </div>
+      <div class="stat-block emerald">
+        <div class="stat-num">${count}</div>
+        <div class="stat-label">Procedimentos</div>
+      </div>
+      <div class="stat-block sapphire">
+        <div class="stat-num">R$&nbsp;${media.toFixed(2)}</div>
+        <div class="stat-label">Ticket Médio</div>
+      </div>
+    </div>
+    <div class="breakdown-wrapper">
+      <div class="breakdown-header">Detalhamento do Mês</div>
+      <div class="breakdown-cols">
+        <div class="breakdown-col">
+          <div class="breakdown-col-title">Por Procedimento</div>
+          ${procRows}
+        </div>
+        <div class="breakdown-col">
+          <div class="breakdown-col-title">Por Pagamento</div>
+          ${pagRows}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+document.addEventListener('click', function(e){
+  if(e.target && e.target.id==='menu-toggle'){
+    const sb=document.querySelector('.sidebar');
+    if(sb) sb.classList.toggle('collapsed');
+  }
+});
+
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+ const btn=document.getElementById('menu-toggle');
+ if(btn){
+   btn.onclick=function(){
+      const sb=document.querySelector('.sidebar');
+      if(sb) sb.classList.toggle('hidden');
+   }
+ }
+});
+</script>
+</body>
+
+</html>
