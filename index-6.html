@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio Emilly Santos</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --crimson:     #c9184a;
+  --crimson-d:   #a01435;
+  --crimson-dd:  #7a0d27;
+  --rose:        #ff6b8a;
+  --blush:       #fde8ee;
+  --blush-deep:  #fbd5e0;
+  --bg:          #faf7f8;
+  --surface:     #ffffff;
+  --surface2:    #fff5f7;
+  --text:        #1c0a10;
+  --text2:       #5a3040;
+  --muted:       #9d7080;
+  --border:      #f0dde3;
+  --success:     #0d9965;
+  --warn:        #d97706;
+  --danger:      #dc2626;
+  --shadow-sm:   0 1px 3px rgba(160,20,53,.08), 0 1px 2px rgba(160,20,53,.04);
+  --shadow:      0 4px 16px rgba(160,20,53,.10), 0 2px 6px rgba(160,20,53,.06);
+  --shadow-lg:   0 20px 48px rgba(160,20,53,.14), 0 8px 20px rgba(160,20,53,.08);
+  --radius:      16px;
+  --radius-sm:   10px;
+  --radius-xs:   6px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── LOADING ─────────────────────────────────── */
+#loading-screen {
+  position: fixed; inset: 0; z-index: 9999;
+  background: linear-gradient(135deg, var(--crimson-dd), var(--crimson));
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 20px;
+}
+.loader-monogram {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: rgba(255,255,255,.12);
+  border: 2px solid rgba(255,255,255,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 28px; color: #fff; letter-spacing: 1px;
+  animation: breathe 2s ease-in-out infinite;
+  backdrop-filter: blur(8px);
+}
+.loader-bar {
+  width: 160px; height: 2px;
+  background: rgba(255,255,255,.2);
+  border-radius: 99px; overflow: hidden;
+}
+.loader-fill {
+  height: 100%; width: 0;
+  background: rgba(255,255,255,.8);
+  border-radius: 99px;
+  animation: loadfill 1.8s ease-out forwards;
+}
+.loader-txt { font-size: 12px; color: rgba(255,255,255,.65); letter-spacing: 2px; text-transform: uppercase; }
+@keyframes breathe { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.06);opacity:.85} }
+@keyframes loadfill { to{width:100%} }
+
+/* ─── APP SHELL ───────────────────────────────── */
+#app { display: none; flex-direction: column; min-height: 100vh; }
+
+/* ─── HEADER ──────────────────────────────────── */
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: linear-gradient(135deg, var(--crimson-dd) 0%, var(--crimson) 60%, var(--rose) 100%);
+  padding: 0 24px;
+  height: 68px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 4px 20px rgba(160,20,53,.25);
+}
+.header-brand { display: flex; align-items: center; gap: 14px; }
+.header-mono {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,.15);
+  border: 1.5px solid rgba(255,255,255,.35);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif; font-size: 15px; color: #fff;
+  flex-shrink: 0;
+}
+.header-title { color: #fff; }
+.header-title h1 { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; line-height: 1.2; }
+.header-title p { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; opacity: .7; margin-top: 1px; }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.header-date { font-size: 12px; color: rgba(255,255,255,.7); letter-spacing: .5px; }
+#btn-logout {
+  background: rgba(255,255,255,.12);
+  border: 1.5px solid rgba(255,255,255,.3);
+  color: rgba(255,255,255,.9);
+  padding: 7px 16px; border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: background .2s;
+  white-space: nowrap;
+}
+#btn-logout:hover { background: rgba(255,255,255,.22); }
+
+/* ─── NAV TABS ────────────────────────────────── */
+.nav-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex; gap: 0;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  max-width: 900px; margin: 0 auto; width: 100%;
+  /* let it go edge to edge on mobile */
+  max-width: 100%;
+}
+.nav-bar::-webkit-scrollbar { display: none; }
+.nav-wrap { background: var(--surface); border-bottom: 1px solid var(--border); }
+
+.tab-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 16px 18px 14px;
+  border: none; background: none;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+  color: var(--muted);
+  cursor: pointer; white-space: nowrap;
+  border-bottom: 2.5px solid transparent;
+  transition: color .2s, border-color .2s;
+  flex-shrink: 0;
+}
+.tab-btn .tab-icon { font-size: 15px; opacity: .7; }
+.tab-btn.active { color: var(--crimson); border-bottom-color: var(--crimson); }
+.tab-btn:hover:not(.active) { color: var(--text2); }
+
+/* ─── MAIN CONTENT ────────────────────────────── */
+main {
+  flex: 1; padding: 28px 24px 60px;
+  max-width: 800px; margin: 0 auto; width: 100%;
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeUp .3s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+/* ─── SECTION HEADING ─────────────────────────── */
+.section-heading {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+.section-heading h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 600;
+  color: var(--text);
+}
+.section-heading p { font-size: 13px; color: var(--muted); margin-top: 3px; }
+
+/* ─── FORM CARD ───────────────────────────────── */
+.form-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.form-card-header {
+  background: linear-gradient(135deg, var(--crimson-dd), var(--crimson));
+  padding: 20px 24px;
+  display: flex; align-items: center; gap: 12px;
+}
+.form-card-header .icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: rgba(255,255,255,.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.form-card-header h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px; color: #fff; font-weight: 600;
+}
+.form-card-header p { font-size: 12px; color: rgba(255,255,255,.7); margin-top: 2px; }
+.form-card-body { padding: 24px; }
+
+/* ─── FORM ELEMENTS ───────────────────────────── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+.form-col-full { grid-column: 1 / -1; }
+
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field label {
+  font-size: 11px; font-weight: 600; letter-spacing: .8px;
+  text-transform: uppercase; color: var(--text2);
+}
+.field input, .field select {
+  width: 100%; padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif; font-size: 14px;
+  color: var(--text); background: var(--surface2);
+  transition: border-color .2s, box-shadow .2s;
+  appearance: none; -webkit-appearance: none;
+}
+.field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239d7080' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+.field input:focus, .field select:focus {
+  outline: none; border-color: var(--crimson);
+  box-shadow: 0 0 0 3px rgba(201,24,74,.1);
+  background: #fff;
+}
+.field input::placeholder { color: #c8a0ab; }
+
+/* ─── BUTTONS ─────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 11px 20px; border: none; border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .2s; white-space: nowrap;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--crimson-d), var(--crimson));
+  color: #fff; width: 100%; padding: 14px; font-size: 14px;
+  box-shadow: 0 4px 14px rgba(201,24,74,.35);
+  margin-top: 8px;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,24,74,.45); }
+.btn-primary:active { transform: translateY(0); }
+.btn-ghost {
+  background: transparent; color: var(--crimson);
+  border: 1.5px solid var(--border); padding: 8px 14px;
+}
+.btn-ghost:hover { border-color: var(--crimson); background: var(--blush); }
+.btn-confirm {
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: #fff; padding: 8px 14px;
+  box-shadow: 0 2px 8px rgba(16,185,129,.3);
+}
+.btn-confirm:hover { transform: translateY(-1px); }
+.btn-del {
+  background: #fff0f0; color: var(--danger);
+  border: 1.5px solid #fecaca; padding: 8px 14px;
+}
+.btn-del:hover { background: #fee2e2; }
+.btn-sm { padding: 7px 12px; font-size: 12px; border-radius: 8px; }
+
+/* ─── ENTRIES LIST ────────────────────────────── */
+.entries-list { display: flex; flex-direction: column; gap: 10px; }
+
+.entry {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow .2s, transform .15s;
+  position: relative; overflow: hidden;
+}
+.entry::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--crimson-d), var(--rose));
+  border-radius: 4px 0 0 4px;
+}
+.entry.confirmed::before {
+  background: linear-gradient(180deg, #059669, #34d399);
+}
+.entry:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+
+.entry-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.entry-left { flex: 1; min-width: 0; }
+.entry-name { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.3; }
+.entry-meta { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.6; }
+.entry-price {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 600; color: var(--crimson);
+  white-space: nowrap; flex-shrink: 0;
+}
+.entry-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* ─── STATUS BADGE ────────────────────────────── */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 99px;
+  font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.badge-pendente   { background: #fef3c7; color: #92400e; }
+.badge-confirmado { background: #d1fae5; color: #065f46; }
+.badge-cancelado  { background: #fee2e2; color: #991b1b; }
+.badge-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+/* ─── ANAMNESE ────────────────────────────────── */
+.anamnese-box {
+  background: var(--blush); border-radius: var(--radius-sm);
+  padding: 10px 14px; margin-top: 8px;
+  font-size: 12px; color: var(--text2);
+  border: 1px solid var(--blush-deep);
+  display: none;
+}
+.anamnese-box.show { display: block; }
+.anamnese-row { display: flex; gap: 8px; padding: 3px 0; border-bottom: 1px solid rgba(201,24,74,.08); }
+.anamnese-row:last-child { border-bottom: none; }
+.anamnese-label { font-weight: 600; min-width: 110px; color: var(--text2); }
+
+/* ─── STAT CARDS ──────────────────────────────── */
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+.stat-card::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+}
+.stat-card.pink::after  { background: linear-gradient(90deg, var(--crimson-d), var(--rose)); }
+.stat-card.green::after { background: linear-gradient(90deg, #059669, #34d399); }
+.stat-card.blue::after  { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+.stat-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px; font-weight: 700; line-height: 1.1;
+  margin-bottom: 5px;
+}
+.stat-card.pink  .stat-val { color: var(--crimson); }
+.stat-card.green .stat-val { color: #059669; }
+.stat-card.blue  .stat-val { color: #2563eb; }
+.stat-label { font-size: 11px; color: var(--muted); font-weight: 500; letter-spacing: .5px; text-transform: uppercase; }
+
+/* ─── FINANCEIRO BREAKDOWNS ───────────────────── */
+.breakdown-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.breakdown-section h4 { font-size: 12px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.breakdown-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 9px 0; border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.breakdown-row:last-child { border-bottom: none; }
+.breakdown-name { color: var(--text2); }
+.breakdown-count { font-size: 11px; color: var(--muted); margin-left: 4px; }
+.breakdown-amount { font-weight: 600; color: var(--text); }
+
+/* ─── EMPTY STATE ─────────────────────────────── */
+.empty-state {
+  text-align: center; padding: 60px 20px;
+  color: var(--muted);
+}
+.empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; opacity: .4; }
+.empty-state p { font-size: 14px; }
+
+/* ─── TOAST ───────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 28px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--text);
+  color: #fff; padding: 12px 22px;
+  border-radius: 10px; font-size: 13px; font-weight: 500;
+  z-index: 9999; animation: toastIn .35s cubic-bezier(.34,1.56,.64,1);
+  box-shadow: 0 8px 24px rgba(0,0,0,.2);
+  white-space: nowrap;
+}
+.toast.success { background: linear-gradient(135deg, #059669, #10b981); }
+.toast.error { background: linear-gradient(135deg, #dc2626, #ef4444); }
+@keyframes toastIn { from{opacity:0;transform:translateX(-50%) translateY(16px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+
+/* ─── DIVIDER ─────────────────────────────────── */
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+/* ─── RESPONSIVE ──────────────────────────────── */
+@media (max-width: 640px) {
+  main { padding: 16px 14px 60px; }
+  .form-grid, .form-grid.three { grid-template-columns: 1fr; }
+  .form-col-full { grid-column: 1; }
+  .stats-grid { grid-template-columns: 1fr; gap: 10px; }
+  .breakdown-grid { grid-template-columns: 1fr; }
+  header { padding: 0 16px; }
+  .header-date { display: none; }
+  .tab-btn { padding: 14px 12px; font-size: 12px; }
+  .tab-btn .tab-label { display: none; }
+  .tab-btn .tab-icon { font-size: 18px; opacity: 1; }
+  .entry-top { flex-direction: column; }
+  .entry-price { font-size: 16px; }
+  .form-card-body { padding: 16px; }
+  .section-heading h2 { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+<!-- Loading -->
+<div id="loading-screen">
+  <div class="loader-monogram">ES</div>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+  <p class="loader-txt">Carregando painel...</p>
+</div>
+
+<!-- App -->
+<div id="app" style="display:none; flex-direction:column; min-height:100vh;">
+
+  <header>
+    <div class="header-brand">
+      <div class="header-mono">ES</div>
+      <div class="header-title">
+        <h1>Studio Emilly Santos</h1>
+        <p>Painel de Controle</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="header-date" id="header-date"></span>
+      <button id="btn-logout" onclick="logout()">Sair</button>
+    </div>
+  </header>
+
+  <div class="nav-wrap">
+    <div class="nav-bar">
+      <button class="tab-btn active" onclick="switchTab('anotar',this)">
+        <span class="tab-icon">✏️</span><span class="tab-label">Anotar</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('historico',this)">
+        <span class="tab-icon">📋</span><span class="tab-label">Histórico</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('agendamentos',this)">
+        <span class="tab-icon">📅</span><span class="tab-label">Agendamentos</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('confirmados',this)">
+        <span class="tab-icon">✅</span><span class="tab-label">Confirmados</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('financeiro',this)">
+        <span class="tab-icon">💰</span><span class="tab-label">Financeiro</span>
+      </button>
+    </div>
+  </div>
+
+  <main>
+
+    <!-- ABA ANOTAR -->
+    <div class="tab-content active" id="tab-anotar">
+      <div class="section-heading">
+        <div>
+          <h2>Registrar Procedimento</h2>
+          <p>Preencha os dados do atendimento</p>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="icon">✏️</div>
+          <div>
+            <h3>Novo Registro</h3>
+            <p>Todos os campos marcados são obrigatórios</p>
+          </div>
+        </div>
+        <div class="form-card-body">
+          <div class="form-grid">
+            <div class="field form-col-full">
+              <label>Nome da Cliente *</label>
+              <input type="text" id="nome" placeholder="Nome completo">
+            </div>
+            <div class="field">
+              <label>Data *</label>
+              <input type="date" id="data">
+            </div>
+            <div class="field">
+              <label>Telefone</label>
+              <input type="tel" id="tel" placeholder="(11) 99999-9999">
+            </div>
+            <div class="field">
+              <label>Procedimento *</label>
+              <select id="proc">
+                <option value="">Selecione</option>
+                <option>Manicure</option>
+                <option>Pedicure</option>
+                <option>Unhas Postiças</option>
+                <option>Design de Sobrancelha</option>
+                <option>Pé</option>
+                <option>Mão</option>
+                <option>Pé e mão</option>
+                <option>SPA dos pés</option>
+                <option>Postiça simples</option>
+                <option>Postiça decorada</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Valor (R$) *</label>
+              <input type="number" id="valor" placeholder="0,00" step="0.01" min="0">
+            </div>
+            <div class="field">
+              <label>Forma de Pagamento *</label>
+              <select id="pagamento">
+                <option value="">Selecione</option>
+                <option>Dinheiro</option>
+                <option>PIX</option>
+                <option>Cartão</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Status</label>
+              <select id="status">
+                <option value="Confirmado">Confirmado</option>
+                <option value="Pendente">Pendente</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Horário Início</label>
+              <input type="time" id="hora-inicio">
+            </div>
+            <div class="field">
+              <label>Horário Fim</label>
+              <input type="time" id="hora-fim">
+            </div>
+          </div>
+          <div id="edit-banner" style="display:none; background:var(--blush); border:1px solid var(--blush-deep); border-radius:8px; padding:10px 14px; margin-top:14px; font-size:13px; color:var(--crimson); display:none; align-items:center; justify-content:space-between;">
+            <span>✏️ Modo de edição ativo</span>
+            <button class="btn btn-ghost btn-sm" onclick="cancelEdit()">Cancelar</button>
+          </div>
+          <button class="btn btn-primary" id="btn-submit" onclick="salvarRegistro()">
+            <span id="btn-submit-icon">✓</span>
+            <span id="btn-submit-label">Anotar Procedimento</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA HISTÓRICO -->
+    <div class="tab-content" id="tab-historico">
+      <div class="section-heading">
+        <div>
+          <h2>Histórico</h2>
+          <p>Todos os procedimentos registrados</p>
+        </div>
+      </div>
+      <div class="entries-list" id="lista-historico">
+        <div class="empty-state"><div class="empty-icon">📋</div><p>Nenhum registro anotado</p></div>
+      </div>
+    </div>
+
+    <!-- ABA AGENDAMENTOS -->
+    <div class="tab-content" id="tab-agendamentos">
+      <div class="section-heading">
+        <div>
+          <h2>Agendamentos</h2>
+          <p>Solicitações pendentes de confirmação</p>
+        </div>
+      </div>
+      <div class="entries-list" id="lista-agendamentos">
+        <div class="empty-state"><div class="empty-icon">📅</div><p>Nenhum agendamento pendente</p></div>
+      </div>
+    </div>
+
+    <!-- ABA CONFIRMADOS -->
+    <div class="tab-content" id="tab-confirmados">
+      <div class="section-heading">
+        <div>
+          <h2>Confirmados</h2>
+          <p>Agendamentos já confirmados</p>
+        </div>
+      </div>
+      <div class="entries-list" id="lista-confirmados">
+        <div class="empty-state"><div class="empty-icon">✅</div><p>Nenhum agendamento confirmado</p></div>
+      </div>
+    </div>
+
+    <!-- ABA FINANCEIRO -->
+    <div class="tab-content" id="tab-financeiro">
+      <div class="section-heading">
+        <div>
+          <h2>Financeiro</h2>
+          <p id="fin-month-label">Resumo do mês atual</p>
+        </div>
+      </div>
+      <div id="financeiro-body"></div>
+    </div>
+
+  </main>
+</div><!-- /app -->
+
+<script>
+// ── FIREBASE CONFIG ──────────────────────────────────────────────────
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyALLJn7hEnTxvTN2SNVzkAEs1HAwUG24hE",
+  authDomain: "studio-emilly.firebaseapp.com",
+  databaseURL: "https://studio-emilly-default-rtdb.firebaseio.com",
+  projectId: "studio-emilly",
+  storageBucket: "studio-emilly.appspot.com",
+  messagingSenderId: "130072077830",
+  appId: "1:130072077830:web:694aa5bb37307dae260587"
+};
+firebase.initializeApp(FIREBASE_CONFIG);
+const auth = firebase.auth();
+const db   = firebase.database();
+
+// ── DATE HEADER ──────────────────────────────────────────────────────
+(function() {
+  const d = new Date();
+  const days = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  document.getElementById('header-date').textContent =
+    days[d.getDay()] + ', ' + d.getDate() + ' ' + months[d.getMonth()];
+})();
+
+// ── AUTH GUARD ───────────────────────────────────────────────────────
+auth.onAuthStateChanged(function(user) {
+  document.getElementById('loading-screen').style.display = 'none';
+  if (!user) {
+    window.location.replace('/login.html');
+  } else {
+    const app = document.getElementById('app');
+    app.style.display = 'flex';
+    iniciarApp();
+  }
+});
+
+function logout() {
+  auth.signOut().then(() => window.location.replace('/login.html'));
+}
+
+// ── GLOBALS ──────────────────────────────────────────────────────────
+let editId = null;
+let registrosData = [];
+let agendamentosData = [];
+
+// ── UTILS ─────────────────────────────────────────────────────────────
+function formatDateBR(s) {
+  if (!s) return '—';
+  const p = s.split('-');
+  return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : '—';
+}
+
+function toast(msg, type = '') {
+  const el = document.createElement('div');
+  el.className = 'toast' + (type ? ' ' + type : '');
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2600);
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (tab === 'financeiro') renderFinanceiro();
+  if (tab === 'historico')  renderHistorico();
+  if (tab === 'confirmados') renderConfirmados();
+}
+
+// ── TEL MASK ──────────────────────────────────────────────────────────
+function mascaraTel(input) {
+  let v = input.value.replace(/\D/g, '').slice(0, 11);
+  if (!v) { input.value = ''; return; }
+  if (v.length <= 2) v = '(' + v;
+  else if (v.length <= 7) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
+  else v = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7);
+  input.value = v;
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+function iniciarApp() {
+  document.getElementById('tel').addEventListener('input', function() { mascaraTel(this); });
+
+  // Migrar localStorage antigo
+  const old = JSON.parse(localStorage.getItem('registros') || '[]');
+  if (old.length) {
+    old.forEach(item => db.ref('registros').push({
+      nome: item.nome||'', data: item.data||'', tel: item.tel||'',
+      proc: item.proc||'', valor: item.valor||'0.00',
+      pagamento: item.pagamento||'', status: item.status||'Confirmado',
+      horaInicio: item.horaInicio||'', horaFim: item.horaFim||'',
+      criadoEm: new Date().toISOString()
+    }));
+    localStorage.removeItem('registros');
+    toast('Dados migrados com sucesso!', 'success');
+  }
+
+  db.ref('registros').on('value', snap => {
+    registrosData = [];
+    snap.forEach(c => registrosData.push({ ...c.val(), id: c.key }));
+    registrosData.sort((a,b) => new Date(b.data) - new Date(a.data));
+    renderHistorico();
+  });
+
+  db.ref('agendamentos').on('value', snap => {
+    agendamentosData = [];
+    snap.forEach(c => agendamentosData.push({ ...c.val(), id: c.key }));
+    agendamentosData.sort((a,b) =>
+      new Date(a.data+'T'+(a.hora||'00:00')+':00') - new Date(b.data+'T'+(b.hora||'00:00')+':00')
+    );
+    renderAgendamentos();
+    renderConfirmados();
+  });
+}
+
+// ── SAVE ──────────────────────────────────────────────────────────────
+function salvarRegistro() {
+  const nome       = document.getElementById('nome').value.trim();
+  const data       = document.getElementById('data').value;
+  const tel        = document.getElementById('tel').value.trim();
+  const proc       = document.getElementById('proc').value;
+  const valor      = document.getElementById('valor').value;
+  const pagamento  = document.getElementById('pagamento').value;
+  const status     = document.getElementById('status').value;
+  const horaInicio = document.getElementById('hora-inicio').value;
+  const horaFim    = document.getElementById('hora-fim').value;
+
+  if (!nome || !data || !proc || !valor || !pagamento) {
+    toast('Preencha os campos obrigatórios', 'error'); return;
+  }
+  const digits = tel.replace(/\D/g,'');
+  if (digits.length > 0 && digits.length < 10) {
+    toast('Telefone inválido', 'error'); return;
+  }
+
+  const dados = { nome, data, tel, proc,
+    valor: parseFloat(valor).toFixed(2),
+    pagamento, status, horaInicio, horaFim,
+    criadoEm: new Date().toISOString()
+  };
+
+  if (editId) {
+    db.ref('registros/' + editId).set(dados)
+      .then(() => { toast('Atualizado!', 'success'); cancelEdit(); })
+      .catch(() => toast('Erro ao atualizar', 'error'));
+  } else {
+    db.ref('registros').push(dados)
+      .then(() => {
+        toast('Anotado com sucesso!', 'success');
+        ['nome','data','tel','valor','hora-inicio','hora-fim'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('proc').value = '';
+        document.getElementById('pagamento').value = '';
+      })
+      .catch(() => toast('Erro ao salvar', 'error'));
+  }
+}
+
+// ── RENDER HISTÓRICO ──────────────────────────────────────────────────
+function renderHistorico() {
+  const container = document.getElementById('lista-historico');
+  if (!registrosData.length) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>Nenhum registro anotado</p></div>';
+    return;
+  }
+  container.innerHTML = registrosData.map(r => `
+    <div class="entry${r.status==='Confirmado'?' confirmed':''}">
+      <span class="badge badge-${(r.status||'pendente').toLowerCase()}">
+        <span class="badge-dot"></span>${r.status||'Pendente'}
+      </span>
+      <div class="entry-top">
+        <div class="entry-left">
+          <div class="entry-name">${r.nome}</div>
+          <div class="entry-meta">
+            📅 ${formatDateBR(r.data)}${r.proc?' &nbsp;·&nbsp; '+r.proc:''}${r.tel?' &nbsp;·&nbsp; 📱 '+r.tel:''}${r.pagamento?' &nbsp;·&nbsp; 💳 '+r.pagamento:''}${r.horaInicio?' &nbsp;·&nbsp; 🕐 '+r.horaInicio+(r.horaFim?'–'+r.horaFim:''):''}
+          </div>
+        </div>
+        <div class="entry-price">R$&nbsp;${r.valor}</div>
+      </div>
+      <div class="entry-actions">
+        <button class="btn btn-ghost btn-sm" onclick="editarRegistro('${r.id}')">✏️ Editar</button>
+        <button class="btn btn-del btn-sm" onclick="deletarRegistro('${r.id}')">✕ Remover</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── RENDER AGENDAMENTOS ───────────────────────────────────────────────
+function renderAgendamentos() {
+  const container = document.getElementById('lista-agendamentos');
+  const list = agendamentosData.filter(a => a.status !== 'Confirmado');
+  if (!list.length) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>Nenhum agendamento pendente</p></div>';
+    return;
+  }
+  container.innerHTML = list.map(a => `
+    <div class="entry">
+      <span class="badge badge-${(a.status||'pendente').toLowerCase()}">
+        <span class="badge-dot"></span>${a.status||'Pendente'}
+      </span>
+      <div class="entry-top">
+        <div class="entry-left">
+          <div class="entry-name">${a.nome}</div>
+          <div class="entry-meta">
+            📅 ${formatDateBR(a.data)} às ${a.hora||'??:??'}${a.proc?' &nbsp;·&nbsp; '+a.proc:''}${a.tel?' &nbsp;·&nbsp; 📱 '+a.tel:''}
+          </div>
+        </div>
+      </div>
+      ${a.anamnese ? `<div class="anamnese-box" id="anamnese-${a.id}">${buildAnamnese(a.anamnese)}</div>` : ''}
+      <div class="entry-actions">
+        <button class="btn btn-confirm btn-sm" onclick="confirmarAgend('${a.id}')">✓ Confirmar</button>
+        ${a.anamnese ? `<button class="btn btn-ghost btn-sm" onclick="toggleAnamnese('${a.id}')">📋 Anamnese</button>` : ''}
+        <button class="btn btn-del btn-sm" onclick="deletarAgend('${a.id}')">✕ Remover</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── RENDER CONFIRMADOS ────────────────────────────────────────────────
+function renderConfirmados() {
+  const container = document.getElementById('lista-confirmados');
+  const list = agendamentosData.filter(a => a.status === 'Confirmado');
+  if (!list.length) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><p>Nenhum agendamento confirmado</p></div>';
+    return;
+  }
+  container.innerHTML = list.map(a => `
+    <div class="entry confirmed">
+      <span class="badge badge-confirmado"><span class="badge-dot"></span>Confirmado</span>
+      <div class="entry-top">
+        <div class="entry-left">
+          <div class="entry-name">${a.nome}</div>
+          <div class="entry-meta">
+            📅 ${formatDateBR(a.data)} às ${a.hora||'??:??'}${a.proc?' &nbsp;·&nbsp; '+a.proc:''}${a.tel?' &nbsp;·&nbsp; 📱 '+a.tel:''}
+          </div>
+        </div>
+        <div class="entry-price">R$&nbsp;${a.valor||'0.00'}</div>
+      </div>
+      ${a.anamnese ? `<div class="anamnese-box" id="anamnese-${a.id}">${buildAnamnese(a.anamnese)}</div>` : ''}
+      <div class="entry-actions">
+        ${a.anamnese ? `<button class="btn btn-ghost btn-sm" onclick="toggleAnamnese('${a.id}')">📋 Anamnese</button>` : ''}
+        <button class="btn btn-del btn-sm" onclick="deletarAgend('${a.id}')">✕ Remover</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── BUILD ANAMNESE ────────────────────────────────────────────────────
+function buildAnamnese(a) {
+  if (!a) return '';
+  return [
+    ['Diabetes', a.diabetes],
+    ['Gestante', a.gestante],
+    ['Alergia', a.alergia+(a.alergiaDetalhe?' ('+a.alergiaDetalhe+')':'')],
+    ['Micose', a.micose],
+    ['Medicamento', a.medicamento+(a.medicamentoDetalhe?' ('+a.medicamentoDetalhe+')':'')],
+    ['Unha encravada', a.encravada],
+    ['Esporte', a.esporte],
+  ].filter(r => r[1]).map(r =>
+    `<div class="anamnese-row"><span class="anamnese-label">${r[0]}:</span>${r[1]}</div>`
+  ).join('');
+}
+
+// ── AÇÕES ─────────────────────────────────────────────────────────────
+window.confirmarAgend = id => {
+  db.ref('agendamentos/'+id).update({ status:'Confirmado' })
+    .then(() => toast('Confirmado!','success'))
+    .catch(() => toast('Erro ao confirmar','error'));
+};
+window.deletarAgend = id => {
+  if (!confirm('Remover agendamento?')) return;
+  const a = agendamentosData.find(x => x.id===id);
+  db.ref('agendamentos/'+id).remove().then(() => {
+    if (a?.data && a?.hora) db.ref('horarios_ocupados/'+a.data+'_'+a.hora).remove();
+    toast('Removido!');
+  }).catch(() => toast('Erro ao remover','error'));
+};
+window.toggleAnamnese = id => {
+  document.getElementById('anamnese-'+id)?.classList.toggle('show');
+};
+window.editarRegistro = id => {
+  db.ref('registros/'+id).once('value').then(snap => {
+    const r = snap.val(); if (!r) return;
+    editId = id;
+    document.getElementById('nome').value        = r.nome;
+    document.getElementById('data').value        = r.data;
+    document.getElementById('tel').value         = r.tel||'';
+    document.getElementById('proc').value        = r.proc;
+    document.getElementById('valor').value       = r.valor;
+    document.getElementById('pagamento').value   = r.pagamento||'';
+    document.getElementById('status').value      = r.status||'Confirmado';
+    document.getElementById('hora-inicio').value = r.horaInicio||'';
+    document.getElementById('hora-fim').value    = r.horaFim||'';
+    document.getElementById('btn-submit-label').textContent = 'Atualizar Registro';
+    document.getElementById('btn-submit-icon').textContent  = '↑';
+    document.getElementById('btn-submit').style.background  = 'linear-gradient(135deg,#1d4ed8,#3b82f6)';
+    const banner = document.getElementById('edit-banner');
+    banner.style.display = 'flex';
+    toast('Editando registro...');
+    switchTab('anotar', document.querySelectorAll('.tab-btn')[0]);
+  });
+};
+window.deletarRegistro = id => {
+  if (!confirm('Remover registro?')) return;
+  db.ref('registros/'+id).remove().then(() => toast('Removido!')).catch(() => toast('Erro','error'));
+};
+window.cancelEdit = () => {
+  editId = null;
+  document.getElementById('btn-submit-label').textContent = 'Anotar Procedimento';
+  document.getElementById('btn-submit-icon').textContent  = '✓';
+  document.getElementById('btn-submit').style.background  = '';
+  document.getElementById('edit-banner').style.display    = 'none';
+  ['nome','data','tel','valor','hora-inicio','hora-fim'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('proc').value = '';
+  document.getElementById('pagamento').value = '';
+};
+
+// ── FINANCEIRO ────────────────────────────────────────────────────────
+function renderFinanceiro() {
+  const hoje = new Date();
+  const mesAtual = hoje.toISOString().slice(0,7);
+  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  document.getElementById('fin-month-label').textContent = meses[hoje.getMonth()] + ' de ' + hoje.getFullYear();
+  const registrosMes = registrosData.filter(r => r.data?.startsWith(mesAtual));
+
+  if (!registrosMes.length) {
+    document.getElementById('financeiro-body').innerHTML =
+      '<div class="empty-state"><div class="empty-icon">💰</div><p>Nenhum registro este mês</p></div>';
+    return;
+  }
+
+  const total = registrosMes.reduce((s,r) => s + parseFloat(r.valor||0), 0);
+  const count = registrosMes.length;
+  const media = total / count;
+  const porProc = {}, porPag = {};
+  registrosMes.forEach(r => {
+    const p = r.proc||'Outro';
+    porProc[p] = porProc[p]||{qtd:0,valor:0};
+    porProc[p].qtd++; porProc[p].valor += parseFloat(r.valor||0);
+    const pg = r.pagamento||'Não informado';
+    porPag[pg] = porPag[pg]||{qtd:0,valor:0};
+    porPag[pg].qtd++; porPag[pg].valor += parseFloat(r.valor||0);
+  });
+
+  const procHTML = Object.keys(porProc).sort((a,b)=>porProc[b].valor-porProc[a].valor).map(p => `
+    <div class="breakdown-row">
+      <span class="breakdown-name">${p} <span class="breakdown-count">(${porProc[p].qtd}x)</span></span>
+      <span class="breakdown-amount">R$ ${porProc[p].valor.toFixed(2)}</span>
+    </div>`).join('');
+
+  const pagHTML = Object.keys(porPag).sort((a,b)=>porPag[b].valor-porPag[a].valor).map(p => `
+    <div class="breakdown-row">
+      <span class="breakdown-name">${p} <span class="breakdown-count">(${porPag[p].qtd}x)</span></span>
+      <span class="breakdown-amount">R$ ${porPag[p].valor.toFixed(2)}</span>
+    </div>`).join('');
+
+  document.getElementById('financeiro-body').innerHTML = `
+    <div class="stats-grid">
+      <div class="stat-card pink">
+        <div class="stat-val">R$&nbsp;${total.toFixed(2)}</div>
+        <div class="stat-label">Faturamento</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-val">${count}</div>
+        <div class="stat-label">Procedimentos</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-val">R$&nbsp;${media.toFixed(2)}</div>
+        <div class="stat-label">Ticket Médio</div>
+      </div>
+    </div>
+    <div class="form-card">
+      <div class="form-card-body">
+        <div class="breakdown-grid">
+          <div class="breakdown-section">
+            <h4>Por Procedimento</h4>
+            ${procHTML}
+          </div>
+          <div class="breakdown-section">
+            <h4>Por Pagamento</h4>
+            ${pagHTML}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+</script>
+</body>
+</html>
