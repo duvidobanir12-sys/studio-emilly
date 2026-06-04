@@ -351,7 +351,7 @@ body {
   font-family: 'Cormorant Garamond', serif;
   font-size: 20px; font-weight: 600; color: var(--c);
   letter-spacing: .5px;
-}
+; font-feature-settings: "lnum"; font-variant-numeric: lining-nums}
 
 .record-actions { display: flex; gap: 6px; }
 
@@ -399,10 +399,10 @@ body {
   font-family: 'Cormorant Garamond', serif;
   font-size: 32px; font-weight: 600; line-height: 1;
   margin-bottom: 6px;
-}
-.stat-block.crimson  .stat-num { color: var(--c); }
-.stat-block.emerald  .stat-num { color: #0c6b39; }
-.stat-block.sapphire .stat-num { color: #1345a0; }
+; font-feature-settings: "lnum"; font-variant-numeric: lining-nums}
+.stat-block.crimson  .stat-num { color: var(--c); ; font-feature-settings: "lnum"; font-variant-numeric: lining-nums}
+.stat-block.emerald  .stat-num { color: #0c6b39; ; font-feature-settings: "lnum"; font-variant-numeric: lining-nums}
+.stat-block.sapphire .stat-num { color: #1345a0; ; font-feature-settings: "lnum"; font-variant-numeric: lining-nums}
 .stat-label { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--ink3); }
 
 /* ─── BREAKDOWN ───────────────────────────── */
@@ -431,7 +431,7 @@ body {
 .breakdown-item:last-child { border-bottom: none; }
 .breakdown-item-name { font-size: 13.5px; color: var(--ink2); }
 .breakdown-item-count { font-size: 11px; color: var(--ink3); margin-left: 4px; }
-.breakdown-item-val { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.breakdown-item-val { font-size: 13.5px; font-weight: 600; color: var(--ink); ; font-feature-settings: "lnum"; font-variant-numeric: lining-nums}
 
 /* ─── EMPTY ───────────────────────────────── */
 .empty-view {
