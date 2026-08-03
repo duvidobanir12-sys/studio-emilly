@@ -665,36 +665,6 @@ function initTestMode() {
 }
 
 // ══════════════════════════════════════════════════════
-// FIREBASE VIA SCRIPT TAGS
-// ══════════════════════════════════════════════════════
-
-function loadFirebaseViaScriptTags() {
-  console.log('[Studio] Carregando Firebase via <script> tags...');
-
-  var appScript = document.createElement('script');
-  appScript.src = 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-  appScript.onload = function() {
-    console.log('[Studio] firebase-app.js carregado via script tag');
-    var dbScript = document.createElement('script');
-    dbScript.src = 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
-    dbScript.onload = function() {
-      console.log('[Studio] firebase-database.js carregado via script tag');
-      initFirebaseWithSDK();
-    };
-    dbScript.onerror = function() {
-      console.error('[Studio] Erro ao carregar firebase-database.js via script tag');
-      initFirebaseREST();
-    };
-    document.head.appendChild(dbScript);
-  };
-  appScript.onerror = function() {
-    console.error('[Studio] Erro ao carregar firebase-app.js via script tag');
-    initFirebaseREST();
-  };
-  document.head.appendChild(appScript);
-}
-
-// ══════════════════════════════════════════════════════
 // FIREBASE INIT
 // ══════════════════════════════════════════════════════
 
@@ -937,15 +907,28 @@ async function enviarAgendamento(){
     criadoEm: new Date().toISOString()
   };
 
-  // Salva no Firebase (não bloqueia se falhar)
-  if(window._fbPush){
-    window._fbPush(agend).catch(e => console.warn('[Studio] Firebase falhou:', e));
+  // 7b. Salva no Firebase de verdade — só mostra sucesso se confirmar que gravou
+  if(!window._fbPush){
+    btn.disabled = false;
+    document.getElementById('msg-error-text').textContent = '⚠️ Não foi possível conectar ao servidor. Verifique sua internet e tente novamente.';
+    showMsg('msg-error');
+    return;
   }
 
-  // Rate limit
+  try {
+    await tentarSalvarComRetry(agend, 3);
+  } catch (e) {
+    console.error('[Studio] Falha ao salvar agendamento após tentativas:', e);
+    btn.disabled = false;
+    document.getElementById('msg-error-text').textContent = '⚠️ Não conseguimos confirmar seu agendamento. Verifique sua internet e tente novamente. Se persistir, chame no WhatsApp.';
+    showMsg('msg-error');
+    return;
+  }
+
+  // Rate limit só depois de confirmar que salvou
   setRateLimit();
 
-  // SEMPRE envia notificação (WhatsApp/Telegram)
+  // Notificação (WhatsApp/Telegram) — não bloqueia o fluxo, é só um aviso extra
   fetch('/api/vercel/notify', {
     method: 'POST',
     keepalive: true,
@@ -955,9 +938,21 @@ async function enviarAgendamento(){
     .then(d => console.log('[Studio] Notificacao OK:', d))
     .catch(e => console.warn('[Studio] Notificacao falhou:', e));
 
-  // Mostra sucesso para o usuario (GARANTIDO)
+  // Só mostra sucesso depois de confirmar a gravação no Firebase
   showMsg(null);
   mostrarSucesso(agend);
+}
+
+// Tenta salvar no Firebase com algumas novas tentativas antes de desistir
+// (cobre falhas passageiras de rede, comuns em dados móveis)
+async function tentarSalvarComRetry(agend, tentativasRestantes){
+  try {
+    await window._fbPush(agend);
+  } catch (err) {
+    if (tentativasRestantes <= 1) throw err;
+    await new Promise(r => setTimeout(r, 800));
+    return tentarSalvarComRetry(agend, tentativasRestantes - 1);
+  }
 }
 
 // ══════════════════════════════════════════════════════

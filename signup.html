@@ -1,45 +1,270 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cadastro</title>
-  <style>
-    body{font-family:Arial,sans-serif;background:#f5f5f5;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;}
-    .card{background:#fff;padding:2rem;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);width:320px;}
-    h1{margin-top:0;text-align:center;}
-    input{width:100%;padding:0.5rem;margin:0.5rem 0;border:1px solid #ccc;border-radius:4px;}
-    button{width:100%;padding:0.6rem;background:#c9184a;color:#fff;border:none;border-radius:4px;cursor:pointer;}
-    a{display:block;margin-top:1rem;text-align:center;color:#c9184a;}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>Cadastro · Studio Emilly Santos</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink: #c9184a;
+    --pink-dark: #a01435;
+    --pink-light: #fce8ef;
+    --pink-soft: #f7c5d2;
+    --bg: #fff5f8;
+    --white: #ffffff;
+    --text: #3a1a24;
+    --muted: #9a6475;
+    --border: #f0cdd8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    position: relative;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .bg-deco { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .bg-circle { position: absolute; border-radius: 50%; background: var(--pink-dark); }
+  .bg-circle:nth-child(1) { width: 500px; height: 500px; top: -200px; right: -150px; opacity: 0.06; }
+  .bg-circle:nth-child(2) { width: 300px; height: 300px; bottom: -100px; left: -100px; opacity: 0.04; }
+  .bg-circle:nth-child(3) { width: 100px; height: 100px; top: 30%; left: 10%; opacity: 0.03; }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 400px;
+    animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero { text-align: center; margin-bottom: 32px; }
+  .logo {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--pink-dark), var(--pink));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px; font-weight: 700; color: #fff;
+    margin: 0 auto 16px;
+    box-shadow: 0 12px 40px rgba(160, 20, 53, 0.35);
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  .hero h1 { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 700; color: var(--pink-dark); margin-bottom: 4px; }
+  .hero p { font-size: 13px; color: var(--muted); letter-spacing: 0.5px; }
+
+  .card {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 32px 28px;
+    box-shadow: 0 12px 48px rgba(160, 20, 53, 0.12);
+    border: 1.5px solid var(--border);
+  }
+  .card-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 24px; text-align: center; }
+
+  .fgroup { margin-bottom: 16px; }
+  .fg-label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .fg-input {
+    width: 100%; padding: 13px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-appearance: none;
+  }
+  .fg-input:focus { border-color: var(--pink); background: var(--white); box-shadow: 0 0 0 4px rgba(201, 24, 74, 0.1); transform: translateY(-1px); }
+  .fg-input::placeholder { color: #c9a0ae; }
+
+  .pw-wrap { position: relative; }
+  .pw-toggle {
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); font-size: 18px; padding: 4px; line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pw-toggle:hover { color: var(--pink); }
+  .fg-hint { font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+  .btn-signup {
+    width: 100%; padding: 15px;
+    background: linear-gradient(135deg, var(--pink-dark), var(--pink));
+    color: #fff; border: none;
+    border-radius: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer; margin-top: 8px;
+    box-shadow: 0 8px 28px rgba(160, 20, 53, 0.35);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative; overflow: hidden;
+    letter-spacing: 0.3px;
+    -webkit-appearance: none;
+  }
+  .btn-signup:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 14px 36px rgba(160, 20, 53, 0.45); }
+  .btn-signup:active { transform: scale(0.98); }
+  .btn-signup:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+
+  .spinner {
+    display: inline-block; width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff; border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle; margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .msg-error {
+    display: none;
+    background: #fce8ef;
+    border: 1.5px solid var(--pink-soft);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 13px; font-weight: 500;
+    color: var(--pink-dark);
+    margin-top: 12px;
+    text-align: center;
+    animation: slideIn 0.3s ease;
+  }
+  .msg-error.show { display: block; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .altlink { text-align: center; margin-top: 18px; font-size: 13px; color: var(--muted); }
+  .altlink a { color: var(--pink); text-decoration: none; font-weight: 600; cursor: pointer; }
+  .altlink a:hover { text-decoration: underline; }
+
+  .footer { text-align: center; margin-top: 24px; font-size: 11px; color: var(--pink-soft); letter-spacing: 0.5px; }
+
+  @media (max-width: 400px) {
+    .card { padding: 24px 18px; border-radius: 20px; }
+    .logo { width: 68px; height: 68px; font-size: 26px; }
+    .hero h1 { font-size: 26px; }
+  }
+</style>
 </head>
 <body>
-  <div class="card">
-    <h1>Cadastre‑se</h1>
-    <form id="signupForm">
-      <input type="email" id="email" placeholder="E‑mail" required />
-      <input type="password" id="password" placeholder="Senha" required />
-      <button type="submit">Criar conta</button>
-    </form>
-    <a href="login.html">Já tem conta? Entrar</a>
+
+<div class="bg-deco">
+  <div class="bg-circle"></div>
+  <div class="bg-circle"></div>
+  <div class="bg-circle"></div>
+</div>
+
+<div class="container">
+  <div class="hero">
+    <div class="logo">ES</div>
+    <h1>Studio Emilly Santos</h1>
+    <p>Painel de Controle · Criar Acesso</p>
   </div>
 
-  <script type="module" src="auth.js"></script>
-  <script type="module">
-    import { signUp, observeAuth } from "./auth.js";
-    document.getElementById('signupForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      const email = e.target.email.value;
-      const password = e.target.password.value;
-      try {
-        await signUp(email, password);
-        window.location.href = "dashboard.html";
-      } catch (err) {
-        alert(err.message);
-      }
-    });
-    // Se já estiver logado, redireciona
-    observeAuth(user => { if (user) window.location.href = "dashboard.html"; });
-  </script>
+  <div class="card">
+    <p class="card-title">Criar sua conta</p>
+
+    <form id="signupForm" novalidate>
+      <div class="fgroup">
+        <label class="fg-label">E-mail</label>
+        <input type="email" class="fg-input" id="inp-email" placeholder="seuemail@exemplo.com" autocomplete="email" inputmode="email" required>
+      </div>
+
+      <div class="fgroup">
+        <label class="fg-label">Senha</label>
+        <div class="pw-wrap">
+          <input type="password" class="fg-input" id="inp-senha" placeholder="••••••••" autocomplete="new-password" minlength="6" required>
+          <button class="pw-toggle" type="button" onclick="toggleSenha()" title="Mostrar/ocultar senha">
+            <span id="eye-icon">👁️</span>
+          </button>
+        </div>
+        <p class="fg-hint">Mínimo de 6 caracteres.</p>
+      </div>
+
+      <button class="btn-signup" id="btn-signup" type="submit">Criar conta</button>
+
+      <div class="msg-error" id="msg-error">
+        ❌ <span id="error-text">Não foi possível criar a conta.</span>
+      </div>
+    </form>
+
+    <div class="altlink">
+      <a href="login.html">Já tem conta? Entrar</a>
+    </div>
+  </div>
+
+  <div class="footer">Studio Emilly Santos &copy; 2025</div>
+</div>
+
+<script type="module">
+  import { signUp, observeAuth } from "./auth.js";
+
+  const form  = document.getElementById('signupForm');
+  const btn   = document.getElementById('btn-signup');
+  const errEl = document.getElementById('msg-error');
+
+  function toggleSenha() {
+    const inp = document.getElementById('inp-senha');
+    const eye = document.getElementById('eye-icon');
+    if (inp.type === 'password') { inp.type = 'text'; eye.textContent = '🙈'; }
+    else { inp.type = 'password'; eye.textContent = '👁️'; }
+  }
+  window.toggleSenha = toggleSenha;
+
+  function traduzirErro(code) {
+    const erros = {
+      'auth/invalid-email':      'E-mail inválido.',
+      'auth/email-already-in-use': 'Já existe uma conta com esse e-mail.',
+      'auth/weak-password':      'A senha precisa ter pelo menos 6 caracteres.',
+      'auth/network-request-failed': 'Sem conexão com a internet.',
+    };
+    return erros[code] || 'Erro ao criar conta. Tente novamente.';
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errEl.classList.remove('show');
+
+    const email = document.getElementById('inp-email').value.trim();
+    const senha = document.getElementById('inp-senha').value;
+
+    if (!email || !senha) {
+      document.getElementById('error-text').textContent = 'Preencha e-mail e senha.';
+      errEl.classList.add('show');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Criando conta...';
+
+    try {
+      await signUp(email, senha);
+      window.location.href = "index.html";
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerHTML = 'Criar conta';
+      document.getElementById('error-text').textContent = traduzirErro(err.code);
+      errEl.classList.add('show');
+    }
+  });
+
+  // Se já estiver logado, redireciona direto pro painel
+  observeAuth(user => { if (user) window.location.href = "index.html"; });
+</script>
 </body>
 </html>
